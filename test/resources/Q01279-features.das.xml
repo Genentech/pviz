@@ -1,0 +1,988 @@
+<?xml version="1.0" standalone="no"?>
+<DASGFF>
+  <GFF href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=Q01279">
+    <SEGMENT id="Q01279" start="1" stop="1210" total="137" version="4ff85108b23ab296e3d7a3fb5b9f917c">
+      <FEATURE id="Q01279" label="Epidermal growth factor receptor">
+        <TYPE id="BS:01003" cvId="BS:01003" category="Protein name">protein_name</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>RecName: Full=Epidermal growth factor receptor, EC=2.7.10.1</NOTE>
+        <LINK href="http://www.uniprot.org/uniprot/Q01279">http://www.uniprot.org/uniprot/Q01279</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_10090" label="Mus musculus (Mouse)">
+        <TYPE id="BS:01040" cvId="BS:01040" category="Taxonomy">taxonomy</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <LINK href="http://www.ebi.ac.uk/newt/display?search=10090">http://www.ebi.ac.uk/newt/display?search=10090</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_ATP-binding" label="ATP-binding">
+        <TYPE id="BS:01035" cvId="BS:01035" category="Keyword">ligand_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Cell membrane" label="Cell membrane">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Keyword">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Complete proteome" label="Complete proteome">
+        <TYPE id="BS:01037" cvId="BS:01037" category="Keyword">technical_term</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Developmental protein" label="Developmental protein">
+        <TYPE id="BS:01036" cvId="BS:01036" category="Keyword">molecular_function</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Disulfide bond" label="Disulfide bond">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Keyword">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Endoplasmic reticulum" label="Endoplasmic reticulum">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Keyword">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Endosome" label="Endosome">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Keyword">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Glycoprotein" label="Glycoprotein">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Keyword">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Golgi apparatus" label="Golgi apparatus">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Keyword">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Isopeptide bond" label="Isopeptide bond">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Keyword">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Kinase" label="Kinase">
+        <TYPE id="BS:01036" cvId="BS:01036" category="Keyword">molecular_function</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Membrane" label="Membrane">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Keyword">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Methylation" label="Methylation">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Keyword">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Nucleotide-binding" label="Nucleotide-binding">
+        <TYPE id="BS:01035" cvId="BS:01035" category="Keyword">ligand_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Nucleus" label="Nucleus">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Keyword">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Phosphoprotein" label="Phosphoprotein">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Keyword">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Receptor" label="Receptor">
+        <TYPE id="BS:01036" cvId="BS:01036" category="Keyword">molecular_function</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Reference proteome" label="Reference proteome">
+        <TYPE id="BS:01037" cvId="BS:01037" category="Keyword">technical_term</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Repeat" label="Repeat">
+        <TYPE id="BS:01004" cvId="BS:01004" category="Keyword">domain_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Signal" label="Signal">
+        <TYPE id="BS:01004" cvId="BS:01004" category="Keyword">domain_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Transferase" label="Transferase">
+        <TYPE id="BS:01036" cvId="BS:01036" category="Keyword">molecular_function</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Transmembrane" label="Transmembrane">
+        <TYPE id="BS:01004" cvId="BS:01004" category="Keyword">domain_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Transmembrane helix" label="Transmembrane helix">
+        <TYPE id="BS:01004" cvId="BS:01004" category="Keyword">domain_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Tyrosine-protein kinase" label="Tyrosine-protein kinase">
+        <TYPE id="BS:01036" cvId="BS:01036" category="Keyword">molecular_function</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_KEYWORD_Ubl conjugation" label="Ubl conjugation">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Keyword">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_SIGNAL_1_24" label="UNIPROTKB_Q01279_SIGNAL_1_24">
+        <TYPE id="SO:0000418" cvId="SO:0000418" category="Molecule processing">signal_peptide</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1</START>
+        <END>24</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CHAIN_25_1210" label="Epidermal growth factor receptor">
+        <TYPE id="SO:0000419" cvId="SO:0000419" category="Molecule processing">mature_protein_region</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>25</START>
+        <END>1210</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Epidermal growth factor receptor</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_TOPO_DOM_25_647" label="Extracellular">
+        <TYPE id="SO:0001072" cvId="SO:0001072" category="Region">extramembrane</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>25</START>
+        <END>647</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Extracellular</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_TRANSMEM_648_670" label="Helical;">
+        <TYPE id="SO:0001077" cvId="SO:0001077" category="Region">transmembrane</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>648</START>
+        <END>670</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Helical;</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_TOPO_DOM_671_1210" label="Cytoplasmic">
+        <TYPE id="SO:0001072" cvId="SO:0001072" category="Region">extramembrane</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>671</START>
+        <END>1210</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Cytoplasmic</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_REPEAT_75_300" label="Approximate">
+        <TYPE id="SO:0001068" cvId="SO:0001068" category="Region">polypeptide_repeat</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>75</START>
+        <END>300</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Approximate</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_REPEAT_390_600" label="Approximate">
+        <TYPE id="SO:0001068" cvId="SO:0001068" category="Region">polypeptide_repeat</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>390</START>
+        <END>600</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Approximate</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DOMAIN_714_981" label="Protein kinase">
+        <TYPE id="SO:0000417" cvId="SO:0000417" category="Region">polypeptide_domain</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>714</START>
+        <END>981</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Protein kinase</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_NP_BIND_720_728" label="ATP">
+        <TYPE id="SO:0000417" cvId="SO:0000417" category="Region">polypeptide_domain</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>720</START>
+        <END>728</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>ATP</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_NP_BIND_792_793" label="ATP">
+        <TYPE id="SO:0000417" cvId="SO:0000417" category="Region">polypeptide_domain</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>792</START>
+        <END>793</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>ATP</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_REGION_690_706" label="Important for dimerization, phosphorylation and activation">
+        <TYPE id="SO:0000001" cvId="SO:0000001" category="Region">polypeptide_region</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>690</START>
+        <END>706</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Important for dimerization, phosphorylation and activation</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMPBIAS_1028_1071" label="Ser-rich">
+        <TYPE id="SO:0001066" cvId="SO:0001066" category="Region">compositionally_biased_region</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1028</START>
+        <END>1071</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Ser-rich</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_ACT_SITE_839_839" label="Proton acceptor">
+        <TYPE id="SO:0001104" cvId="SO:0001104" category="Site">catalytic_residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>839</START>
+        <END>839</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Proton acceptor</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_BINDING_747_747" label="ATP">
+        <TYPE id="SO:0100018" cvId="SO:0100018" category="Site">binding_motif</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>747</START>
+        <END>747</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>ATP</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_BINDING_857_857" label="ATP">
+        <TYPE id="SO:0100018" cvId="SO:0100018" category="Site">binding_motif</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>857</START>
+        <END>857</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>ATP</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_SITE_1018_1018" label="Important for interaction with PIK3C2B">
+        <TYPE id="SO:0000839" cvId="SO:0000839" category="Site">polypeptide_region</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1018</START>
+        <END>1018</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Important for interaction with PIK3C2B</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_229_229" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>229</START>
+        <END>229</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_680_680" label="Phosphothreonine; by PKC and PKD/PRKD1">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>680</START>
+        <END>680</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphothreonine; by PKC and PKD/PRKD1</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_695_695" label="Phosphothreonine; by PKD/PRKD1">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>695</START>
+        <END>695</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphothreonine; by PKD/PRKD1</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_697_697" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>697</START>
+        <END>697</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_727_727" label="Phosphothreonine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>727</START>
+        <END>727</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphothreonine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_871_871" label="Phosphotyrosine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>871</START>
+        <END>871</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_980_980" label="Phosphotyrosine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>980</START>
+        <END>980</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_993_993" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>993</START>
+        <END>993</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_995_995" label="Phosphothreonine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>995</START>
+        <END>995</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphothreonine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_997_997" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>997</START>
+        <END>997</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1000_1000" label="Phosphotyrosine; by autocatalysis">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1000</START>
+        <END>1000</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine; by autocatalysis</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1018_1018" label="Phosphotyrosine; by autocatalysis">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1018</START>
+        <END>1018</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine; by autocatalysis</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1028_1028" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1028</START>
+        <END>1028</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1039_1039" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1039</START>
+        <END>1039</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1041_1041" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1041</START>
+        <END>1041</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1043_1043" label="Phosphothreonine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1043</START>
+        <END>1043</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphothreonine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1044_1044" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1044</START>
+        <END>1044</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1047_1047" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1047</START>
+        <END>1047</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1069_1069" label="Phosphotyrosine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1069</START>
+        <END>1069</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1070_1070" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1070</START>
+        <END>1070</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1071_1071" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1071</START>
+        <END>1071</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1092_1092" label="Phosphotyrosine; by autocatalysis">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1092</START>
+        <END>1092</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine; by autocatalysis</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1110_1110" label="Phosphotyrosine; by autocatalysis">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1110</START>
+        <END>1110</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine; by autocatalysis</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1138_1138" label="Phosphotyrosine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1138</START>
+        <END>1138</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1166_1166" label="Phosphoserine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1166</START>
+        <END>1166</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphoserine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1172_1172" label="Phosphotyrosine; by autocatalysis">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1172</START>
+        <END>1172</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine; by autocatalysis</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1197_1197" label="Phosphotyrosine; by autocatalysis">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1197</START>
+        <END>1197</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Phosphotyrosine; by autocatalysis</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_MOD_RES_1199_1199" label="Omega-N-methylated arginine">
+        <TYPE id="SO:0001089" cvId="SO:0001089" category="Amino acid modification">post_translational_modification</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1199</START>
+        <END>1199</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Omega-N-methylated arginine</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_128_128" label="UNIPROTKB_Q01279_CARBOHYD_128_128">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>128</START>
+        <END>128</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_175_175" label="UNIPROTKB_Q01279_CARBOHYD_175_175">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="PubMed:17330941" cvId="ECO:0000006">experimental evidence</METHOD>
+        <START>175</START>
+        <END>175</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/17330941">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_196_196" label="UNIPROTKB_Q01279_CARBOHYD_196_196">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>196</START>
+        <END>196</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_352_352" label="UNIPROTKB_Q01279_CARBOHYD_352_352">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="PubMed:16944957" cvId="ECO:0000006">experimental evidence</METHOD>
+        <START>352</START>
+        <END>352</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/16944957">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_413_413" label="UNIPROTKB_Q01279_CARBOHYD_413_413">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>413</START>
+        <END>413</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_444_444" label="UNIPROTKB_Q01279_CARBOHYD_444_444">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="PubMed:16944957" cvId="ECO:0000006">experimental evidence</METHOD>
+        <START>444</START>
+        <END>444</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/16944957">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_528_528" label="UNIPROTKB_Q01279_CARBOHYD_528_528">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>528</START>
+        <END>528</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_568_568" label="UNIPROTKB_Q01279_CARBOHYD_568_568">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>568</START>
+        <END>568</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_603_603" label="UNIPROTKB_Q01279_CARBOHYD_603_603">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>603</START>
+        <END>603</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CARBOHYD_623_623" label="UNIPROTKB_Q01279_CARBOHYD_623_623">
+        <TYPE id="MOD:00693" cvId="MOD:00693" category="Amino acid modification">glycosylated residue</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>623</START>
+        <END>623</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>N-linked ((GlcNAc...))</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_190_199" label="UNIPROTKB_Q01279_DISULFID_190_199">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>190</START>
+        <END>199</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_194_207" label="UNIPROTKB_Q01279_DISULFID_194_207">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>194</START>
+        <END>207</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_215_223" label="UNIPROTKB_Q01279_DISULFID_215_223">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>215</START>
+        <END>223</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_219_231" label="UNIPROTKB_Q01279_DISULFID_219_231">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>219</START>
+        <END>231</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_232_240" label="UNIPROTKB_Q01279_DISULFID_232_240">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>232</START>
+        <END>240</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_236_248" label="UNIPROTKB_Q01279_DISULFID_236_248">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>236</START>
+        <END>248</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_251_260" label="UNIPROTKB_Q01279_DISULFID_251_260">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>251</START>
+        <END>260</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_264_291" label="UNIPROTKB_Q01279_DISULFID_264_291">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>264</START>
+        <END>291</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_295_307" label="UNIPROTKB_Q01279_DISULFID_295_307">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>295</START>
+        <END>307</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_311_326" label="UNIPROTKB_Q01279_DISULFID_311_326">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>311</START>
+        <END>326</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_329_333" label="UNIPROTKB_Q01279_DISULFID_329_333">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>329</START>
+        <END>333</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_506_515" label="UNIPROTKB_Q01279_DISULFID_506_515">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>506</START>
+        <END>515</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_510_523" label="UNIPROTKB_Q01279_DISULFID_510_523">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>510</START>
+        <END>523</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_526_535" label="UNIPROTKB_Q01279_DISULFID_526_535">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>526</START>
+        <END>535</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_539_555" label="UNIPROTKB_Q01279_DISULFID_539_555">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>539</START>
+        <END>555</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_558_571" label="UNIPROTKB_Q01279_DISULFID_558_571">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>558</START>
+        <END>571</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_562_579" label="UNIPROTKB_Q01279_DISULFID_562_579">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>562</START>
+        <END>579</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_582_591" label="UNIPROTKB_Q01279_DISULFID_582_591">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>582</START>
+        <END>591</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_595_617" label="UNIPROTKB_Q01279_DISULFID_595_617">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>595</START>
+        <END>617</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_620_628" label="UNIPROTKB_Q01279_DISULFID_620_628">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>620</START>
+        <END>628</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_DISULFID_624_636" label="UNIPROTKB_Q01279_DISULFID_624_636">
+        <TYPE id="MOD:00689" cvId="MOD:00689" category="Amino acid modification">disulfide crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>624</START>
+        <END>636</END>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CROSSLNK_718_718" label="Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)">
+        <TYPE id="MOD:00033" cvId="MOD:00033" category="Amino acid modification">crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>718</START>
+        <END>718</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CROSSLNK_739_739" label="Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)">
+        <TYPE id="MOD:00033" cvId="MOD:00033" category="Amino acid modification">crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>739</START>
+        <END>739</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CROSSLNK_756_756" label="Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)">
+        <TYPE id="MOD:00033" cvId="MOD:00033" category="Amino acid modification">crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>756</START>
+        <END>756</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CROSSLNK_869_869" label="Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)">
+        <TYPE id="MOD:00033" cvId="MOD:00033" category="Amino acid modification">crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>869</START>
+        <END>869</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CROSSLNK_931_931" label="Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)">
+        <TYPE id="MOD:00033" cvId="MOD:00033" category="Amino acid modification">crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>931</START>
+        <END>931</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CROSSLNK_972_972" label="Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)">
+        <TYPE id="MOD:00033" cvId="MOD:00033" category="Amino acid modification">crosslinked residues</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>972</START>
+        <END>972</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CONFLICT_539_539" label="UNIPROTKB_Q01279_CONFLICT_539_539">
+        <TYPE id="SO:0001085" cvId="SO:0001085" category="Experimental information">sequence_conflict</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>539</START>
+        <END>539</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>C -> W</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CONFLICT_991_991" label="UNIPROTKB_Q01279_CONFLICT_991_991">
+        <TYPE id="SO:0001085" cvId="SO:0001085" category="Experimental information">sequence_conflict</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>991</START>
+        <END>991</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>L -> F</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_CONFLICT_1116_1117" label="UNIPROTKB_Q01279_CONFLICT_1116_1117">
+        <TYPE id="SO:0001085" cvId="SO:0001085" category="Experimental information">sequence_conflict</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1116</START>
+        <END>1117</END>
+        <SCORE>0.0</SCORE>
+        <NOTE>HP -> DR</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_1408137" label="Avivi A. (1992). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Avivi A., Skorecki K., Yayon A., Givol D. (1992). "Promoter region of the murine fibroblast growth factor receptor 2 (bek/KGFR) gene.", Oncogene, 7 1957-1962</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=1408137">View in CiteXplore</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/1408137">View in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_7678348" label="Paria B.C. (1993). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Paria B.C., Das S.K., Andrews G.K., Dey S.K. (1993). "Expression of the epidermal growth factor receptor gene is regulated in mouse blastocysts during delayed implantation.", Proc. Natl. Acad. Sci. U.S.A., 90 55-59</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7678348">View in PubMed</LINK>
+        <LINK href="http://dx.doi.org/10.1073/pnas.90.1.55">Resolve DOI: 10.1073/pnas.90.1.55</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7678348">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_submission_3" label="Hibbs M.L. (APR-1994). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Hibbs M.L. (APR-1994). Database: EMBL/GenBank/DDBJ databases</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_8125255" label="Luetteke N.C. (1994). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Luetteke N.C., Phillips H.K., Qiu T.H., Copeland N.G., Earp H.S., Jenkins N.A., Lee D.C. (1994). "The mouse waved-2 phenotype results from a point mutation in the EGF receptor tyrosine kinase.", Genes Dev., 8 399-413</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8125255">View in CiteXplore</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/8125255">View in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_2030916" label="Avivi A. (1991). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Avivi A., Lax I., Ullrich A., Schlessinger J., Givol D., Morse B. (1991). "Comparison of EGF receptor sequences as a guide to study the ligand binding site.", Oncogene, 6 673-676</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/2030916">View in PubMed</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=2030916">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_submission_6" label="Eisinger D.P. (JUN-1992). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Eisinger D.P., Serrero G. (JUN-1992). Database: EMBL/GenBank/DDBJ databases</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_8404850" label="Fazioli F. (1993). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Fazioli F., Minichiello L., Matoska V., Castagnino P., Miki T., Wong W.T., di Fiore P.P. (1993). "Eps8, a substrate for the epidermal growth factor receptor kinase, enhances EGF-dependent mitogenic signals.", EMBO J., 12 3799-3808</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/8404850">View in PubMed</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=8404850">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_7630400" label="Miettinen P.J. (1995). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Miettinen P.J., Berger J.E., Meneses J., Phung Y., Pedersen R.A., Werb Z., Derynck R. (1995). "Epithelial immaturity and multiorgan failure in mice lacking epidermal growth factor receptor.", Nature, 376 337-341</NOTE>
+        <LINK href="http://dx.doi.org/10.1038/376337a0">Resolve DOI: 10.1038/376337a0</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7630400">View in CiteXplore</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7630400">View in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_7618084" label="Threadgill D.W. (1995). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Threadgill D.W., Dlugosz A.A., Hansen L.A., Tennenbaum T., Lichti U., Yee D., LaMantia C., Mourton T., Herrup K., Harris R.C. (1995). "Targeted disruption of mouse EGF receptor: effect of genetic background on mutant phenotype.", Science, 269 230-234</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7618084">View in CiteXplore</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7618084">View in PubMed</LINK>
+        <LINK href="http://dx.doi.org/10.1126/science.7618084">Resolve DOI: 10.1126/science.7618084</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_7618085" label="Sibilia M. (1995). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Sibilia M., Wagner E.F. (1995). "Strain-dependent epithelial defects in mice lacking the EGF receptor.", Science, 269 234-238</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=7618085">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1126/science.7618085">Resolve DOI: 10.1126/science.7618085</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7618085">View in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_10953014" label="Confalonieri S. (2000). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Confalonieri S., Salcini A.E., Puri C., Tacchetti C., Di Fiore P.P. (2000). "Tyrosine phosphorylation of Eps15 is required for ligand-regulated, but not constitutive, endocytosis.", J. Cell Biol., 150 905-912</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=10953014">View in CiteXplore</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/10953014">View in PubMed</LINK>
+        <LINK href="http://dx.doi.org/10.1083/jcb.150.4.905">Resolve DOI: 10.1083/jcb.150.4.905</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_16944957" label="Ghesquiere B. (2006). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Ghesquiere B., Van Damme J., Martens L., Vandekerckhove J., Gevaert K. (2006). "Proteome-wide characterization of N-glycosylation events by diagonal chromatography.", J. Proteome Res., 5 2438-2447</NOTE>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=16944957">View in CiteXplore</LINK>
+        <LINK href="http://dx.doi.org/10.1021/pr060186m">Resolve DOI: 10.1021/pr060186m</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/16944957">View in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_pubmed_17330941" label="Bernhard O.K. (2007). ">
+        <TYPE id="BS:00138" cvId="BS:00138" category="Publication">publication</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>Bernhard O.K., Kapp E.A., Simpson R.J. (2007). "Enhanced analysis of the mouse plasma proteome using cysteine-containing tryptic glycopeptides.", J. Proteome Res., 6 987-995</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/17330941">View in PubMed</LINK>
+        <LINK href="http://dx.doi.org/10.1021/pr0604559">Resolve DOI: 10.1021/pr0604559</LINK>
+        <LINK href="http://www.ebi.ac.uk/citexplore/citationDetails.do?dataSource=MED&amp;externalId=17330941">View in CiteXplore</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_FUNCTION0" label="UNIPROTKB - COMMENT - FUNCTION - 0">
+        <TYPE id="BS:01030" cvId="BS:01030" category="Comment">functional_annotation</TYPE>
+        <METHOD id="PubMed:8404850" cvId="ECO:0000006">experimental evidence</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>FUNCTION: Receptor tyrosine kinase binding ligands of the EGF family and activating several signaling cascades to convert extracellular cues into appropriate cellular responses. Known ligands include EGF, TGFA/TGF-alpha, amphiregulin, epigen/EPGN, BTC/betacellulin, epiregulin/EREG and HBEGF/heparin-binding EGF. Ligand binding triggers receptor homo- and/or heterodimerization and autophosphorylation on key cytoplasmic residues. The phosphorylated receptor recruits adapter proteins like GRB2 which in turn activates complex downstream signaling cascades. Activates at least 4 major downstream signaling cascades including the RAS-RAF-MEK-ERK, PI3 kinase-AKT, PLCgamma-PKC and STATs modules. May also activate the NF-kappa-B signaling cascade. Also directly phosphorylates other proteins like RGS16, activating its GTPase activity and probably coupling the EGF receptor signaling to the G protein-coupled receptor signaling. Also phosphorylates MUC1 and increases its interaction with SRC and CTNNB1/beta-catenin.</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/10953014">View evidence in PubMed</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/8404850">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_CATALYTIC_ACTIVITY1" label="UNIPROTKB - COMMENT - CATALYTIC ACTIVITY - 1">
+        <TYPE id="BS:01006" cvId="BS:01006" category="Comment">catalytic_activity</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>CATALYTIC ACTIVITY: ATP + a [protein]-L-tyrosine = ADP + a [protein]-L-tyrosine phosphate.</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_ENZYME_REGULATION2" label="UNIPROTKB - COMMENT - ENZYME REGULATION - 2">
+        <TYPE id="BS:01005" cvId="BS:01005" category="Comment">enzyme_regulation</TYPE>
+        <METHOD id="PubMed:10953014" cvId="ECO:0000006">experimental evidence</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>ENZYME REGULATION: Endocytosis and inhibition of the activated EGFR by phosphatases like PTPRJ and PTPRK constitute immediate regulatory mechanisms. Upon EGF-binding phosphorylates EPS15 that regulates EGFR endocytosis and activity. Moreover, inducible feedback inhibitors including LRIG1, SOCS4, SOCS5 and ERRFI1 constitute alternative regulatory mechanisms for the EGFR signaling.</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/10953014">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_SUBUNIT3" label="UNIPROTKB - COMMENT - SUBUNIT - 3">
+        <TYPE id="BS:01001" cvId="BS:01001" category="Comment">subunit_information</TYPE>
+        <METHOD id="PubMed:8404850" cvId="ECO:0000006">experimental evidence</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>SUBUNIT: Binding of the ligand triggers homo- and/or heterodimerization of the receptor triggering its autophosphorylation. Heterodimer with ERBB2. Interacts with ERRFI1; inhibits dimerization of the kinase domain and autophosphorylation. Part of a complex with ERBB2 and either PIK3C2A or PIK3C2B. Interacts with GRB2; an adapter protein coupling the receptor to downstream signaling pathways. Interacts with GAB2; involved in signaling downstream of EGFR. Interacts with STAT3; mediates EGFR downstream signaling in cell proliferation. Interacts with RIPK1; involved in NF-kappa-B activation. Interacts (autophosphorylated) with CBL; involved in EGFR ubiquitination and regulation. Interacts with SOCS5; regulates EGFR degradation through TCEB1- and TCEB2-mediated ubiquitination and proteasomal degradation. Interacts with PRMT5; methylates EGFR and enhances interaction with PTPN6. Interacts (phosphorylated) with PTPN6; inhibits EGFR-dependent activation of MAPK/ERK. Interacts with COPG1; essential for regulation of EGF-dependent nuclear transport of EGFR by retrograde trafficking from the Golgi to the ER. Interacts with TNK2; this interaction is dependent on EGF stimulation and kinase activity of EGFR. Interacts with PCNA; positively regulates PCNA. Interacts with PELP1. Interacts with MUC1. Interacts with AP2M1. Interacts with FER. Interacts (via SH2 domains) with GRB2, NCK1 and NCK2 (By similarity). Interacts with EPS8; mediates EPS8 phosphorylation. Interacts with ATX2 (By similarity).</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/8404850">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_SUBCELLULAR_LOCATION4" label="UNIPROTKB - COMMENT - SUBCELLULAR LOCATION - 4">
+        <TYPE id="BS:01033" cvId="BS:01033" category="Comment">cellular_component</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>SUBCELLULAR LOCATION: Cell membrane; Single-pass type I membrane protein. Endoplasmic reticulum membrane; Single-pass type I membrane protein (By similarity). Golgi apparatus membrane; Single-pass type I membrane protein (By similarity). Nucleus membrane; Single-pass type I membrane protein (By similarity). Endosome. Endosome membrane. Note=In response to EGF, translocated from the cell membrane to the nucleus via Golgi and ER. Endocytosed upon activation by ligand (By similarity).</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_PTM5" label="UNIPROTKB - COMMENT - PTM - 5">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Comment">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>PTM: Monoubiquitinated and polyubiquitinated upon EGF stimulation; which does not affect tyrosine kinase activity or signaling capacity but may play a role in lysosomal targeting. Polyubiquitin linkage is mainly through 'Lys-63', but linkage through 'Lys-48', 'Lys-11' and 'Lys-29' also occur (By similarity).</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_PTM6" label="UNIPROTKB - COMMENT - PTM - 6">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Comment">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>PTM: Phosphorylated. Phosphorylation of Ser-697 is partial and occurs only if Thr-695 is phosphorylated. Phosphorylation at Thr-680 and Thr-695 by PRKD1 inhibits EGF-induced MAPK8/JNK1 activation. Dephosphorylation by PTPRJ prevents endocytosis and stabilizes the receptor at the plasma membrane. Autophosphorylation at Tyr-1197 is stimulated by methylation at Arg-1199 and enhances interaction with PTPN6. Autophosphorylation at Tyr-1092 and/or Tyr-1110 recruits STAT3 (By similarity).</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_PTM7" label="UNIPROTKB - COMMENT - PTM - 7">
+        <TYPE id="BS:01009" cvId="BS:01009" category="Comment">post_translational_modification_information</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>PTM: Methylated. Methylation at Arg-1199 by PRMT5 positively stimulates phosphorylation at Tyr-1197 (By similarity).</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_DISRUPTION_PHENOTYPE8" label="UNIPROTKB - COMMENT - DISRUPTION PHENOTYPE - 8">
+        <TYPE id="No ontology mapping" />
+        <METHOD id="PubMed:7630400" cvId="ECO:0000006">experimental evidence</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>DISRUPTION PHENOTYPE: Mice are growth retarded and die at different stages of development depending on their genetic background. Embryonic death is due to placental defects. Mice surviving until birth or later display brain, bone, heart and various epithelial development defects in several organs, including skin, lung and gastrointestinal tract.</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7618084">View evidence in PubMed</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7618085">View evidence in PubMed</LINK>
+        <LINK href="http://www.ncbi.nlm.nih.gov/pubmed/7630400">View evidence in PubMed</LINK>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_SIMILARITY9" label="UNIPROTKB - COMMENT - SIMILARITY - 9">
+        <TYPE id="BS:01014" cvId="BS:01014" category="Comment">similarity</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>SIMILARITY: Belongs to the protein kinase superfamily. Tyr protein kinase family. EGF receptor subfamily.</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_COMMENT_SIMILARITY10" label="UNIPROTKB - COMMENT - SIMILARITY - 10">
+        <TYPE id="BS:01014" cvId="BS:01014" category="Comment">similarity</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+        <NOTE>SIMILARITY: Contains 1 protein kinase domain.</NOTE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_ORGANISM_Mus musculus" label="Mouse">
+        <TYPE id="BS:01034" cvId="BS:01034" category="Organism">organism_species</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+      <FEATURE id="UNIPROTKB_Q01279_EC_2.7.10.1" label="2.7.10.1">
+        <TYPE id="BS:01034" cvId="BS:01034" category="Organism">organism_species</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <SCORE>0.0</SCORE>
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>

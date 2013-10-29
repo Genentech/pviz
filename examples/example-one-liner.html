@@ -1,0 +1,140 @@
+<html>
+    <head>
+        <title>pViz example - one liner</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz, a one-line example</h2>
+        </div>
+        <div class="row">
+            <div class="span6">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>secondary structures</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <td> HER2 head </td>
+                        <td id="one-liner"></td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            We define a SeqEntry object, map features on it and display it as a simple one-liner image.
+            There is no zoom nor interaction at this level, but we can display tons of such icons on a web page.
+            <br/>
+            It is possible to add a
+            <a href= "example-one-liner-multiple-categories.html"><code>
+                groups:['xxx','yyy',...]
+            </code>
+            </a>
+            option to the OneLiner constructor to keep only a set of features and display them on multiple lines
+        </div>
+
+        <script class="example">
+            //namespace handling pViz classes
+            var pviz = this.pviz;
+
+            /*
+             * Define the model, a sequence entry with an explicit sequence
+             * For this example, we don't actually need the sequence itself.
+             * Whatever string with the correct length is OK (ok, it's ugly, but it can be useful in certain cases)
+             */
+            var seqEntry = new pviz.SeqEntry({
+                sequence : 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLA'
+            });
+
+            new pviz.OneLiner({
+                model : seqEntry,
+                el : '#one-liner'
+            }).render();
+
+            /*
+             * Features are added explicitely.
+             * There is only on group of features here (secondary_structure). There can be more that would be merged or we could keep only one group with the filer:'xxx' option
+             *
+             * In real application, these features would be read from DASReader, a PeffReader or whatever ajax call you find convenient (the view is rendered when model changes)
+             */
+            seqEntry.addFeatures([{
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 24,
+                end : 26
+            }, {
+                category : 'secondary structure',
+                type : 'helix',
+                start : 38,
+                end : 49
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 53,
+                end : 57
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 59,
+                end : 63
+            }, {
+                category : 'secondary structure',
+                type : 'helix',
+                start : 71,
+                end : 73
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 78,
+                end : 81
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 83,
+                end : 87
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 91,
+                end : 94
+            }, {
+                category : 'secondary structure',
+                type : 'turn',
+                start : 108,
+                end : 110
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 111,
+                end : 116
+            }, {
+                category : 'secondary structure',
+                type : 'turn',
+                start : 129,
+                end : 131
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 138,
+                end : 140
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 150,
+                end : 155
+            }]);
+
+        </script>
+
+    </body>
+</html>

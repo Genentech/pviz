@@ -1,0 +1,9 @@
+  //ok, that's jsut to fit togehter
+  define('jQuery', ['jquery'], function($){
+    return $;
+  });
+
+  define('pviz', ['PVizExport'], function(pve){
+    return pve;
+  });
+}());

@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <title>pViz PEFF reader</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz PEFF reader example</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            Peff format extends fasta with entry annotations. some of them are positional.
+            <pre>var cont = 'nxp:NX_Q16586-1 \\DbUniqueId=NX_Q16586-1 \\Pname=Alpha-sarcoglycan isoform SGCA-1 \\Gname=SGCA \\NcbiTaxId=9606 \\TaxName=Homo Sapiens \\Length=387 \\SV=55 \\EV=119 \\PE=1 \\ModRes=(174|N-linked (GlcNAc...))(246|N-linked (GlcNAc...)) \\Variant=(30|30|L)(31|31|P)(34|34|C)(34|34|H)(62|62|H)(68|68|E)(74|74|W)(77|77|C)(89|89|P)(91|91|R)(93|93|V)(97|97|G)(98|98|H)(98|98|C)(103|103|T)(107|107|V)(110|110|Q)(124|124|T)(136|136|APGAQP)(137|137|K)(137|137|G)(158|158|F)(173|173|P)(175|175|A)(190|190|D)(196|196|I)(201|201|D)(205|205|H)(221|221|H)(228|228|Q)(242|242|A)(247|247|M)(284|284|C)(310|310|C)(374|374|C) \\Processed=(1|23|signal peptide)(24|387|mature protein)
+MAETLFWTPLLVVLLAGLGDTEAQQTTLHPLVGRVFVHTLDHETFLSLPEHVAVPPAVHI
+TYHAHLQGHPDLPRWLRYTQRSPHHPGFLYGSATPEDRGLQVIEVTAYNRDSFDTTRQRL
+VLEIGDPEGPLLPYQAEFLVRSHDAEEVLPSTPASRFLSALGGLWEPGELQLLNVTSALD
+RGGRVPLPIEGRKEGVYIKVGSASPFSTCLKMVASPDSHARCAQGQPPLLSCYDTLAPHF
+RVDWCNVTLVDKSVPEPADEVPTPGDGILEHDPFFCPPTEAPDRDFLVDALVTLLVPLLV
+ALLLTLLLAYVMCCRREGRLKRDLATSDIQMVHHCTIHGNTEELRQMAASREVPRPLSTL
+PMFNVHTGERLPPRVDSAQVPLILDQH
+</pre>
+            
+        </div>
+
+        <script class="example">
+            //namespace handling pViz classes
+            var pviz = this.pviz;
+
+            var cont = 'nxp:NX_Q16586-1 \\DbUniqueId=NX_Q16586-1 \\Pname=Alpha-sarcoglycan isoform SGCA-1 \\Gname=SGCA \\NcbiTaxId=9606 \\TaxName=Homo Sapiens \\Length=387 \\SV=55 \\EV=119 \\PE=1 \\ModRes=(174|N-linked (GlcNAc...))(246|N-linked (GlcNAc...)) \\Variant=(30|30|L)(31|31|P)(34|34|C)(34|34|H)(62|62|H)(68|68|E)(74|74|W)(77|77|C)(89|89|P)(91|91|R)(93|93|V)(97|97|G)(98|98|H)(98|98|C)(103|103|T)(107|107|V)(110|110|Q)(124|124|T)(136|136|APGAQP)(137|137|K)(137|137|G)(158|158|F)(173|173|P)(175|175|A)(190|190|D)(196|196|I)(201|201|D)(205|205|H)(221|221|H)(228|228|Q)(242|242|A)(247|247|M)(284|284|C)(310|310|C)(374|374|C) \\Processed=(1|23|signal peptide)(24|387|mature protein)\n\
+MAETLFWTPLLVVLLAGLGDTEAQQTTLHPLVGRVFVHTLDHETFLSLPEHVAVPPAVHI\n\
+TYHAHLQGHPDLPRWLRYTQRSPHHPGFLYGSATPEDRGLQVIEVTAYNRDSFDTTRQRL\n\
+VLEIGDPEGPLLPYQAEFLVRSHDAEEVLPSTPASRFLSALGGLWEPGELQLLNVTSALD\n\
+RGGRVPLPIEGRKEGVYIKVGSASPFSTCLKMVASPDSHARCAQGQPPLLSCYDTLAPHF\n\
+RVDWCNVTLVDKSVPEPADEVPTPGDGILEHDPFFCPPTEAPDRDFLVDALVTLLVPLLV\n\
+ALLLTLLLAYVMCCRREGRLKRDLATSDIQMVHHCTIHGNTEELRQMAASREVPRPLSTL\n\
+PMFNVHTGERLPPRVDSAQVPLILDQH\n\
+'
+            var fastaReader=new pviz.FastaReader()
+            var entry = fastaReader.buildSeqEntry(cont)
+
+            new pviz.SeqEntryAnnotInteractiveView({
+                model : entry,
+                el : '#main'
+            }).render();
+
+        </script>
+
+    </body>
+</html>

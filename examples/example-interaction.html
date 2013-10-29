@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <title>pViz interaction</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz customizing interaction</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <div class="span2" >
+                <strong>mouseover</strong>
+            </div><div class="span10" id="output-mouse-over"></div>
+        </div>
+        <div class="row">
+            <div class="span2" >
+                <strong>xchange</strong>
+            </div><div class="span10" id="output-x-change"></div>
+        </div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            <h4>Mouse over features</h4>
+            Mousing over features can launch some more interactive experience.
+            We demonstrate here how to display secondary structure feature details in a box.
+            Any JavaScript code can be launched based on the feature.
+            <p>
+                Mouse over secondary structure to see it happen.
+            </p>
+
+            <h4>change mouse position</h4>
+            The second type of interaction is to move the mouse (on the x axis). It will trigger a callback with the mouse coordinate into the sequence one.
+            In fact, a start and an end position are passed to the callback (1 pixel can mean larger position in case of long sequence)
+        </div>
+
+        <script class="example">
+            var pviz = this.pviz;
+
+            /*
+             * for the sake of the demo, we keep track of the mousover ft
+             */
+            var mouseOveredFT;
+
+            /*
+             * add a mouseover/mouseout call back based on the feature type
+             */
+            pviz.FeatureDisplayer.addMouseoverCallback(['helix', 'turn', 'beta_strand'], function(ft) {
+                mouseOveredFT = ft;
+                var el = $('#output-mouse-over');
+                el.empty();
+                el.html('<pre>' + JSON.stringify(ft) + '</pre>')
+            }).addMouseoutCallback(['helix', 'turn', 'beta_strand'], function(ft) {
+                mouseOveredFT = undefined;
+                
+            });
+
+            var seq = 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLA';
+            var seqEntry = new pviz.SeqEntry({
+                sequence : seq
+            });
+
+            var view = new pviz.SeqEntryAnnotInteractiveView({
+                model : seqEntry,
+                el : '#main',
+                /** adding a xChange callback. It is called whenever the x position is fired
+                 *
+                 */
+                xChangeCallback : function(pStart, pEnd) {
+                    var str = 'cursor at ' + pStart.toFixed(1) + ' - ' + pEnd.toFixed(1);
+                    if (mouseOveredFT !== undefined) {
+                        str += '<strong> -> on FT</strong>'
+                    }
+
+                    $('#output-x-change').html(str);
+                }
+            })
+            view.render();
+
+            seqEntry.addFeatures([{
+                category : 'regions',
+                type : 'topological domain',
+                text : 'extra cellular',
+                start : 22,
+                end : 650
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 24,
+                end : 26
+            }, {
+                category : 'secondary structure',
+                type : 'helix',
+                start : 38,
+                end : 49
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 53,
+                end : 57
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 59,
+                end : 63
+            }, {
+                category : 'secondary structure',
+                type : 'helix',
+                start : 71,
+                end : 73
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 78,
+                end : 81
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 83,
+                end : 87
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 91,
+                end : 94
+            }, {
+                category : 'secondary structure',
+                type : 'turn',
+                start : 108,
+                end : 110
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 111,
+                end : 116
+            }, {
+                category : 'secondary structure',
+                type : 'turn',
+                start : 129,
+                end : 131
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 138,
+                end : 140
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 150,
+                end : 155
+            }]);
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Jasmine/phantom test 4 pvis</title>
+		<link rel="stylesheet" type="text/css" href="../lib/jasmine.css">
+
+		<script type="text/javascript" src="lib/jasmine.js"></script>
+		<script type="text/javascript" src="lib/jasmine-html.js"></script>
+		<script type="text/javascript" src="lib/console-runner.js"></script>
+		<script type="text/javascript" src="lib/jasmine.junit_reporter.js"></script>
+
+        <script src="../src/lib/require.js"></script>
+		<script src="./require-config.js"></script>
+		<script  src="jasmine-index.js"></script>
+
+
+        <script src="test-commons.js"></script>
+        <script src="suite-list.js"></script>
+
+		<style type="text/css">
+            div#dz {
+
+            }
+
+            div#dz div {
+                display: inline-block;
+                vertical-align: top;
+                border: black;
+                border-style: solid;
+                border-width: 1px;
+                margin: 10px
+            }
+		</style>
+	</head>
+	<body>
+		<div id='dz'></div>
+		</script>
+
+		<script type="text/javascript">
+            var console_reporter = new jasmine.ConsoleReporter();
+            require(suiteFiles, function($, _, config) {
+
+                jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+                jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter());
+
+                jasmine.getEnv().addReporter(console_reporter);
+
+                setTimeout(function() {
+                    jasmine.getEnv().execute();
+                }, 3000)
+            });
+		</script>
+
+	</body>
+
+</html>

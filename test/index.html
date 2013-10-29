@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>pViz tests</title>
+		<link rel="stylesheet" type="text/css" href="lib/jasmine.css">
+		<link rel="stylesheet" type="text/css" href="../src/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="../src/css/pviz-core.css">
+
+		<script type="text/javascript" src="lib/jasmine.js"></script>
+		<script type="text/javascript" src="lib/jasmine-html.js"></script>
+
+		<script src="../src/lib/require.js"></script>
+		<script src="require-config.js"></script>
+
+
+        <script src="test-commons.js"></script>
+        <script src="suite-list.js"></script>
+
+		<style type="text/css">
+            div#dz {
+
+            }
+
+            div#dz div.block {
+                display: inline-block;
+                vertical-align: top;
+                border: black;
+                border-style: solid;
+                border-width: 1px;
+                margin: 10px
+            }
+
+            div.dz-folder {
+/*                zoom: 15%;*/
+            }
+            div.dz-folder:hover {
+                zoom: 100%;
+            }
+		</style>
+	</head>
+	<body>
+		<h1>pViz tests</h1>
+		<div id='dz'></div>
+
+		<script type="application/javascript">
+
+            require(suiteFiles, function() {
+                jasmine.getEnv().addReporter(new jasmine.HtmlReporter());
+
+                var oldCallback = jasmine.getEnv().currentRunner().finishCallback;
+                jasmine.getEnv().currentRunner().finishCallback = function() {
+                    oldCallback.apply(this, arguments);
+                    if ($('div.dz-folder').size() == 1) {
+                        $('div.dz-folder').removeClass('dz-folder')
+                    }
+                };
+                jasmine.getEnv().execute();
+
+            })
+
+
+		</script>
+
+	</body>
+
+</html>

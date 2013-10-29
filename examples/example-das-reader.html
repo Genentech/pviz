@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>pViz, DASReader example</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz, DASReader example</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            Protein sequence and features are retrieved from ebi/uniprot DAS server
+            <br/>
+            Zoom by dragging mouse and out by double-clicking
+        </div>
+
+        <script class="example">
+            //namespace handling pViz classes
+            var pviz = this.pviz;
+            var dasReader = new pviz.DASReader()
+
+            dasReader.buildSeqEntry("Q01279", {
+                getFeatures : true,
+                success : function(se) {
+                    new pviz.SeqEntryAnnotInteractiveView({
+                        model : se,
+                        el : '#main'
+                    }).render();
+                }
+            });
+
+        </script>
+
+    </body>
+</html>

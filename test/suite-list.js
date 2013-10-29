@@ -1,0 +1,1 @@
+var suiteFiles = ['suites/models/SeqEntry-tests', 'suites/services/DASReader-tests', 'suites/services/FastaReader-tests', 'suites/services/FeatureManager-tests', 'suites/views/SeqEntryAnnotInteractiveView-tests', 'suites/views/OneLiner-tests', 'suites/views/DetailsPane-tests', 'suites/services/IconFactory-tests'];

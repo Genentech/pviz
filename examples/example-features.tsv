@@ -1,0 +1,15 @@
+category	type	text	start	end
+regions	topological domain	extra cellular	22	650
+secondary structure	beta_strand		24	26
+secondary structure	helix		38	49
+secondary structure	beta_strand		53	57
+secondary structure	beta_strand		59	63
+secondary structure	helix		71	73
+secondary structure	beta_strand		78	81
+secondary structure	beta_strand		83	87
+secondary structure	beta_strand		91	94
+secondary structure	turn		108	110
+secondary structure	beta_strand		111	116
+secondary structure	turn		129	131
+secondary structure	beta_strand		138	140
+secondary structure	beta_strand		150	155		

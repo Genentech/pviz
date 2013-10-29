@@ -1,0 +1,78 @@
+<project name="pviz_core" default="test">
+	<property name="app.name" value="${ant.project.name}"/>
+	<property name="bin.phantomjs" value="phantomjs"/>
+	<property name="bin.nodejs" value="node"/>
+	<property name="targetDir" value="target"/>
+	<property name="dir.target.test" value="${targetDir}/test"/>
+	<property name="buildDir" value="${targetDir}/build"/>
+	<property name="srcDir" value="src"/>
+	<property name="dist.archive" value="${targetDir}/dist/${app.name}.tgz"/>
+	<target name="dist" >
+		<mkdir dir="${targetDir}/dist"/>
+		<tar destfile="${dist.archive}"
+		baseDir = "${srcDir}"
+		excludes=".*,include/**"
+		compression="gzip"
+		/>
+	</target>
+	<target name="build-app-min" depends="clean,r-optimize">
+		<mkdir dir="${targetDir}/dist"/>
+		<tar destfile="${dist.archive}"
+		basedir="${buildDir}"
+		excludes=".*,include/**"
+		compression="gzip"
+		/>
+	</target>
+	<target name="r-optimize">
+		<exec executable="${bin.nodejs}" failonerror="true">
+			<arg value="build-tools/r.js"/>
+			<arg value="-o"/>
+			<arg value="build-tools/build-app.js"/>
+		</exec>
+	</target>
+	<target name="test" depends="clean">
+		<mkdir dir="${dir.target.test}"/>
+		<exec executable="${bin.phantomjs}" dir="${dir.target.test}">
+			<arg value="${basedir}/test/scripts/phantomjs-testrunner.js"/>
+			<arg value="${basedir}/test/phantom-index.html"/>
+		</exec>
+	</target>
+	<target name="junit-html" depends="test">
+		<junitreport todir="${dir.target.test}">
+			<fileset dir="${dir.target.test}">
+				<include name="TEST-*.xml"/>
+			</fileset>
+			<report format="frames" todir=".${dir.target.test}/html"/>
+		</junitreport>
+	</target>
+	<target name="clean">
+		<delete failonerror="false" dir="${targetDir}"/>
+		<mkdir dir="${targetDir}"/>
+	</target>
+	<target name="package" depends="package-clean,build-library-bundle,build-library-amd,package-css"/>
+	<target name="package-clean">
+		<delete failonerror="false" dir="dist"/>
+		<mkdir dir="dist"/>
+	</target>
+	<target name="build-library-bundle">
+		<exec executable="${bin.nodejs}" failonerror="true">
+			<arg value="build-tools/r.js"/>
+			<arg value="-o"/>
+			<arg value="build-tools/build-library-bundle.js"/>
+			<arg value="name=../../build-tools/almond"/>
+		</exec>
+	</target>
+	<target name="build-library-amd">
+		<exec executable="${bin.nodejs}" failonerror="true">
+			<arg value="build-tools/r.js"/>
+			<arg value="-o"/>
+			<arg value="build-tools/build-library-amd.js"/>
+		</exec>
+	</target>
+	<target name="package-css">
+		<copy todir="dist">
+			<fileset dir="src/css" includes="*.css"/>
+		</copy>
+	</target>
+
+</project>

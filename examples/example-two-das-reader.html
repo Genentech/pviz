@@ -1,0 +1,77 @@
+<html>
+    <head>
+        <title>pViz, two DASReader example</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz, two DASReader example</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            Protein sequence and features are retrieved from ebi/uniprot DAS server
+            <br/>
+            Zoom by dragging mouse and out by double-clicking
+        </div>
+
+        <script class="example">
+            var pviz = this.pviz;
+            //default das ebi/uniprot
+            var dasReader = new pviz.DASReader()
+
+            /**Pride das server
+             * the XML returned map polypepides category through a pride id.
+             * To avoid too many layer, we can regroupe them on one layer.
+             * to achieve that, a function is given, taking into account the default term and the xml node
+             */
+            var dasPride = new pviz.DASReader('http://www.ebi.ac.uk/pride-das/das/PrideDataSource', {
+                xmlMapper : {
+                    category : function(cat, ft, xmlNode) {
+                        if (/^\d+$/.test(cat)) {
+                            return 'experiments'
+                        }
+                        return cat;
+                    },
+                    text : function(text, ft, xmlNode) {
+                        if(ft.type=='Polypeptide'){
+                            return xmlNode.getElementsByTagName('TYPE')[0].attributes['category'].nodeValue
+                        }
+                        return text
+                    }
+                }
+            })
+
+            dasReader.buildSeqEntry("Q01279", {
+                getFeatures : true,
+                success : function(se) {
+                    new pviz.SeqEntryAnnotInteractiveView({
+                        model : se,
+                        el : '#main'
+                    }).render();
+                    /*
+                     * adding features from pride happens here, view will be automatically updated
+                     *
+                     * Pride features are appended within a groupSet , to appear together at the end
+                     * feature with category 'coverage' are skipped
+                     */
+                    dasPride.addFeatures(se, {
+                        groupSet : 'pride',
+                        skipCategory : {
+                            coverage : true
+                        }
+                    })
+                }
+            });
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,44 @@
+/**
+ * pViz all bundled file, with dependencies
+
+
+ * jQuery v1.8.3 jquery.com | jquery.org/license
+ * bootstrap 3.0 The MIT  License (MIT) Copyright (c) 2013 Twitter, Inc
+ * d3.v3.js Copyright (c) 2013, Michael Bostock All rights reserved.
+ * backbonejs.org Copyright (c) 2010-2013 Jeremy Ashkenas, DocumentCloud
+ * underscore.js Copyright (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ 
+ * pViz
+ * Copyright (c) 2013, Genentech Inc.
+ * All rights reserved.
+ * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
+  
+  Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are	
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by the Bioinformatics and Computational Biology Department, Genentech Inc.  The name of
+Genentech may not be used to endorse or promote products derived
+from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ */
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        //Allow using this built library as an AMD module
+        //in another project. That other project will only
+        //see this AMD call, not the internal modules in
+        //the closure below.
+        define(factory);
+    } else {
+        //Browser globals case. Just assign the
+        //result to a property on the global.
+        root.pviz = factory();
+    }
+}(this, function () {
+    //almond, and your modules will be inlined here
+    

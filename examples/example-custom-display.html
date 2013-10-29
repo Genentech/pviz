@@ -1,0 +1,182 @@
+<html>
+    <head>
+        <title>pViz custom display example</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+        <style type="text/css" media="screen" clas="example">
+            circle.ptms.mickey {
+                fill: red;
+                fill-opacity: 0.6;
+            }
+            circle.ptms.mickey.doubtful {
+                fill: blue;
+            }
+        </style>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz custom display with SVG example</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            Instead of displaying features as basic, we show here how we can attach some drawing function to some feature type.
+            <br/>
+            We pretend we have some fictious ptm's, with a count attribute. We add an 'improbable' atribute to some cases.
+            This attribute will be used to modifiy the element class, thus its color via css
+            <br/>
+            Depending on the type, a svg primitive is called for display and the count attribute used for scaling.
+            <br/>
+            The secondary structures are already displayed by 'fancy' ideograms by default
+        </div>
+
+        <script class="example">
+            var pviz = this.pviz;
+
+            var seq = 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLA';
+            var seqEntry = new pviz.SeqEntry({
+                sequence : seq
+            });
+
+            new pviz.SeqEntryAnnotInteractiveView({
+                model : seqEntry,
+                el : '#main'
+            }).render();
+
+            /**
+             * setting custome handler for a given type is stringly coupled with d3.js
+             * two components:
+             * - appender: to build the widget structure
+             * - positioner: called at zooming, to adapt position, size (or whatever indeed)
+             * - color and transparency are defined by css, found in the html header
+             */
+            pviz.FeatureDisplayer.setCustomHandler('mickey', {
+                appender : function(viewport, svgGroup, features, type) {
+                    var selCircle = svgGroup.selectAll("g.feature.internal.data." + type).data(features).enter().append("g").attr("class", "feature internal data " + type)
+
+                    selCircle.append("circle").attr('class', 'ptms mickey')
+                    //add a 'doubltful class based on the feature 'improbable' attribute
+                    .classed('doubtful', function(ft) {
+                        return ft.improbable
+                    }).attr('r', function(ft) {
+                        return 4 * Math.sqrt(ft.count)
+                    });
+
+                    return selCircle;
+                },
+                positioner : function(viewport, d3selection) {
+                    d3selection.attr('transform', function(ft, i) {
+                        return 'translate(' + viewport.scales.x(ft.start) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                    });
+                    return d3selection
+                }
+            });
+
+            seqEntry.addFeatures([{
+                category : 'ptms',
+                type : 'mickey',
+                start : 20,
+                end : 20,
+                count : 10
+            }, {
+                category : 'ptms',
+                type : 'mickey',
+                start : 22,
+                end : 22,
+                count : 3
+            }, {
+                category : 'ptms',
+                type : 'mickey',
+                start : 40,
+                end : 40,
+                count : 10,
+                improbable : true //!! an option attribute
+            }, {
+                category : 'ptms',
+                type : 'mickey',
+                start : 50,
+                end : 50,
+                count : 2
+            }, {
+                category : 'regions',
+                type : 'topological domain',
+                text : 'extra cellular',
+                start : 22,
+                end : 650
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 24,
+                end : 26
+            }, {
+                category : 'secondary structure',
+                type : 'helix',
+                start : 38,
+                end : 49
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 53,
+                end : 57
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 59,
+                end : 63
+            }, {
+                category : 'secondary structure',
+                type : 'helix',
+                start : 71,
+                end : 73
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 78,
+                end : 81
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 83,
+                end : 87
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 91,
+                end : 94
+            }, {
+                category : 'secondary structure',
+                type : 'turn',
+                start : 108,
+                end : 110
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 111,
+                end : 116
+            }, {
+                category : 'secondary structure',
+                type : 'turn',
+                start : 129,
+                end : 131
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 138,
+                end : 140
+            }, {
+                category : 'secondary structure',
+                type : 'beta_strand',
+                start : 150,
+                end : 155
+            }]);
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>pViz hellow world</title>
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+        <script src="../dist/pviz-bundle-min.js"></script>
+    </head>
+    <body>
+        <div id="main" ></div>
+
+        <script>
+            var pviz = this.pviz;
+
+            var seqEntry = new pviz.SeqEntry({
+                sequence : 'ABCDEFGIJKLMNOPQRSTUVWXYZ'
+            });
+
+            new pviz.SeqEntryAnnotInteractiveView({
+                model : seqEntry,
+                el : '#main'
+            }).render();
+
+            seqEntry.addFeatures([{
+                category : 'foo',
+                type : 'bar',
+                start : 5,
+                end : 12,
+                text : 'hello'
+            }, {
+                category : 'foo',
+                type : 'bar',
+                start : 9,
+                end : 15,
+                text : 'world'
+            }]);
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <title>pViz cuslivingstone display example</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+        <style type="text/css" media="screen" class="example">
+            g.feature.psms.stanley rect.feature {
+                fill: red;
+                fill-opacity: 0.8;
+            }
+            g.feature.psms.stanley:hover rect.feature {
+                fill: black;
+                fill-opacity: 0.8;
+            }
+
+            g.feature.psms.stanley text {
+                font-weight: bold;
+                fill: yellow;
+            }
+
+            g.feature.psms.livingstone rect.feature {
+                fill: green;
+                fill-opacity: 0.2;
+            }
+            g.feature.psms rect.feature-block-end {
+                display: none;
+            }
+
+        </style>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz custom display with css example</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            Instead of displaying features as basic, we can use css to custom the svg rectangle.
+            <br/>
+            Both category and feature type can be captured at the css level.
+            <br/>Mouse over the red features.
+
+        </div>
+
+        <script class="example">
+            var pviz = this.pviz;
+
+            var seq = 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLR';
+            var seqEntry = new pviz.SeqEntry({
+                sequence : seq
+            });
+
+            new pviz.SeqEntryAnnotInteractiveView({
+                model : seqEntry,
+                el : '#main'
+            }).render();
+
+            var fts = [[1, 5, 'livingstone'], [1, 7, 'livingstone'], [6, 8, 'livingstone'], [12, 23, 'livingstone'], [7, 15, 'livingstone'], [1, 30, 'stanley'], [5, 7, 'stanley'], [9, 12, 'stanley']];
+
+            seqEntry.addFeatures(fts.map(function(ft) {
+                return {
+                    category : 'psms',
+                    type : ft[2],
+                    start : ft[0],
+                    end : ft[1],
+                    text : ft[0] + '-' + ft[1] + '/' + ft[2]
+                }
+            }))
+
+        </script>
+
+    </body>
+</html>

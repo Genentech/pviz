@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <title>pViz custom display example</title>
+        <link rel="stylesheet" type="text/css" href="../dist/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
+
+        <script src="../dist/pviz-bundle-min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+        <style type="text/css" media="screen" class='example'>
+            g.feature rect.coverage_bar.psm_coverage {
+                fill: blue;
+                fill-opacity: 0.4;
+            }
+            g.feature rect.coverage_bar.psm_no_coverage {
+                fill: red;
+                fill-opacity: 0.4;
+            }
+        </style>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz with different track heights example</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+        </div>
+
+        <script class="example">
+            var pviz = this.pviz;
+
+            var seq = 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNAS';
+            var seqEntry = new pviz.SeqEntry({
+                sequence : seq
+            });
+
+            /**
+             * attach a track height ratio to the category (1 is the default)
+             */
+            pviz.FeatureDisplayer.trackHeightPerCategoryType.psms = 0.2;
+            pviz.FeatureDisplayer.trackHeightPerCategoryType.psms_coverage = 3;
+
+            new pviz.SeqEntryAnnotInteractiveView({
+                model : seqEntry,
+                el : '#main'
+            }).render();
+
+            pviz.FeatureDisplayer.setCustomHandler(['psm_coverage', 'psm_no_coverage'], {
+                appender : function(viewport, svgGroup, features, type) {
+                    var sel = svgGroup.selectAll("g.feature.internal.data." + type).data(features).enter().append("g").attr("class", "feature internal data " + type)
+
+                    sel.append("rect").attr('class', function(ft) {
+                        return 'coverage_bar ' + ft.type
+                    })
+
+                    return sel;
+                },
+                positioner : function(viewport, d3selection) {
+                    // d3selection.attr('transform', function(ft, i) {
+                    // return 'translate(' +  + ',' + viewport.scales.y(ft.displayTrack) + ')';
+                    // });
+                    var w1 = viewport.scales.x(10) - viewport.scales.x(9);
+                    var hMax = viewport.scales.y(1) * pviz.FeatureDisplayer.heightFactor('psms_coverage');
+
+                    d3selection.selectAll("rect.coverage_bar.psm_coverage").attr('height', function(ft) {
+                        return ft.coverage * hMax;
+                    })
+                    d3selection.selectAll("rect.coverage_bar.psm_no_coverage").attr('height', hMax);
+                    d3selection.selectAll("rect.coverage_bar").attr('x', function(ft) {
+                        return viewport.scales.x(ft.start - 0.5);
+                    }).attr('width', function(ft) {
+                        return viewport.scales.x(ft.start + 0.5) - viewport.scales.x(ft.start - 0.5);
+                    });
+
+                    return d3selection
+                }
+            });
+
+            var fts = [[0, 30], [3, 15], [10, 16], [2, 8], [35, 50], [60, 69], [60, 65], [60, 62], [61, 62], [4, 15], [7, 15], [62, 69], [40, 50], [9, 15]];
+
+            seqEntry.addFeatures(fts.map(function(ft) {
+                return {
+                    //we could also use te categoryType property, for height purpose, but not grouping purpose
+                    category : 'psms',
+                    type : 'psm',
+                    start : ft[0],
+                    end : ft[1],
+                    text : ''
+                }
+            }));
+
+            /*
+             * now we just compute the coverage by counting how many psms cover each amino acid
+             */
+            var coverage = []
+            for ( i = 0; i < seqEntry.length(); i++) {
+                coverage[i] = 0;
+            }
+            var max = 0;
+            fts.forEach(function(ft) {
+                for ( i = ft[0]; i <= ft[1]; i++) {
+                    coverage[i]++;
+                    max = Math.max(coverage[i], max)
+                }
+            });
+            /*
+             * and ad new features for that
+             */
+            seqEntry.addFeatures(coverage.map(function(c, i) {
+                return {
+                    category : 'psms_coverage',
+                    type : (c == 0) ? 'psm_no_coverage' : 'psm_coverage',
+                    start : i,
+                    end : i,
+                    text : c,
+                    coverage : c / max
+                }
+            }));
+            
+            seqEntry.addFeatures({
+                category:'oups',
+                type:'oups',
+                start:10,
+                end:40,
+                text:'oups'
+            });
+        </script>
+
+    </body>
+</html>
