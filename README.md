@@ -71,7 +71,7 @@ Easier than a full documentation, we bring some demonstration use cases:
 	</tr>
 	<tr>
 		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-interaction.html"><img src="images/example-interaction.jpg"/><br/>mouse over, click etc. some feature to see more happen</a></td>
-		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-das-reader.html"><img src="images/example-das-reader.jpg"/><br/>loading sequence & features from <a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an interactive view</a></td>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-das-reader.html"><img src="images/example-das-reader.jpg"/><br/>loading sequence & features from EBI/Uniprot DAS server in an interactive view</a></td>
 	</tr>
 	<tr>
 		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-two-das-reader.html"><img src="images/example-two-das-reader.jpg"/><br/>ebi/uniprot DAS server is used to populate the sequence, and Pride server to add features and customize the parsing</a></td>
