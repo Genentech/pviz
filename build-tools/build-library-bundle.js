@@ -8,7 +8,7 @@
         },
 
         out : '../dist/pviz-bundle-min.js',
-        optimize: "none",
+        optimize: "uglify",
 //        exclude : ['jQuery', 'backbone', 'underscore', 'd3'],
 
         paths : {
