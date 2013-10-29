@@ -32,7 +32,7 @@ Default sources can be explictely defined in JavaScript (limit is the sky),  [DA
       </script>
     </body>
 
-### The rendered features. In practice, the widget is zoomable
+**The rendered features. In practice, the widget is zoomable**
 ![](images/hello-world.jpg)
 
 ##How does it works?
