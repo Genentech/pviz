@@ -59,21 +59,19 @@ But do not worry, including the [packaged distribution](dist/pviz-bundle-min.js)
 
 ##Examples
 Easier than a full documentation, we bring some demonstration use cases:
+ 
+ * [basic interactive](examples/example-0.html): 2 categories, a few features and an interactive view;
+ * [custom feature display with CSS](examples/example-custom-display-css.html): css depending on category and feature type;
+ * [custom feature display with SVG](examples/example-custom-display.html): drawing special ideogram depending on the feature type;
+ * [different track heights](examples/example-different-track-heights.html): getting more of less extend tracks depending on the category;
+ * [interactive features display](examples/example-interaction.html): mouse over some feature to see more happen;
+ * [DAS source](examples/example-das-reader.html): loading sequence & features from <a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an interactive view;
+ * [multiple DAS source](examples/example-two-das-reader.html): ebi/uniprot DAS server is used to populate the sequence, and Pride server to add features and customize the parsing;
+ * [peff reader](examples/example-peff-reader.html): PSI Extended Fasta Format handles classic fasta information plus annotations
+ * [one liner](examples/example-one-liner.html): displaying features in a simple, non interactive ideogram (and potentially showing thousands of them on the same page)
+ * [one liner, with multiple categories](examples/example-one-liner-multiple-categories.html): the same ideogram, but showing multiple categories at once.
 
- * [basic interactive](examples/example-0.html) <sup>**</sup>: 2 categories, a few features and an interactive view;
- * [custom feature display with CSS](examples/example-custom-display-css.html)<sup>*</sup>: css depending on category and feature type;
- * [custom feature display with SVG](examples/example-custom-display.html)<sup>*</sup>: drawing special ideogram depending on the feature type;
- * [different track heights](examples/example-different-track-heights.html)<sup>*</sup>: getting more of less extend tracks depending on the category;
- * [interactive features display](examples/example-interaction.html)<sup>*</sup>: mouse over some feature to see more happen;
- * [DAS source](examples/example-das-reader.html)<sup>*</sup>: loading sequence & features from <a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an interactive view;
- * [multiple DAS source](examples/example-two-das-reader.html)<sup>*</sup>: ebi/uniprot DAS server is used to populate the sequence, and Pride server to add features and customize the parsing;
- * [peff reader](examples/example-peff-reader.html)<sup>*</sup>: PSI Extended Fasta Format handles classic fasta information plus annotations
- * [one liner](examples/example-one-liner.html)<sup>*</sup>: displaying features in a simple, non interactive ideogram (and potentially showing thousands of them on the same page)
- * [one liner, with multiple categories](examples/example-one-liner-multiple-categories.html)<sup>*</sup>: the same ideogram, but showing multiple categories at once.
-
-<sup>*</sup> download the project locally, at least on your file system, to get javascript executed;
-
-<sup>**</sup> run the example behind a http server (node, apache, lighttp...) because of a ajax JSON query.
+**NB**: download the project locally, at least on your file system, to get javascript executed;
 
 ##And more
 ###A few comments on the code
