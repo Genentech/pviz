@@ -60,18 +60,29 @@ But do not worry, including the [packaged distribution](dist/pviz-bundle-min.js)
 
 ##Examples
 Easier than a full documentation, we bring some demonstration use cases:
+<table style="border-spacing: 0px">
+	<tr>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-0.html"><img src="images/example-0.jpg"/><br/>2 categories, a few features and an interactive view</a></td>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-custom-display-css.html"><img src="images/example-custom-display-css.jpg"/><br/>css depending on category and feature type</a></td>
+	</tr>
+	<tr>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-custom-display.html"><img src="images/example-custom-display.jpg"/><br/>drawing special ideograms depending on the feature type</a></td>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-different-track-heights.html"><img src="images/example-different-track-heights.jpg"/><br/>getting more of less extend tracks depending on the category</a></td>
+	</tr>
+	<tr>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-interaction.html"><img src="images/example-interaction.jpg"/><br/>mouse over, click etc. some feature to see more happen</a></td>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-das-reader.html"><img src="images/example-das-reader.jpg"/><br/>loading sequence & features from <a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an interactive view</a></td>
+	</tr>
+	<tr>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-two-das-reader.html"><img src="images/example-two-das-reader.jpg"/><br/>ebi/uniprot DAS server is used to populate the sequence, and Pride server to add features and customize the parsing</a></td>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-peff-reader.html"><img src="images/example-peff-reader.jpg"/><br/>PSI Extended Fasta Format handles classic fasta information plus annotations</a></td>
+	</tr>
+	<tr>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-one-liner.html"><img src="images/example-one-liner.jpg"/><br/>displaying features in a simple, non interactive ideogram (and potentially showing thousands of them on the same page)</a></td>
+		<td style="text-align:center;padding: 20px;border: 1px solid #999;"><a href="examples/example-one-liner-multiple-categories.html"><img src="images/example-one-liner-multiple-categories.jpg"/><br/>the same ideogram, but showing multiple categories at once</a></td>
+	</tr>
+</table> 
  
- * [basic interactive](examples/example-0.html): 2 categories, a few features and an interactive view;
- * [custom feature display with CSS](examples/example-custom-display-css.html): css depending on category and feature type;
- * [custom feature display with SVG](examples/example-custom-display.html): drawing special ideogram depending on the feature type;
- * [different track heights](examples/example-different-track-heights.html): getting more of less extend tracks depending on the category;
- * [interactive features display](examples/example-interaction.html): mouse over some feature to see more happen;
- * [DAS source](examples/example-das-reader.html): loading sequence & features from <a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an interactive view;
- * [multiple DAS source](examples/example-two-das-reader.html): ebi/uniprot DAS server is used to populate the sequence, and Pride server to add features and customize the parsing;
- * [peff reader](examples/example-peff-reader.html): PSI Extended Fasta Format handles classic fasta information plus annotations
- * [one liner](examples/example-one-liner.html): displaying features in a simple, non interactive ideogram (and potentially showing thousands of them on the same page)
- * [one liner, with multiple categories](examples/example-one-liner-multiple-categories.html): the same ideogram, but showing multiple categories at once.
-
 **NB**: download the project locally, at least on your file system, to get javascript executed;
 
 ##And more
