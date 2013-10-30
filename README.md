@@ -1,4 +1,4 @@
-#pViz doc & examples
+#pViz: a dynamic JavaScript & SVG library for visualization of protein sequence features
 ##What is pViz?
 pViz is a <strike>protein</strike> sequence features viewer for modern browsers, based on a JavaScript library, SVG and css.
 
@@ -98,7 +98,7 @@ test, distribution etc. can be launched in a CI environment via ant tasks (./bui
 
 ###Authors
 This library was initiated by 
-Alexandre Masselot (masselot.alexandre@gene.com) & Kiran Kiran Mukhyala (mukhyala.kiran@gene.com) within Genentech Bioinformatics & Computation Biology Department.
+Alexandre Masselot (masselot.alexandre@gene.com) & Kiran Kiran Mukhyala (mukhyala.kiran@gene.com) within Genentech Bioinformatics & Computational Biology Department.
             
 ###License
 The library is distributed under a BSD license. Full description can be found in [LICENSE.txt](LICENSE.txt)
