@@ -111,7 +111,8 @@ define(['jQuery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             var yshiftScale = self.options.hideAxis ? -20 : 0;
             self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(tot + 1) + yshiftScale)
           }
-          view.g.attr("transform", "translate(0," + self.viewport.scales.y(tot + 1) + ")");
+          var yshift = self.viewport.scales.y(tot + 1)
+          view.g.attr("transform", "translate(0," + yshift + ")");
           tot += view.height() + 1 + self.paddingCategory;
           view.g.style('display', null);
 
@@ -119,14 +120,14 @@ define(['jQuery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
           view.g.style('display', 'none');
         }
       });
-      self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(tot + 1) + 20) + ")");
+      self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(tot+1) + 20) + ")");
 
       var heightAdd = 60;
       if (self.options.hideAxis)
         heightAdd -= 30
       if (self.options.hideSequene)
         heightAdd -= 25
-      self.svg.attr("height", self.viewport.scales.y(tot + 1) + heightAdd)
+      self.svg.attr("height", self.viewport.scales.y(tot) + heightAdd)
     },
     /*
      * define gradients to be used.
@@ -149,7 +150,7 @@ define(['jQuery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
 
       var layer = new FeatureLayer({
         name : 'sequence',
-        height : 2,
+        nbTracks : 2,
       })
       self.layers.push(layer)
       var view = new FeatureLayerView({
@@ -189,7 +190,7 @@ define(['jQuery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
           type : groupType,
           groupSet : groupSet,
           id : 'features-' + cssClass,
-          height : nbTracks * featureDisplayer.heightFactor(group[0].category)
+          nbTracks : nbTracks
         });
         self.layers.push(layer)
 
@@ -213,7 +214,7 @@ define(['jQuery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
 
         container : self.svg,
         layers : self.layers,
-        height : 1
+        nbTracks : 1
       });
       // /self.layers.push(layer)
 

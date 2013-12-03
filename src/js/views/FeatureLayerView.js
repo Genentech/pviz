@@ -83,8 +83,7 @@ define(['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplay
       return this;
     },
     height : function() {
-      return this.model.get('height');
-      //* featureDisplayer.heightFactor(this.model.attributes);
+      return this.model.get('nbTracks') * featureDisplayer.heightFactor(this.model.attributes);
     }
   });
 
