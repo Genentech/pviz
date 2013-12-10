@@ -1,0 +1,23 @@
+{
+  "name": "pviz",
+  "version": "0.1",
+  "homepage": "https://github.com/Genentech/pviz/",
+  "authors": [
+    "Alexandre Masselot",
+    "Kiran Mukhyala"
+  ],
+  "description": "pViz.js: a dynamic JavaScript & SVG library for visualization of protein sequence features",
+  "keywords": [
+    "pviz",
+    "protein",
+    "sequence"
+  ],
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
