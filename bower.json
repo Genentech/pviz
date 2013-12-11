@@ -1,6 +1,7 @@
 {
   "name": "pviz",
   "version": "0.1.0",
+  "main": ["build/pviz.js", "build/pviz.css"],
   "homepage": "https://github.com/Genentech/pviz/",
   "authors": [
     "Alexandre Masselot",
