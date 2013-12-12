@@ -1,7 +1,10 @@
 {
   "name": "pviz",
   "version": "0.1.0",
-  "main": ["build/pviz.js", "build/pviz.css"],
+  "main": [
+    "build/pviz.js",
+    "build/pviz.css"
+  ],
   "homepage": "https://github.com/Genentech/pviz/",
   "authors": [
     "Alexandre Masselot",
@@ -22,10 +25,13 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "1.8.3",
-    "underscore": "1.4.4",
-    "bootstrap": "3.0",
-    "backbone": "~1.1.0",
-    "d3": "~3.3.11"
+    "jquery": "~1.9.0",
+    "underscore-amd": "~1.4.4",
+    "bootstrap": "~3.0.0",
+    "backbone-amd": "~1.1.0",
+    "d3-amd": "~3.3.0",
+    "requirejs-text": "~2.0.10",
+    "requirejs-domready": "~2.0.1",
+    "requirejs": "~2.1.9"
   }
 }

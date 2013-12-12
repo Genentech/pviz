@@ -4,7 +4,7 @@
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
 
-define(['jQuery', 'underscore', 'backbone'], function($, _, Backbone) {
+define(['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
   var SeqEntryFastaView = Backbone.View.extend({
     initialize : function(options) {
       var self = this;

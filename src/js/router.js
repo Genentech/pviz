@@ -2,7 +2,7 @@
  * Copyright (c) 2013, Genentech Inc.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
-define(['jQuery', 'underscore', 'backbone', 'pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/views/SeqEntryFastaView', 'pviz/views/SeqEntryAnnotInteractiveView', 'pviz/views/SeqEntryTableView'], function($, _, Backbone, SeqEntry, DasReader, SeqEntryFastaView, SeqEntryAnnotInteractiveView, SeqEntryTableView) {
+define(['jquery', 'underscore', 'backbone', 'pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/views/SeqEntryFastaView', 'pviz/views/SeqEntryAnnotInteractiveView', 'pviz/views/SeqEntryTableView'], function($, _, Backbone, SeqEntry, DasReader, SeqEntryFastaView, SeqEntryAnnotInteractiveView, SeqEntryTableView) {
   var dasReader = new DasReader();
   var AppRouter = Backbone.Router.extend({
     routes : {

@@ -4,7 +4,7 @@
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
 
-define(['jQuery', 'underscore', 'backbone', 'pviz/services/FeatureManager'], function($, _, Backbone, FeatureManager) {
+define(['jquery', 'underscore', 'backbone', 'pviz/services/FeatureManager'], function($, _, Backbone, FeatureManager) {
   var SeqEntryTableView = Backbone.View.extend({
     initialize : function(options) {
       var self = this;

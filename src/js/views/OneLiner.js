@@ -7,7 +7,7 @@
  * Copyright (c) 2013, Genentech Inc.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
-define(['jQuery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function($, _, bb, d3, tmpl) {
+define(['jquery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function($, _, bb, d3, tmpl) {
   return bb.View.extend({
     initialize : function() {
       var self = this;

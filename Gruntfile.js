@@ -30,13 +30,25 @@ module.exports = function(grunt) {
 		watch: {
 		  files: ['<%= src_files %>'],
 		  tasks: ['uglify']
+		},
+		bower: {
+			target: {
+				rjsConfig: 'src/js/main.js'
+			}
+		},
+		devserver: {
+			server: {
+				base: "src"
+			}
 		}
 	});
 
-	// Load the plugin that provides the "uglify" task.
+	// Load the plugin that provides tasks.
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-bower-requirejs');
+	grunt.loadNpmTasks('grunt-devserver');
 	
 	// Default task(s).
 	grunt.registerTask('default', ['uglify']);

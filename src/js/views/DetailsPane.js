@@ -5,7 +5,7 @@
  * All rights reserved.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
  */
-define(['underscore', 'jQuery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function(_, $, bb, undefined, tmpl) {
+define(['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function(_, $, bb, undefined, tmpl) {
   return bb.View.extend({
     initialize : function() {
       var self = this;
