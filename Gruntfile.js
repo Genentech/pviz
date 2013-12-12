@@ -29,7 +29,7 @@ module.exports = function(grunt) {
 		},
 		watch: {
 		  files: ['<%= src_files %>'],
-		  tasks: ['uglify']
+		  tasks: ['devserver']
 		},
 		bower: {
 			target: {
@@ -38,7 +38,7 @@ module.exports = function(grunt) {
 		},
 		devserver: {
 			server: {
-				base: "src"
+				base: "./src"
 			}
 		}
 	});

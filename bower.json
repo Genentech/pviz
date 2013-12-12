@@ -25,10 +25,10 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~1.9.0",
-    "underscore-amd": "~1.4.4",
-    "bootstrap": "~3.0.0",
-    "backbone-amd": "~1.1.0",
+    "jquery": "1.8.3",
+    "underscore-amd": "1.4.4",
+    "bootstrap": "3.0.0",
+    "backbone-amd": "1.0.0",
     "d3-amd": "~3.3.0",
     "requirejs-text": "~2.0.10",
     "requirejs-domready": "~2.0.1",
