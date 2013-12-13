@@ -12,3 +12,7 @@ define(['jquery', 'underscore', 'backbone', './router'], function($, _, Backbone
     initialize : initialize
   };
 }); 
+
+require(['app'], function(App) {
+	App.initialize();
+});

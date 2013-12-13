@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 			files: { src: ['<%= src_files %>']}
 		  },
 		  options: {
-			// options here to override JSHint defaults
+			// options here to override JSHint defaults 
 			globals: {
 			  jQuery: true,
 			  console: true,
@@ -28,12 +28,50 @@ module.exports = function(grunt) {
 		  }
 		},
 		watch: {
-		  files: ['<%= src_files %>'],
-		  tasks: ['devserver']
+		  files: ['Gruntfile.js', 'src/js/main.js'],
+		  tasks: ['requirejs:compile-bundle', 'requirejs:compile-amd-module']
 		},
 		bower: {
 			target: {
 				rjsConfig: 'src/js/main.js'
+			}
+		},
+		requirejs: {
+			'compile-bundle': {
+				options: {
+					name: "app",
+					baseUrl: "src/js",
+					mainConfigFile: "src/js/main.js",
+					out: "build/<%= pkg.name %>-bundle.js",
+					optimize: 'none'
+				}
+			},
+			'compile-amd-module': {
+				options: {
+					name: "PVizExport",
+					baseUrl: "src/js",
+					mainConfigFile: "src/js/main.js",
+					out: "build/<%= pkg.name %>-amd.js",
+					exclude: ['jquery', 'underscore', 'backbone', 'd3', 'bootstrap', 'domReady', 'text'],
+					optimize: 'none'
+				}
+			},
+			'compile-bundle-min': {
+				options: {
+					name: "app",
+					baseUrl: "src/js",
+					mainConfigFile: "src/js/main.js",
+					out: "build/<%= pkg.name %>-bundle.min.js"
+				}
+			},
+			'compile-amd-module-min': {
+				options: {
+					name: "PVizExport",
+					baseUrl: "src/js",
+					mainConfigFile: "src/js/main.js",
+					out: "build/<%= pkg.name %>-amd.min.js",
+					exclude: ['jquery', 'underscore', 'backbone', 'd3', 'bootstrap', 'domReady', 'text']
+				}
 			}
 		},
 		devserver: {
@@ -48,6 +86,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-bower-requirejs');
+	grunt.loadNpmTasks('grunt-requirejs');
 	grunt.loadNpmTasks('grunt-devserver');
 	
 	// Default task(s).
