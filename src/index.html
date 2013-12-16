@@ -22,6 +22,11 @@
 		</div>
 	<div id="main"></div>
 	<footer> B&CB  </footer>
-	<script type="application/javascript" data-main="../build/pviz-bundle" src="lib/require.js"></script>
+	<script type="application/javascript" data-main="js/main.js" src="lib/require.js"></script>
+	<script type="application/javascript">
+	require(['app'], function(App) {
+		App.initialize();
+	});
+	</script>
 </body>
 </html>

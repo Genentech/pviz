@@ -25705,7 +25705,3 @@ define('app',['jquery', 'underscore', 'backbone', './router'], function($, _, Ba
     initialize : initialize
   };
 }); 
-
-require(['app'], function(App) {
-	App.initialize();
-});

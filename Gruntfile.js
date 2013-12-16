@@ -53,7 +53,10 @@ module.exports = function(grunt) {
 					mainConfigFile: "src/js/main.js",
 					out: "build/<%= pkg.name %>-amd.js",
 					exclude: ['jquery', 'underscore', 'backbone', 'd3', 'bootstrap', 'domReady', 'text'],
-					optimize: 'none'
+					optimize: "none",
+					wrap: {
+						endFile: "build-tools/amd-module-end.txt"
+					}
 				}
 			},
 			'compile-bundle-min': {

@@ -1,0 +1,4 @@
+
+define('pviz', ['PVizExport'], function(pve){
+	return pve;
+});

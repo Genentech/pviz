@@ -1843,12 +1843,103 @@ define('pviz/views/OneLiner',['jquery', 'underscore', 'backbone', 'd3', 'text!pv
 
 });
 
+/**
+ * just a dummy table view of features
+ * Copyright (c) 2013, Genentech Inc.
+ * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
+ */
+
+define('pviz/views/SeqEntryTableView',['jquery', 'underscore', 'backbone', 'pviz/services/FeatureManager'], function($, _, Backbone, FeatureManager) {
+  var SeqEntryTableView = Backbone.View.extend({
+    initialize : function(options) {
+      var self = this;
+
+    },
+    render : function() {
+      var self = this;
+      $(self.el).empty();
+      var feats = self.model.get('features');
+      var sortedFeats = FeatureManager.assignTracks(feats);
+      var html = "<table class='table'><tbody>";
+      var templ = "<tr><td><%= category %></td><td><%= type %></td><td><%= start %></td><td><%= end %></td></tr>";
+      _.each(sortedFeats, function(f) {
+        html += _.template(templ, f);
+      });
+      html += "</tbody></table>";
+
+      $(self.el).html(html);
+    }
+  });
+  return SeqEntryTableView;
+});
+
+/*
+ * Copyright (c) 2013, Genentech Inc.
+ * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
+ */
+define('pviz/router',['jquery', 'underscore', 'backbone', 'pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/views/SeqEntryFastaView', 'pviz/views/SeqEntryAnnotInteractiveView', 'pviz/views/SeqEntryTableView'], function($, _, Backbone, SeqEntry, DasReader, SeqEntryFastaView, SeqEntryAnnotInteractiveView, SeqEntryTableView) {
+  var dasReader = new DasReader();
+  var AppRouter = Backbone.Router.extend({
+    routes : {
+      // '/projects': 'showProjects',
+      'fasta/:ac' : 'showFasta',
+      'annot/:ac' : 'showAnnot',
+      'feats/:ac' : 'showFeats',
+      '*actions' : 'defaultAction'
+    },
+    showAnnot : function(accession) {
+      dasReader.buildSeqEntry(accession, {
+        getFeatures : true,
+        success : function(seqEntry) {
+          new SeqEntryAnnotInteractiveView({
+            model : seqEntry,
+            el : $('#main')
+          }).render();
+        }
+      });
+    },
+    showFasta : function(accession) {
+      dasReader.buildSeqEntry(accession, {
+        success : function(seqEntry) {
+          new SeqEntryFastaView({
+            model : seqEntry,
+            el : $('#main')
+          }).render();
+        }
+      });
+    },
+    showFeats : function(accession) {
+      dasReader.buildSeqEntry(accession, {
+        getFeatures : true,
+        success : function(seqEntry) {
+          new SeqEntryTableView({
+            model : seqEntry,
+            el : $('#main')
+          }).render();
+        }
+      });
+    },
+    defaultAction : function(actions) {
+      // We have no matching route, lets just log what the URL was
+      console.log('No route:', actions);
+    }
+  });
+
+  var initialize = function() {
+    var app_router = new AppRouter;
+    Backbone.history.start();
+  };
+  return {
+    initialize : initialize
+  };
+});
+
 /*
  * Copyright (c) 2013, Genentech Inc.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
 var classPaths = ['pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/services/FastaReader', 'pviz/services/FeatureManager', 'pviz/services/IconFactory', 'pviz/views/SeqEntryAnnotInteractiveView', 'pviz/views/SeqEntryFastaView', 'pviz/views/FeatureDisplayer', 'pviz/views/OneLiner']
-define('PVizExport',['pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/services/FastaReader', 'pviz/services/FeatureManager', 'pviz/services/IconFactory', 'pviz/views/SeqEntryAnnotInteractiveView', 'pviz/views/SeqEntryFastaView', 'pviz/views/FeatureDisplayer', 'pviz/views/OneLiner'], function() {
+define('PVizExport',['pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/services/FastaReader', 'pviz/services/FeatureManager', 'pviz/services/IconFactory', 'pviz/views/SeqEntryAnnotInteractiveView', 'pviz/views/SeqEntryFastaView', 'pviz/views/FeatureDisplayer', 'pviz/views/OneLiner', 'pviz/router'], function() {
   var args = arguments;
   var exp = {}
   for (i in classPaths) {
@@ -1858,3 +1949,6 @@ define('PVizExport',['pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/se
   return exp;
 })
 ;
+define('pviz', ['PVizExport'], function(pve){
+	return pve;
+});
