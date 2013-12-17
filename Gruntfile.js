@@ -5,15 +5,6 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('bower.json'),
 		src_files: ['src/js/**/*.js', '!src/js/*.js'],
 		copyright: "build-tools/copyright.txt",
-		uglify: {
-		  options: {
-			banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-		  },
-		  build: {
-			src: '<%= src_files %>',
-			dest: 'build/<%= pkg.name %>.min.js'
-		  }
-		},
 		jshint: {
 		  all: {
 			files: { src: ['<%= src_files %>']}
@@ -27,10 +18,6 @@ module.exports = function(grunt) {
 			  document: true
 			}
 		  }
-		},
-		watch: {
-		  files: ['Gruntfile.js', 'src/js/main.js'],
-		  tasks: ['requirejs:compile-bundle', 'requirejs:compile-amd-module']
 		},
 		bower: {
 			target: {
@@ -101,11 +88,14 @@ module.exports = function(grunt) {
 			server: {
 				base: "./src"
 			}
+		},
+		watch: {
+		  files: ['Gruntfile.js', 'src/js/main.js'],
+		  tasks: ['build']
 		}
 	});
 
 	// Load the plugin that provides tasks.
-	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-bower-requirejs');
@@ -114,7 +104,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	
 	// Default task(s).
-	grunt.registerTask('default', ['uglify']);
 	grunt.registerTask('build', ['requirejs', 'concat:concat_copyright']);
+	grunt.registerTask('default', ['build']);
 
 };
