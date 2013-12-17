@@ -7,7 +7,7 @@
  Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
 
  */
-define(['jQuery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function($, _, Backbone, d3, typedDisplayer) {
+define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function($, _, Backbone, d3, typedDisplayer) {
 
   /**
    * display array of features passed as d3selection.

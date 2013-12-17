@@ -2,7 +2,7 @@
  * Copyright (c) 2013, Genentech Inc.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
-define(['jQuery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) {
+define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) {
   var SeqEntryViewport = function(options) {
     var self = this;
 
