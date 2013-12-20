@@ -1,6 +1,7 @@
 {
   "name": "pviz",
   "version": "0.1.1",
+  "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-jshint": "~0.7.2",
