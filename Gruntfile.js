@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
+		//testing a commit line
 		pkg: grunt.file.readJSON('bower.json'),
 		src_files: ['src/js/**/*.js', '!src/js/*.js'],
 		copyright: "build-tools/copyright.txt",
