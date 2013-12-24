@@ -21919,35 +21919,34 @@ define('pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', 
 
     var allSel = svgGroup.selectAll(".feature.data")
     allSel.on('mouseover', function(ft) {
-      console.log(arguments, this)
-      self.callMouseoverCallBacks(ft)
+      self.callMouseoverCallBacks(ft, this)
     })
     allSel.on('mouseout', function(ft) {
-      self.callMouseoutCallBacks(ft)
+      self.callMouseoutCallBacks(ft, this)
     })
     allSel.on('click', function(ft) {
-      self.callClickCallBacks(ft);
+      self.callClickCallBacks(ft, this);
     })
     return allSel
   }
 
-  FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft) {
+  FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft, el) {
     var self = this;
     if (self.mouseoverCallBacks[ft.type] !== undefined) {
-      self.mouseoverCallBacks[ft.type](ft)
+      self.mouseoverCallBacks[ft.type](ft, el)
     }
   }
 
-  FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft) {
+  FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft, el) {
     var self = this;
     if (self.mouseoutCallBacks[ft.type] !== undefined) {
-      self.mouseoutCallBacks[ft.type](ft)
+      self.mouseoutCallBacks[ft.type](ft, el)
     }
   }
-  FeatureDisplayer.prototype.callClickCallBacks = function(ft) {
+  FeatureDisplayer.prototype.callClickCallBacks = function(ft, el) {
     var self = this;
     if (self.clickCallBacks[ft.type] !== undefined) {
-      self.clickCallBacks[ft.type](ft)
+      self.clickCallBacks[ft.type](ft, el)
     }
   }
   var defaultAppender = function(viewport, svgGroup, features, type) {

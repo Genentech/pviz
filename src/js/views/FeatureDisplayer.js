@@ -117,23 +117,23 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
     return allSel
   }
 
-  FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft) {
+  FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft, el) {
     var self = this;
     if (self.mouseoverCallBacks[ft.type] !== undefined) {
-      self.mouseoverCallBacks[ft.type](ft)
+      self.mouseoverCallBacks[ft.type](ft, el)
     }
   }
 
-  FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft) {
+  FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft, el) {
     var self = this;
     if (self.mouseoutCallBacks[ft.type] !== undefined) {
-      self.mouseoutCallBacks[ft.type](ft)
+      self.mouseoutCallBacks[ft.type](ft, el)
     }
   }
-  FeatureDisplayer.prototype.callClickCallBacks = function(ft) {
+  FeatureDisplayer.prototype.callClickCallBacks = function(ft, el) {
     var self = this;
     if (self.clickCallBacks[ft.type] !== undefined) {
-      self.clickCallBacks[ft.type](ft)
+      self.clickCallBacks[ft.type](ft, el)
     }
   }
   var defaultAppender = function(viewport, svgGroup, features, type) {
