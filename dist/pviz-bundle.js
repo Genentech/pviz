@@ -21919,6 +21919,7 @@ define('pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', 
 
     var allSel = svgGroup.selectAll(".feature.data")
     allSel.on('mouseover', function(ft) {
+      console.log(arguments, this)
       self.callMouseoverCallBacks(ft)
     })
     allSel.on('mouseout', function(ft) {

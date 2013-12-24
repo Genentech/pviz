@@ -106,13 +106,13 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
 
     var allSel = svgGroup.selectAll(".feature.data")
     allSel.on('mouseover', function(ft) {
-      self.callMouseoverCallBacks(ft)
+      self.callMouseoverCallBacks(ft, this)
     })
     allSel.on('mouseout', function(ft) {
-      self.callMouseoutCallBacks(ft)
+      self.callMouseoutCallBacks(ft, this)
     })
     allSel.on('click', function(ft) {
-      self.callClickCallBacks(ft);
+      self.callClickCallBacks(ft, this);
     })
     return allSel
   }

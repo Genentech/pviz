@@ -143,6 +143,6 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('build', ['requirejs', 'concat:concat_copyright']);
     grunt.registerTask('default', ['build']);
-    grunt.registerTask('dist', ['build', 'copy:dist', 'copy:example-dist']);
+    grunt.registerTask('dist', ['build', 'copy:dist', 'copy:dist-examples']);
 
 };
