@@ -1,4 +1,4 @@
-define(['jQuery', 'underscore', 'suites/ExpServer', 'pviz/models/SeqEntry', 'pviz/services/FeatureManager'], function($, _, expServer, SeqEntry, featureManager) {
+define(['jquery', 'underscore', 'suites/ExpServer', 'pviz/models/SeqEntry', 'pviz/services/FeatureManager'], function($, _, expServer, SeqEntry, featureManager) {
 
     describe('FeatureManager', function() {
         it("singleton instance is set", function() {

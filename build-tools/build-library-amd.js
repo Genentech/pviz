@@ -12,7 +12,7 @@
     paths : { pviz : '.',
         pviz_templates : '../templates',
 
-        jQuery : 'empty:',
+        jquery : 'empty:',
         underscore : 'empty:',
         backbone : 'empty:',
         d3 : 'empty:',

@@ -1,4 +1,4 @@
-define(['jQuery', 'underscore', 'suites/ExpServer', 'models/SeqEntry'], function($, _, expServer, SeqEntry) {
+define(['jquery', 'underscore', 'suites/ExpServer', 'models/SeqEntry'], function($, _, expServer, SeqEntry) {
 
     describe('SeqEntry', function() {
         it("constructor", function() {

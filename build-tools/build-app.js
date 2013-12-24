@@ -6,18 +6,16 @@
     name : 'app',
     fileExclusionRegExp : /^\.(svn|\.DS_Store)$/i,
     paths : {
-        pviz : '.', 
-        jQuery : '../lib/jquery-1.8.3.min',
-        underscore : '../lib/underscore-min',
-        backbone : '../lib/backbone-min',
-        d3 : '../lib/d3.v3.min',
-        bootstrap : '../lib/bootstrap.min',
-        text : '../lib/require/text',
-        domReady : '../lib/require/domReady',
-
-        //        'msms-js-lib' : '../include/msms-js-lib/js',
-        pviz_templates : '../templates'
-
+        pviz : '.',
+        pviz_templates : '../templates',
+        jquery : '../../bower_components/jquery/jquery',
+        bootstrap : '../../bower_components/bootstrap/dist/js/bootstrap',
+        requirejs : '../../bower_components/requirejs/require',
+        'backbone' : '../../bower_components/backbone-amd/backbone',
+        'd3' : '../../bower_components/d3/d3',
+        'domReady' : '../../bower_components/requirejs-domready/domReady',
+        'text' : '../../bower_components/requirejs-text/text',
+        'underscore' : '../../bower_components/underscore-amd/underscore'
     },
     uglify : {
         toplevel : true,
@@ -37,19 +35,8 @@
         no_mangle : true
     },
     shim : {
-        'jQuery' : {
-            exports : '$'
-        },
-        'underscore' : {
-            exports : '_'
-        },
-        'backbone' : {
-            deps : ['underscore', 'jQuery'],
-            exports : 'Backbone'
-        },
         bootstrap : {
-            deps : ['jQuery'],
-            exports : 'bootstrap'
+            deps : ['jquery']
         },
         d3 : {
             exports : 'd3'

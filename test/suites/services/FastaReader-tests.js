@@ -1,4 +1,4 @@
-define(['jQuery', 'underscore', 'pviz/models/SeqEntry', 'pviz/services/FastaReader'], function($, _, SeqEntry, FastaReader) {
+define(['jquery', 'underscore', 'pviz/models/SeqEntry', 'pviz/services/FastaReader'], function($, _, SeqEntry, FastaReader) {
     var fastaReader= new FastaReader();
     describe('FastaReader', function() {
         describe('headerAndSequence', function() {

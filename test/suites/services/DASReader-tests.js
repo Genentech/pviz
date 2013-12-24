@@ -1,4 +1,4 @@
-define(['jQuery', 'underscore', 'suites/ExpServer', 'pviz/models/SeqEntry', 'pviz/services/DASReader'], function($, _, expServer, SeqEntry, DASReader) {
+define(['jquery', 'underscore', 'suites/ExpServer', 'pviz/models/SeqEntry', 'pviz/services/DASReader'], function($, _, expServer, SeqEntry, DASReader) {
 
     describe('DASReader', function() {
         it(" instance is set", function() {
