@@ -121,7 +121,7 @@ module.exports = function(grunt) {
                 flatten:true,
                 expand:true
             },
-            'dist-example' : {
+            'dist-examples' : {
                 src : ['build/pviz-bundle.min.js','src/css/pviz-core.css', 'bower_components/bootstrap/dist/css/bootstrap*.min.css'],
                 dest : 'examples/deps',
                 flatten:true,
