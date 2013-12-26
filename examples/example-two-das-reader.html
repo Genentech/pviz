@@ -3,7 +3,7 @@
         <title>pViz, two DASReader example</title>
         <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="deps/pviz-core.css">
-        <script src="deps/pviz-bundle.min.js"></script>
+        <script src="deps/pviz-bundle.js"></script>
 
         <!-- just a few lines of javscript to decorate the page -->
         <script src="examples-utils.js"></script>
@@ -40,15 +40,16 @@
                         return cat;
                     },
                     text : function(text, ft, xmlNode) {
+                        var xml = $(xmlNode);
                         if(ft.type=='Polypeptide'){
-                            return xmlNode.getElementsByTagName('TYPE')[0].attributes['category'].nodeValue
+                            return xml.find('TYPE:first').attr('category');
                         }
-                        return text
+                        return text;
                     }
                 }
             })
 
-            dasReader.buildSeqEntry("Q01279", {
+            dasReader.buildSeqEntry("P04626", {
                 getFeatures : true,
                 success : function(se) {
                     new pviz.SeqEntryAnnotInteractiveView({
