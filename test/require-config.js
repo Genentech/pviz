@@ -14,12 +14,15 @@ requirejs.config({
         'underscore' : '../../bower_components/underscore-amd/underscore',
 
         suites : '../../test/suites',
-        sinon : '../../test/lib/sinon-1.4.2',
+        sinon : '../../test/lib/sinon-1.7.3',
         resources : '../../test/resources'
     },
     shim : {
         bootstrap : {
             deps : ['jquery']
+        },
+        jquery:{
+            exports:'$'
         },
         d3 : {
             exports : 'd3'

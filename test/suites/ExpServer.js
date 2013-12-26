@@ -9,11 +9,9 @@ define(['underscore', 'sinon', 'text!resources/Q01279-sequence.das.xml', 'text!r
     var server = sinon.fakeServer.create();
 
     //fake the fields=precursorOnly by removing the peaks data array
-    server.respondWith('GET', /.*\/das\/uniprot\/sequence\?segment=Q01279/, function(xhr) {
-        xhr.respond(200, {
-            "Content-Type" : "application/xml"
-        }, das_seq_Q01279);
-    });
+    server.respondWith('GET', /.*\/das\/uniprot\/sequence\?segment=Q01279/, [200, {
+        "Content-Type" : "application/xml"
+    }, das_seq_Q01279]);
 
     //http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot/features?segment=Q01279
     server.respondWith('GET', /.*\/das\/uniprot\/features\?segment=Q01279/, function(xhr) {
