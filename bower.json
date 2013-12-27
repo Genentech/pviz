@@ -1,6 +1,6 @@
 {
   "name": "pviz",
-  "version": "v0.1.1",
+  "version": "0.1.1",
   "main": [
     "build/pviz-amd.js",
     "build/pviz-core.css"
