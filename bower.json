@@ -14,7 +14,9 @@
   "keywords": [
     "pviz",
     "protein",
-    "sequence"
+    "sequence",
+    "sequence features",
+    "visualization"
   ],
   "license": "BSD",
   "ignore": [
