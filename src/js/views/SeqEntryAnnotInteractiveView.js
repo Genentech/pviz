@@ -32,6 +32,32 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
 
             var rectBg = self.svg.insert("rect").attr("class", 'background').attr('width', '100%').attr('height', '100%');
 
+            var xChangeCallbacks = [];
+            if (options.xChangeCallback) {
+                xChangeCallbacks.push(options.xChangeCallback);
+            }
+            if (!self.options.noPositionBubble) {
+                xChangeCallbacks.push(function(i0, i1) {
+                    var gbubble = self.gAABubble;
+                    if (self.viewport.scales.font > 10) {
+                        gbubble.style('display', 'none');
+
+                        return
+                    }
+
+                    var i = Math.round((i0 + i1) / 2);
+                    var xscales = self.viewport.scales.x;
+                    if (i < xscales.domain()[0] || i > xscales.domain()[1]) {
+                        gbubble.style('display', 'none');
+                        return;
+
+                    }
+                    gbubble.style('display', null);
+                    gbubble.selectAll('text').text(self.model.get('sequence').split('')[i] + ' '+ (i+1));
+                    gbubble.attr('transform', 'translate(' + (xscales(i)-13) + ',10)');
+                });
+
+            }
             self.viewport = new SeqEntryViewport({
                 el : self.components.features,
                 svg : self.svg,
@@ -46,7 +72,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                     // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
                     // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
                 },
-                xChangeCallback : options.xChangeCallback
+                xChangeCallback : xChangeCallbacks
             });
 
             self.drawContainer = self.svg.append('g');
@@ -84,9 +110,10 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             self.svg.select('g.groupset-title').remove()
 
             self.layers = [];
-            self.layerViews = []
-            if (!self.options.hideSequence)
+            self.layerViews = [];
+            if (!self.options.hideSequence) {
                 self.p_setup_layer_sequence();
+            }
 
             self.p_setup_layer_features();
             self.p_setup_hidden_layers_container();
@@ -149,7 +176,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             gr.append('stop').attr('offset', '0%').style('stop-color', '#fff').style('stop-opacity', 0);
             gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
 
-            var xRight = ($(self.el).width() || $(document).width())-self.margins.right;
+            var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
             defs.append('clipPath').attr('id', 'clipper').append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
         },
         /*
@@ -175,9 +202,13 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             self.layerViews.push(view)
 
             var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function(d) {
-                return d
-            })
+                return d;
+            });
+
             self.p_positionText(self.viewport, sel);
+            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble');
+            self.gAABubble .append('rect').attr('x', -5).attr('y', -13).attr('width', 65).attr('height', 16)
+            self.gAABubble.append('text');
         },
         /*
          * group features by category, and build a lyer for each of them

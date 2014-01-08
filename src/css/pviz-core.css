@@ -3,7 +3,7 @@
         fill: white;
     }
     line.x-bar {
-        display:none;
+        display: none;
     }
 }
 
@@ -31,6 +31,13 @@ text.sequence {
     font-family: monospace;
 }
 
+g.aa-bubble text {
+    font-family: monospace;
+}
+g.aa-bubble rect {
+    stroke:#777;
+    fill:white;
+}
 svg.pviz rect.background {
     fill: #f5f5f5;
 }
@@ -99,9 +106,9 @@ g.one-hidden-layer text {
 g.axis g.tick line {
     stroke: black;
 }
-g.axis path.domain{
+g.axis path.domain {
     stroke: black;
-    fill:none;
+    fill: none;
 }
 
 /* icons sections!! */

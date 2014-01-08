@@ -27,9 +27,12 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
         self.svg.on('mousemove', function() {
             var i = d3.mouse(self.el[0])[0];
             self.setXBar(self.scales.x.invert(i))
-            if (options.xChangeCallback) {
-                options.xChangeCallback(self.scales.x.invert(i - 0.5), self.scales.x.invert(i) + 0.5)
-            }
+            _.each(options.xChangeCallback, function(f) {
+                if (!f) {
+                    return;
+                }
+                f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5));
+            });
         });
         self.svg.on('mouseout', function() {
             self.xBar.style('display', 'none');
@@ -51,11 +54,11 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
         function brushZoom() {
             self.rectClear()
             var bounds = brush.extent();
-            if(bounds[0]<0){
-                bounds[0]=0;
+            if (bounds[0] < 0) {
+                bounds[0] = 0;
             }
-            if(bounds[1]>self.length-1){
-                bounds[1]=self.length-1;
+            if (bounds[1] > self.length - 1) {
+                bounds[1] = self.length - 1;
             }
             if (bounds[1] < bounds[0] + 0.3) {
                 self.scales.x.domain([0, self.length - 1]);
