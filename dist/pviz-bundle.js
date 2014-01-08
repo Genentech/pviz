@@ -1,4 +1,4 @@
-/*! pviz - v0.1.1 - 2013-12-25 */
+/*! pviz - v0.1.1 - 2014-01-07 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -12256,8 +12256,8 @@ define('pviz/services/DASReader',['underscore', 'pviz/models/SeqEntry', 'pviz/mo
         }).map(function(n) {
             var node = $(n);
             var f = new PositionedFeature({
-                start : parseInt(node.find('START:first').text()),
-                end : parseInt(node.find('END:first').text()),
+                start : parseInt(node.find('START:first').text())-1,
+                end : parseInt(node.find('END:first').text())-1,
                 type : node.find('TYPE:first').text(),
                 category : node.find('TYPE:first').attr('category'),
                 //note : node.getElementsByTagName('NOTE')[0].childNodes[0].nodeValue
@@ -12751,10 +12751,13 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
     var SeqEntryViewport = function(options) {
         var self = this;
 
+        self.margins = _.extend({
+            left : 0,
+            right : 0,
+            top : 0,
+            bottom : 0
+        })
         self.yShift = (options && options.yShift)
-        if (self.yShift === undefined)
-            self.yShift = 25;
-        self.xShift = (options && options.xShift) || 0;
 
         for (n in options) {
             self[n] = options[n];
@@ -12769,12 +12772,15 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
         self.svg.on('mousemove', function() {
             var i = d3.mouse(self.el[0])[0];
             self.setXBar(self.scales.x.invert(i))
-            if (options.xChangeCallback) {
-                options.xChangeCallback(self.scales.x.invert(i - 0.5), self.scales.x.invert(i) + 0.5)
-            }
+            _.each(options.xChangeCallback, function(f) {
+                if (!f) {
+                    return;
+                }
+                f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5));
+            });
         });
         self.svg.on('mouseout', function() {
-            self.xBar.style('display','none');
+            self.xBar.style('display', 'none');
         }).on('mouseover', function() {
             self.xBar.style('display', null);
         })
@@ -12793,8 +12799,14 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
         function brushZoom() {
             self.rectClear()
             var bounds = brush.extent();
+            if (bounds[0] < 0) {
+                bounds[0] = 0;
+            }
+            if (bounds[1] > self.length - 1) {
+                bounds[1] = self.length - 1;
+            }
             if (bounds[1] < bounds[0] + 0.3) {
-                self.scales.x.domain([-1, self.length + 1]);
+                self.scales.x.domain([0, self.length - 1]);
             } else {
                 self.scales.x.domain([Math.floor(bounds[0]), Math.ceil(bounds[1])]);
             }
@@ -12833,7 +12845,10 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
         // });
         // }
         var domain = self.scales.x.domain();
-        // console.log('a', domain)
+        if (domain[0] < 1)
+            domain[0] = 0;
+        if (domain[1] > self.length)
+            domain[1] = self.length
 
         if (domain[1] - domain[0] < 4) {
             var d = 2 - (domain[1] - domain[0]) / 2;
@@ -12842,10 +12857,6 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
         }
 
         //console.log('b', domain)
-        if (domain[0] < -1)
-            domain[0] = -1;
-        if (domain[1] > self.length + 1)
-            domain[1] = self.length + 1
 
         //console.log('c', domain)
 
@@ -12879,7 +12890,7 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
             w = $(document).height();
             self.dim.height = h;
         }
-
+        self.dim.innerWidth = self.dim.width - self.margins.left - self.margins.right;
         self.computeScaling()
     };
 
@@ -12889,13 +12900,14 @@ define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'],
             options = {};
         }
         var xMin = options.xMin || 0;
-        var xMax = options.xMax || (self.length + 1);
+        var xMax = options.xMax || (self.length - 1);
         var lineHeight = 15;
 
         if (self.scales == undefined)
             self.scales = {};
         if (self.scales.x == undefined) {
-            self.scales.x = d3.scale.linear().domain([xMin - 1, xMax]).range([self.xShift, self.dim.width])
+            self.scales.x = d3.scale.linear().domain([xMin, xMax]).range([self.margins.left, self.dim.width - self.margins.right])
+            console.log()
         } else {
             self.scales.x.domain([xMin, xMax]);
         }
@@ -13233,87 +13245,90 @@ define('pviz/services/IconFactory',[], function() {
 
  */
 define('pviz/views/FeatureLayerView',['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplayer'], function(_, bb, iconFactory, featureDisplayer) {
-  var FeatureLayerView = bb.View.extend({
-    initialize : function(options) {
-      var self = this;
-      options = options || {}
+    var FeatureLayerView = bb.View.extend({
+        initialize : function(options) {
+            var self = this;
+            options = options || {}
+            self.clipper = self.options.clipper;
 
-      _.each(['container', 'viewport'], function(n) {
-        self[n] = self.options[n];
-        delete self.options[n];
-      })
-      self.options.layerMenu = self.options.layerMenu || 'sticky'
+            _.each(['container', 'viewport'], function(n) {
+                self[n] = self.options[n];
+                delete self.options[n];
+            })
+            self.options.layerMenu = self.options.layerMenu || 'sticky';
 
-      self.build(options);
-    },
-    build : function() {
-      var self = this;
+            self.build(options);
+        },
+        build : function() {
+            var self = this;
 
-      var g = self.container.insert("g").attr("id", self.model.get('id') || self.model.get('.name')).attr('class', 'layer');
+            var g = self.container.insert("g").attr("id", self.model.get('id') || self.model.get('.name')).attr('class', 'layer');
 
-      if (self.options.cssClass) {
-        g.classed(self.options.cssClass, true)
-      };
-      self.g = g;
+            if (self.options.cssClass) {
+                g.classed(self.options.cssClass, true)
+            };
+            self.g = g;
+            self.gFeatures = g.append('g').attr('clip-path', 'url('+self.clipper+')');
 
-      if (self.options.layerMenu && self.options.layerMenu !== 'off') {
-        self.p_build_menu(self.options.layerMenu === 'minimize');
-      }
-      return self;
-    },
-    p_build_menu : function(isMinimizable) {
-      var self = this;
+            if (self.options.layerMenu && self.options.layerMenu !== 'off') {
+                self.p_build_menu(self.options.layerMenu === 'minimize');
+            }
+            return self;
+        },
+        p_build_menu : function(isMinimizable) {
+            var self = this;
 
-      if (self.model.get('name') === 'sequence')
-        return;
+            if (self.model.get('name') === 'sequence')
+                return;
 
-      if (isMinimizable) {
-        self.g.append("rect").attr('class', 'layer-background').attr('height', self.viewport.scales.y(self.height()) + 2).attr('width', self.viewport.dim.width)
-      }
-      var menuWidth = 50;
-      self.gMenu = self.g.append("g").attr('class', 'layer-menu').attr('transform', 'translate(0, -13)');
+            if (isMinimizable) {
+                self.g.append("rect").attr('class', 'layer-background').attr('height', self.viewport.scales.y(self.height()) + 2).attr('width', self.viewport.dim.width)
+            }
+            var menuWidth = 50;
+            self.gMenu = self.g.append("g").attr('class', 'layer-menu').attr('transform', 'translate(0, -13)');
 
-      if (isMinimizable)
-        rect = self.gMenu.append('rect').attr('height', 25).attr('class', 'layer-background layer-menu-background').attr('rx', 5).attr('ry', 5);
-      var t = self.gMenu.append('text').attr('class', 'layer-category').text(self.model.get('name')).attr('y', 2).attr('x', 7);
-      var w = t.node().getComputedTextLength();
+            if (isMinimizable){
+                rect = self.gMenu.append('rect').attr('height', 25).attr('class', 'layer-background layer-menu-background').attr('rx', 5).attr('ry', 5);
+            }
+            var t = self.gMenu.append('text').attr('class', 'layer-category').text(self.model.get('name')).attr('y', 2).attr('x', 7);
+            var w = t.node().getComputedTextLength();
 
-      if (isMinimizable)
-        rect.attr('width', w + 50);
+            if (isMinimizable)
+                rect.attr('width', w + 50);
 
-      self.gMenuButtons = self.gMenu.append("g").attr('class', 'buttons').attr('transform', 'translate(' + (w + 15) + ', -2)');
+            self.gMenuButtons = self.gMenu.append("g").attr('class', 'buttons').attr('transform', 'translate(' + (w + 15) + ', -2)');
 
-      if (isMinimizable) {
-        var ic = iconFactory.append(self.gMenuButtons, 'noview', 20);
-        ic.on('mousedown', function() {
-          self.model.set('visible', false);
-        });
-        self.hideMenu();
+            if (isMinimizable) {
+                var ic = iconFactory.append(self.gMenuButtons, 'noview', 20);
+                ic.on('mousedown', function() {
+                    self.model.set('visible', false);
+                });
+                self.hideMenu();
 
-        self.g.on('mouseover', function() {
-          self.showMenu()
-        });
-        self.g.on('mouseout', function() {
-          self.hideMenu()
-        });
-      }
+                self.g.on('mouseover', function() {
+                    self.showMenu()
+                });
+                self.g.on('mouseout', function() {
+                    self.hideMenu()
+                });
+            }
 
-      return self;
-    },
-    hideMenu : function() {
-      this.gMenu.style('display', 'none');
-      return this;
-    },
-    showMenu : function() {
-      this.gMenu.style('display', null);
-      return this;
-    },
-    height : function() {
-      return this.model.get('nbTracks') * featureDisplayer.heightFactor(this.model.attributes);
-    }
-  });
+            return self;
+        },
+        hideMenu : function() {
+            this.gMenu.style('display', 'none');
+            return this;
+        },
+        showMenu : function() {
+            this.gMenu.style('display', null);
+            return this;
+        },
+        height : function() {
+            return this.model.get('nbTracks') * featureDisplayer.heightFactor(this.model.attributes);
+        }
+    });
 
-  return FeatureLayerView;
+    return FeatureLayerView;
 });
 
 /*
@@ -15921,254 +15936,298 @@ define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { r
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
 define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager', './FeatureDisplayer', './SeqEntryViewport', 'pviz/models/FeatureLayer', './FeatureLayerView', './HiddenLayersView', './DetailsPane', 'text!pviz_templates/seq-entry-annot-interactive.html'], function($, _, Backbone, d3, featureManager, featureDisplayer, SeqEntryViewport, FeatureLayer, FeatureLayerView, HiddenLayersView, DetailsPane, tmpl) {
-  var SeqEntryAnnotInteractiveView = Backbone.View.extend({
+    var SeqEntryAnnotInteractiveView = Backbone.View.extend({
 
-    initialize : function(options) {
-      var self = this;
-      self.layers = [];
-      self.layerViews = [];
-      self.hide = {};
+        initialize : function(options) {
+            var self = this;
+            self.margins = {
+                left : self.options.marginLeft || 20,
+                right : self.options.marginRight || 20,
+                top : self.options.marginTop || 25,
+            };
+            self.layers = [];
+            self.layerViews = [];
+            self.hide = {};
 
-      self.paddingCategory = options.paddingCategory || 0;
+            self.paddingCategory = options.paddingCategory || 0;
 
-      $(self.el).empty();
-      var el = $(tmpl);
-      $(self.el).append(el)
+            $(self.el).empty();
+            var el = $(tmpl);
+            $(self.el).append(el)
 
-      self.components = {
-        features : el.find('#feature-viewer'),
-        details : el.find('#details-viewer')
-      }
+            self.components = {
+                features : el.find('#feature-viewer'),
+                details : el.find('#details-viewer')
+            }
 
-      self.svg = d3.select(self.components.features[0]).append("svg").attr("width", '100%').attr("height", '123').attr('class', 'pviz');
-      self.p_setup_gradients();
+            self.svg = d3.select(self.components.features[0]).append("svg").attr("width", '100%').attr("height", '123').attr('class', 'pviz');
+            self.p_setup_defs();
 
-      var rectBg = self.svg.insert("rect").attr("class", 'background').attr('width', '100%').attr('height', '100%');
+            var rectBg = self.svg.insert("rect").attr("class", 'background').attr('width', '100%').attr('height', '100%');
 
-      self.viewport = new SeqEntryViewport({
-        el : self.components.features,
-        svg : self.svg,
-        length : self.model.length(),
-        yShift : self.options.hideAxis ? 0 : 25,
-        xShift : self.options.xShift || 0,
-        changeCallback : function(vp) {
-          self.p_positionText(vp, self.svg.selectAll('text.data'));
-          featureDisplayer.position(vp, self.svg.selectAll('g.data'));
+            var xChangeCallbacks = [];
+            if (options.xChangeCallback) {
+                xChangeCallbacks.push(options.xChangeCallback);
+            }
+            if (!self.options.noPositionBubble) {
+                xChangeCallbacks.push(function(i0, i1) {
+                    var gbubble = self.gAABubble;
+                    if (self.viewport.scales.font > 10) {
+                        gbubble.style('display', 'none');
 
-          if (!self.options.hideAxis)
-            self.updateAxis();
-          // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
-          // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
+                        return
+                    }
+
+                    var i = Math.round((i0 + i1) / 2);
+                    var xscales = self.viewport.scales.x;
+                    if (i < xscales.domain()[0] || i > xscales.domain()[1]) {
+                        gbubble.style('display', 'none');
+                        return;
+
+                    }
+                    gbubble.style('display', null);
+                    gbubble.selectAll('text').text(self.model.get('sequence').split('')[i] + ' '+ (i+1));
+                    gbubble.attr('transform', 'translate(' + (xscales(i)-13) + ',10)');
+                });
+
+            }
+            self.viewport = new SeqEntryViewport({
+                el : self.components.features,
+                svg : self.svg,
+                length : self.model.length(),
+                margins : self.margins,
+                changeCallback : function(vp) {
+                    self.p_positionText(vp, self.svg.selectAll('text.data'));
+                    featureDisplayer.position(vp, self.svg.selectAll('g.data'));
+
+                    if (!self.options.hideAxis)
+                        self.updateAxis();
+                    // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
+                    // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
+                },
+                xChangeCallback : xChangeCallbacks
+            });
+
+            self.drawContainer = self.svg.append('g');
+            //.attr('transform', 'translate(' + self.margins.left + ',' + self.margins.top + ')');
+            self.axisContainer = self.drawContainer.append('g').attr('class', 'axis')
+            var yyshift = self.options.hideSequence ? 0 : 30
+            self.axisContainer.attr('transform', 'translate(0, ' + yyshift + ')');
+            //var yshiftScale = self.options.hideAxis ? 0 : 20;
+            self.layerContainer = self.drawContainer.append('g').attr('class', 'layers');
+
+            self.detailsPane = new DetailsPane({
+                el : self.components.details
+            })
+
+            self.update()
+            if (!self.options.hideAxis)
+                self.updateAxis();
+
+            self.listenTo(self.model, 'change', self.update)
+
         },
-        xChangeCallback : options.xChangeCallback
-      });
+        updateAxis : function() {
+            var self = this;
 
-      self.axisContainer = self.svg.append('g').attr('class', 'axis');
-      var yshiftScale = self.options.hideAxis ? 0 : 20;
-      self.layerContainer = self.svg.append('g').attr('class', 'layers').attr('transform', 'translate(0,' + yshiftScale + ')');
+            var vpXScale = self.viewport.scales.x;
+            var scale = d3.scale.linear().domain([vpXScale.domain()[0] + 1, vpXScale.domain()[1] + 1]).range(vpXScale.range());
+            var xAxis = d3.svg.axis().scale(scale).tickSize(6, 5, 5).tickFormat(function(p) {
+                return (p == 0) ? '' : p
+            }).ticks(4);
+            self.axisContainer.call(xAxis);
+        },
+        update : function() {
+            var self = this;
+            self.layerContainer.selectAll('g').remove()
+            self.svg.select('g.groupset-title').remove()
 
-      self.detailsPane = new DetailsPane({
-        el : self.components.details
-      })
+            self.layers = [];
+            self.layerViews = [];
+            if (!self.options.hideSequence) {
+                self.p_setup_layer_sequence();
+            }
 
-      self.update()
-      if (!self.options.hideAxis)
-        self.updateAxis();
+            self.p_setup_layer_features();
+            self.p_setup_hidden_layers_container();
+            self.p_setup_groupset_titles()
+            self.render()
 
-      self.listenTo(self.model, 'change', self.update)
+            _.each(self.layers, function(layer) {
+                layer.on('change', function() {
+                    self.render();
+                })
+            });
+        },
+        /**
+         * render: show the visible layers and pile them up.
+         */
+        render : function() {
+            var self = this;
 
-    },
-    updateAxis : function() {
-      var self = this;
+            var tot = 0
+            var previousGroupSet = undefined
+            _.chain(self.layerViews).filter(function(layerViews) {
+                return true;
+            }).each(function(view) {
+                if (view.model.get('visible')) {
+                    var currentGroupSet = view.model.get('groupSet');
+                    if (currentGroupSet != previousGroupSet) {
+                        var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
+                        tot += 2
+                        previousGroupSet = currentGroupSet;
+                        var yshiftScale = self.options.hideAxis ? -20 : 0;
+                        self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(tot + 1) + yshiftScale)
+                    }
+                    var yshift = self.viewport.scales.y(tot + 1)
+                    view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
+                    tot += view.height() + 1 + self.paddingCategory;
+                    view.g.style('display', null);
 
-      var vpXScale = self.viewport.scales.x
-      var scale = d3.scale.linear().domain([vpXScale.domain()[0] + 1, vpXScale.domain()[1] + 1]).range(vpXScale.range())
-      var xAxis = d3.svg.axis().scale(scale).tickSize(6, 0, 0).tickFormat(function(p) {
-        return (p == 0) ? '' : p
-      }).ticks(4);
-      self.axisContainer.call(xAxis);
-    },
-    update : function() {
-      var self = this;
-      self.layerContainer.selectAll('g').remove()
-      self.svg.select('g.groupset-title').remove()
+                } else {
+                    view.g.style('display', 'none');
+                }
+            });
+            self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(tot + 1) + 20) + ")");
 
-      self.layers = [];
-      self.layerViews = []
-      if (!self.options.hideSequence)
-        self.p_setup_layer_sequence();
+            var heightAdd = 60;
+            if (self.options.hideAxis)
+                heightAdd -= 30
+            if (self.options.hideSequene)
+                heightAdd -= 25
+            self.svg.attr("height", self.viewport.scales.y(tot) + heightAdd)
+        },
+        /*
+         * define gradients to be used.
+         * This should certainly lie elsewhere...
+         */
+        p_setup_defs : function() {
+            var self = this;
+            var defs = self.svg.append('defs');
 
-      self.p_setup_layer_features();
-      self.p_setup_hidden_layers_container();
-      self.p_setup_groupset_titles()
-      self.render()
+            var gr = defs.append('svg:linearGradient').attr('id', 'grad_endFTBlock').attr('x1', 0).attr('y1', 0).attr('x2', '100%').attr('y2', 0);
+            gr.append('stop').attr('offset', '0%').style('stop-color', '#fff').style('stop-opacity', 0);
+            gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
 
-      _.each(self.layers, function(layer) {
-        layer.on('change', function() {
-          self.render();
-        })
-      });
-    },
-    /**
-     * render: show the visible layers and pile them up.
-     */
-    render : function() {
-      var self = this;
+            var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
+            defs.append('clipPath').attr('id', 'clipper').append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
+        },
+        /*
+         * build the Sequence layer
+         */
+        p_setup_layer_sequence : function() {
+            var self = this;
 
-      var tot = 0
-      var previousGroupSet = undefined
-      _.chain(self.layerViews).filter(function(layerViews) {
-        return true;
-      }).each(function(view) {
-        if (view.model.get('visible')) {
-          var currentGroupSet = view.model.get('groupSet');
-          if (currentGroupSet != previousGroupSet) {
-            var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
-            tot += 2
-            previousGroupSet = currentGroupSet;
-            var yshiftScale = self.options.hideAxis ? -20 : 0;
-            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(tot + 1) + yshiftScale)
-          }
-          var yshift = self.viewport.scales.y(tot + 1)
-          view.g.attr("transform", "translate(0," + yshift + ")");
-          tot += view.height() + 1 + self.paddingCategory;
-          view.g.style('display', null);
+            var layer = new FeatureLayer({
+                name : 'sequence',
+                nbTracks : 2,
+            })
+            self.layers.push(layer)
+            var view = new FeatureLayerView({
+                model : layer,
+                container : self.layerContainer,
+                viewport : self.viewport,
+                cssClass : 'sequence',
+                noMenu : true,
+                margins : self.margins,
+                clipper : '#clipper'
+            })
+            self.layerViews.push(view)
 
-        } else {
-          view.g.style('display', 'none');
+            var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function(d) {
+                return d;
+            });
+
+            self.p_positionText(self.viewport, sel);
+            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble');
+            self.gAABubble .append('rect').attr('x', -5).attr('y', -13).attr('width', 65).attr('height', 16)
+            self.gAABubble.append('text');
+        },
+        /*
+         * group features by category, and build a lyer for each of them
+         */
+        p_setup_layer_features : function() {
+            var self = this;
+
+            var groupedFeatures = _.groupBy(self.model.get('features'), function(ft) {
+                return (ft.groupSet ? (ft.groupSet + '/') : '') + ft.category;
+
+            })
+            _.each(groupedFeatures, function(group, groupConcatName) {
+                var nbTracks = featureManager.assignTracks(group);
+
+                var groupName = group[0].category;
+                var groupType = group[0].categoryType || groupName;
+                var groupSet = group[0].groupSet;
+                var cssClass = groupName.replace(/\s+/g, '_')
+
+                var layer = new FeatureLayer({
+                    name : (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
+                    type : groupType,
+                    groupSet : groupSet,
+                    id : 'features-' + cssClass,
+                    nbTracks : nbTracks
+                });
+                self.layers.push(layer)
+
+                var layerView = new FeatureLayerView({
+                    model : layer,
+                    container : self.layerContainer,
+                    viewport : self.viewport,
+                    cssClass : cssClass,
+                    layerMenu : self.options.layerMenu,
+                    margins : self.margins,
+                    clipper : '#clipper'
+                });
+                self.layerViews.push(layerView);
+
+                var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+            });
+        },
+        p_setup_hidden_layers_container : function() {
+            var self = this;
+
+            self.hiddenLayers = new HiddenLayersView({
+
+                container : self.svg,
+                layers : self.layers,
+                nbTracks : 1
+            });
+            // /self.layers.push(layer)
+
+        },
+        p_setup_groupset_titles : function() {
+            var self = this;
+            var groupSetNames = _.chain(self.model.get('features')).map(function(ft) {
+                return ft.groupSet
+            }).unique().filter(function(t) {
+                return t
+            }).value();
+
+            self.gGroupSets = self.svg.append('g').attr('class', 'groupset-title');
+            self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function(x) {
+                return x;
+            }).attr('x', 7).attr('y', 10).attr('id', function(x) {
+                return 'groupset-title-' + (x || '').replace(/\W/g, '_');
+            })
+
+            return self;
+        },
+        /*
+         * position sequence text.
+         * @param {Object} viewport
+         * @param {Object} sel
+         */
+        p_positionText : function(viewport, sel) {
+            var self = this;
+            sel.attr('x', function(d, i) {
+                return viewport.scales.x(i);
+            }).attr('y', viewport.scales.y(1) - 7).style('font-size', '' + viewport.scales.font + 'px').style('letter-spacing', '' + (viewport.scales.x(2) - viewport.scales.x(1) - viewport.scales.font) + 'px')
+            return sel
         }
-      });
-      self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(tot+1) + 20) + ")");
+    });
 
-      var heightAdd = 60;
-      if (self.options.hideAxis)
-        heightAdd -= 30
-      if (self.options.hideSequene)
-        heightAdd -= 25
-      self.svg.attr("height", self.viewport.scales.y(tot) + heightAdd)
-    },
-    /*
-     * define gradients to be used.
-     * This should certainly lie elsewhere...
-     */
-    p_setup_gradients : function() {
-      var self = this;
-      var defs = self.svg.append('defs');
-
-      var gr = defs.append('svg:linearGradient').attr('id', 'grad_endFTBlock').attr('x1', 0).attr('y1', 0).attr('x2', '100%').attr('y2', 0);
-      gr.append('stop').attr('offset', '0%').style('stop-color', '#fff').style('stop-opacity', 0);
-      gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
-
-    },
-    /*
-     * build the Sequence layer
-     */
-    p_setup_layer_sequence : function() {
-      var self = this;
-
-      var layer = new FeatureLayer({
-        name : 'sequence',
-        nbTracks : 2,
-      })
-      self.layers.push(layer)
-      var view = new FeatureLayerView({
-        model : layer,
-        container : self.layerContainer,
-        viewport : self.viewport,
-        cssClass : 'sequence',
-        noMenu : true
-      })
-      self.layerViews.push(view)
-
-      var sel = view.g.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function(d) {
-        return d
-      })
-      self.p_positionText(self.viewport, sel);
-    },
-    /*
-     * group features by category, and build a lyer for each of them
-     */
-    p_setup_layer_features : function() {
-      var self = this;
-
-      var groupedFeatures = _.groupBy(self.model.get('features'), function(ft) {
-        return (ft.groupSet ? (ft.groupSet + '/') : '') + ft.category;
-
-      })
-      _.each(groupedFeatures, function(group, groupConcatName) {
-        var nbTracks = featureManager.assignTracks(group);
-
-        var groupName = group[0].category;
-        var groupType = group[0].categoryType || groupName;
-        var groupSet = group[0].groupSet;
-        var cssClass = groupName.replace(/\s+/g, '_')
-
-        var layer = new FeatureLayer({
-          name : (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
-          type : groupType,
-          groupSet : groupSet,
-          id : 'features-' + cssClass,
-          nbTracks : nbTracks
-        });
-        self.layers.push(layer)
-
-        var layerView = new FeatureLayerView({
-          model : layer,
-          container : self.layerContainer,
-          viewport : self.viewport,
-          cssClass : cssClass,
-          layerMenu : self.options.layerMenu
-
-        })
-        self.layerViews.push(layerView)
-
-        var sel = featureDisplayer.append(self.viewport, layerView.g, group).classed(cssClass, true);
-      });
-    },
-    p_setup_hidden_layers_container : function() {
-      var self = this;
-
-      self.hiddenLayers = new HiddenLayersView({
-
-        container : self.svg,
-        layers : self.layers,
-        nbTracks : 1
-      });
-      // /self.layers.push(layer)
-
-    },
-    p_setup_groupset_titles : function() {
-      var self = this;
-      var groupSetNames = _.chain(self.model.get('features')).map(function(ft) {
-        return ft.groupSet
-      }).unique().filter(function(t) {
-        return t
-      }).value();
-
-      self.gGroupSets = self.svg.append('g').attr('class', 'groupset-title');
-      self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function(x) {
-        return x;
-      }).attr('x', 7).attr('y', 10).attr('id', function(x) {
-        return 'groupset-title-' + (x || '').replace(/\W/g, '_');
-      })
-
-      return self;
-    },
-    /*
-     * position sequence text.
-     * @param {Object} viewport
-     * @param {Object} sel
-     */
-    p_positionText : function(viewport, sel) {
-      var self = this;
-      sel.attr('x', function(d, i) {
-        return viewport.scales.x(i);
-      }).attr('y', viewport.scales.y(1)).style('font-size', '' + viewport.scales.font + 'px').style('letter-spacing', '' + (viewport.scales.x(2) - viewport.scales.x(1) - viewport.scales.font) + 'px')
-      return sel
-    }
-  });
-
-  return SeqEntryAnnotInteractiveView;
+    return SeqEntryAnnotInteractiveView;
 });
 /**
  * just a dummy table view of features
