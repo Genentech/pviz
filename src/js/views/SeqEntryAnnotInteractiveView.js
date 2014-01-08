@@ -45,7 +45,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                         return
                     }
 
-                    var imid = (i0+i1)/2;
+                    var imid = (i0 + i1) / 2;
                     var xscales = self.viewport.scales.x;
                     if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
                         gbubble.style('display', 'none');
@@ -53,10 +53,10 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
 
                     }
                     gbubble.style('display', null);
-                    gbubble.selectAll('text.pos').text(Math.round(imid+1));
-                    var ic0 = Math.round(imid)-4;
-                    var ic1 = Math.round(imid)+4;
-                    var subseq = self.model.get('sequence').substring(ic0, ic1+1);
+                    gbubble.selectAll('text.pos').text(Math.round(imid + 1));
+                    var ic0 = Math.round(imid) - 4;
+                    var ic1 = Math.round(imid) + 4;
+                    var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
                     gbubble.selectAll('text.subseq').text(subseq);
                     gbubble.attr('transform', 'translate(' + xscales(imid) + ',10)');
                 });
@@ -212,7 +212,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             self.p_positionText(self.viewport, sel);
             self.gAABubble = view.g.append('g').attr('class', 'aa-bubble');
             self.gAABubble.append('rect').attr('x', -40).attr('y', -23).attr('width', 81).attr('height', 26)
-            self.gAABubble.append('text').attr('class', 'pos').attr('y',-12);
+            self.gAABubble.append('text').attr('class', 'pos').attr('y', -12);
             self.gAABubble.append('text').attr('class', 'subseq');
         },
         /*
@@ -254,6 +254,9 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                 self.layerViews.push(layerView);
 
                 var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                sel.append('title').text(function(ft) {
+                    return ft.description;
+                })
             });
         },
         p_setup_hidden_layers_container : function() {

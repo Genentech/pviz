@@ -101,8 +101,8 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
             return ft.type;
         }).each(function(ftGroup, type) {
             var sel = (self.appenders[type] || defaultAppender)(viewport, svgGroup, ftGroup, type)
-            sel.attr('fttype', type)
-            self.position(viewport, sel, ftGroup)
+            sel.attr('fttype', type);
+            self.position(viewport, sel, ftGroup);
         });
 
         var allSel = svgGroup.selectAll(".feature.data")

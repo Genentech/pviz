@@ -84,7 +84,7 @@ define(['underscore', 'pviz/models/SeqEntry', 'pviz/models/PositionedFeature'], 
                 end : parseInt(node.find('END:first').text())-1,
                 type : node.find('TYPE:first').text(),
                 category : node.find('TYPE:first').attr('category'),
-                //note : node.getElementsByTagName('NOTE')[0].childNodes[0].nodeValue
+                description : node.find('NOTE:first').text()
             });
             if (options.groupSet) {
                 f.groupSet = options.groupSet;

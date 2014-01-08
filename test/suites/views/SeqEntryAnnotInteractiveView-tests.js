@@ -28,8 +28,8 @@ define(
         var div = addDZDiv('annot-interactive', 'raw_Q01279', 600, 'auto');
         new SeqEntryAnnotInteractiveView({
           model : seqEntry_Q01279,
-          el : div,
-          layerMenu : 'minimize'
+          el : div
+          //layerMenu : 'minimize'
         }).render();
 
       });
@@ -207,12 +207,14 @@ define(
           start : 1,
           end : 4,
           type : 'ttt',
-          text : '2-5'
+          text : '2-5',
+          description:'one description'
         }, {
           category : 'Region',
           start : 6,
           end : 11,
-          type : 'xxx'
+          type : 'xxx',
+          description:'another description'
         },{category:'Amino acid modification', start:6, end:6, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
         {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
         {category:'Amino acid modification', start:14, end:14, type:'xxx', text:'B', groupSet:'BBB'},

@@ -5,7 +5,7 @@
 define(['underscore'], function(_) {
   var PositionedFeature = function(options) {
     var self = this;
-    _.each(['start', 'end', 'type', 'category', 'note', 'displayTrack', 'text', 'groupSet'], function(name) {
+    _.each(['start', 'end', 'type', 'category', 'description', 'displayTrack', 'text', 'groupSet'], function(name) {
       self[name] = options[name]
     })
   }
