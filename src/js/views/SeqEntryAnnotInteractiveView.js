@@ -36,9 +36,16 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             if (options.xChangeCallback) {
                 xChangeCallbacks.push(options.xChangeCallback);
             }
+            
+            /* 
+             * add the callback to set the aabubble position and text (if needed) 
+             */
             if (!self.options.noPositionBubble) {
                 xChangeCallbacks.push(function(i0, i1) {
                     var gbubble = self.gAABubble;
+                    if(gbubble === undefined){
+                        return;
+                    }
                     if (self.viewport.scales.font > 10) {
                         gbubble.style('display', 'none');
 
@@ -210,7 +217,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             });
 
             self.p_positionText(self.viewport, sel);
-            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble');
+            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble').style('display', 'none');
             self.gAABubble.append('rect').attr('x', -40).attr('y', -23).attr('width', 81).attr('height', 26)
             self.gAABubble.append('text').attr('class', 'pos').attr('y', -12);
             self.gAABubble.append('text').attr('class', 'subseq');
@@ -254,6 +261,8 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                 self.layerViews.push(layerView);
 
                 var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                
+                //add tolltip based on description field
                 sel.append('title').text(function(ft) {
                     return ft.description;
                 })

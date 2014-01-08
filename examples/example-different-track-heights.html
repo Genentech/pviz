@@ -41,6 +41,7 @@
              */
             pviz.FeatureDisplayer.trackHeightPerCategoryType.psms = 0.2;
             pviz.FeatureDisplayer.trackHeightPerCategoryType.psms_coverage = 3;
+            pviz.FeatureDisplayer.setStrikeoutCategory('oups');
 
             new pviz.SeqEntryAnnotInteractiveView({
                 model : seqEntry,
@@ -118,13 +119,13 @@
                     coverage : c / max
                 }
             }));
-            
+
             seqEntry.addFeatures({
-                category:'oups',
-                type:'oups',
-                start:10,
-                end:40,
-                text:'oups'
+                category : 'oups',
+                type : 'oups',
+                start : 10,
+                end : 40,
+                text : 'oups'
             });
         </script>
 

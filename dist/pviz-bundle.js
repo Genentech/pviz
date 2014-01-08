@@ -1,4 +1,4 @@
-/*! pviz - v0.1.1 - 2014-01-07 */
+/*! pviz - v0.1.1 - 2014-01-08 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -12166,7 +12166,7 @@ define('pviz/models/SeqEntry',['underscore', 'backbone'], function(_, Backbone) 
 define('pviz/models/PositionedFeature',['underscore'], function(_) {
   var PositionedFeature = function(options) {
     var self = this;
-    _.each(['start', 'end', 'type', 'category', 'note', 'displayTrack', 'text', 'groupSet'], function(name) {
+    _.each(['start', 'end', 'type', 'category', 'description', 'displayTrack', 'text', 'groupSet'], function(name) {
       self[name] = options[name]
     })
   }
@@ -12260,7 +12260,7 @@ define('pviz/services/DASReader',['underscore', 'pviz/models/SeqEntry', 'pviz/mo
                 end : parseInt(node.find('END:first').text())-1,
                 type : node.find('TYPE:first').text(),
                 category : node.find('TYPE:first').attr('category'),
-                //note : node.getElementsByTagName('NOTE')[0].childNodes[0].nodeValue
+                description : node.find('NOTE:first').text()
             });
             if (options.groupSet) {
                 f.groupSet = options.groupSet;
@@ -12535,212 +12535,239 @@ define('pviz/views/TypedDisplayer',[], function() {
  */
 define('pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function($, _, Backbone, d3, typedDisplayer) {
 
-  /**
-   * display array of features passed as d3selection.
-   *
-   */
-  var FeatureDisplayer = function() {
-    var self = this;
+    /**
+     * display array of features passed as d3selection.
+     *
+     */
+    var FeatureDisplayer = function() {
+        var self = this;
 
-    self.positioners = {};
-    self.appenders = {};
+        self.positioners = {};
+        self.appenders = {};
 
-    self.mouseoverCallBacks = {};
-    self.mouseoutCallBacks = {};
-    self.clickCallBacks = {};
+        self.mouseoverCallBacks = {};
+        self.mouseoutCallBacks = {};
+        self.clickCallBacks = {};
 
-    typedDisplayer.init(self);
-    self.trackHeightPerCategoryType = {};
-  }
-  /**
-   * that's the way to register other maner of displying info thatn mere
-   * rectangle
-   */
-  FeatureDisplayer.prototype.setCustomHandler = function(type, mFct) {
-    var self = this;
-    if (_.isArray(type)) {
-      _.each(type, function(t) {
-        self.setCustomHandler(t, mFct)
-      })
-      return self;
+        typedDisplayer.init(self);
+        self.trackHeightPerCategoryType = {};
+        self.strikeoutCategory = {}
     }
-    self.appenders[type] = mFct.appender
-    self.positioners[type] = mFct.positioner
+    /**
+     * that's the way to register other maner of displying info thatn mere
+     * rectangle
+     */
+    FeatureDisplayer.prototype.setCustomHandler = function(type, mFct) {
+        var self = this;
+        if (_.isArray(type)) {
+            _.each(type, function(t) {
+                self.setCustomHandler(t, mFct)
+            })
+            return self;
+        }
+        self.appenders[type] = mFct.appender
+        self.positioners[type] = mFct.positioner
 
-    self.addMouseoverCallback(type, mFct.mouseoverCallback)
-    self.addMouseoutCallback(type, mFct.mouseoutCallback)
-    self.addClickCallback(type, mFct.clickCallback)
+        self.addMouseoverCallback(type, mFct.mouseoverCallback)
+        self.addMouseoutCallback(type, mFct.mouseoutCallback)
+        self.addClickCallback(type, mFct.clickCallback)
 
-    return self
-  }
+        return self
+    }
 
-  FeatureDisplayer.prototype.addMouseoverCallback = function(name, fct) {
-    var self = this;
+    FeatureDisplayer.prototype.addMouseoverCallback = function(name, fct) {
+        var self = this;
 
-    if (fct) {
-      if (_.isArray(name)) {
-        _.each(name, function(n) {
-          self.addMouseoverCallback(n, fct)
-        })
+        if (fct) {
+            if (_.isArray(name)) {
+                _.each(name, function(n) {
+                    self.addMouseoverCallback(n, fct)
+                })
+                return self;
+            }
+        }
+        self.mouseoverCallBacks[name] = fct;
         return self;
-      }
     }
-    self.mouseoverCallBacks[name] = fct;
-    return self;
-  }
 
-  FeatureDisplayer.prototype.addMouseoutCallback = function(name, fct) {
-    var self = this;
+    FeatureDisplayer.prototype.addMouseoutCallback = function(name, fct) {
+        var self = this;
 
-    if (fct) {
-      if (_.isArray(name)) {
-        _.each(name, function(n) {
-          self.addMouseoutCallback(n, fct)
-        })
+        if (fct) {
+            if (_.isArray(name)) {
+                _.each(name, function(n) {
+                    self.addMouseoutCallback(n, fct)
+                })
+                return self;
+            }
+        }
+        self.mouseoutCallBacks[name] = fct;
         return self;
-      }
     }
-    self.mouseoutCallBacks[name] = fct;
-    return self;
-  }
 
-  FeatureDisplayer.prototype.addClickCallback = function(name, fct) {
-    var self = this;
+    FeatureDisplayer.prototype.addClickCallback = function(name, fct) {
+        var self = this;
 
-    if (fct) {
-      if (_.isArray(name)) {
-        _.each(name, function(n) {
-          self.addClickCallback(n, fct)
-        })
+        if (fct) {
+            if (_.isArray(name)) {
+                _.each(name, function(n) {
+                    self.addClickCallback(n, fct)
+                })
+                return self;
+            }
+        }
+        self.clickCallBacks[name] = fct;
         return self;
-      }
-    }
-    self.clickCallBacks[name] = fct;
-    return self;
-  }
-
-  FeatureDisplayer.prototype.append = function(viewport, svgGroup, features) {
-    var self = this;
-
-    _.chain(features).groupBy(function(ft) {
-      return ft.type;
-    }).each(function(ftGroup, type) {
-      var sel = (self.appenders[type] || defaultAppender)(viewport, svgGroup, ftGroup, type)
-      sel.attr('fttype', type)
-      self.position(viewport, sel, ftGroup)
-    });
-
-    var allSel = svgGroup.selectAll(".feature.data")
-    allSel.on('mouseover', function(ft) {
-      self.callMouseoverCallBacks(ft, this)
-    })
-    allSel.on('mouseout', function(ft) {
-      self.callMouseoutCallBacks(ft, this)
-    })
-    allSel.on('click', function(ft) {
-      self.callClickCallBacks(ft, this);
-    })
-    return allSel
-  }
-
-  FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft, el) {
-    var self = this;
-    if (self.mouseoverCallBacks[ft.type] !== undefined) {
-      self.mouseoverCallBacks[ft.type](ft, el)
-    }
-  }
-
-  FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft, el) {
-    var self = this;
-    if (self.mouseoutCallBacks[ft.type] !== undefined) {
-      self.mouseoutCallBacks[ft.type](ft, el)
-    }
-  }
-  FeatureDisplayer.prototype.callClickCallBacks = function(ft, el) {
-    var self = this;
-    if (self.clickCallBacks[ft.type] !== undefined) {
-      self.clickCallBacks[ft.type](ft, el)
-    }
-  }
-  var defaultAppender = function(viewport, svgGroup, features, type) {
-    var sel = svgGroup.selectAll("rect.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
-    sel.append("rect").attr('class', 'feature');
-    sel.append("rect").attr('class', 'feature-block-end').attr('fill', 'url(#grad_endFTBlock)');
-
-    sel.append("text").attr('y', viewport.scales.y(0.5)).attr('x', 2);
-
-    return sel
-  }
-
-  FeatureDisplayer.prototype.position = function(viewport, sel) {
-    var self = this;
-    _.chain(sel[0]).map(function(s) {
-      return s.attributes.fttype.nodeValue;
-    }).unique().each(function(type) {
-      (self.positioners[type] || defaultPositioner)(viewport, sel.filter(function(ft) {
-        return ft.type == type
-      }))
-    });
-
-    return sel
-  }
-  /**
-   * return the height factory associated with
-   */
-  FeatureDisplayer.prototype.heightFactor = function(o) {
-    if ( o instanceof Object) {
-      return this.heightFactor(o.type || o.name)
     }
 
-    return this.trackHeightPerCategoryType[o] || 1
-  }
-  /**
-   * refresh posiiton, font size ... at init or after zooming
-   *
-   * @param {Object}
-   *          viewport
-   * @param {Object}
-   *          d3selection
-   */
-  // FeatureDisplayer.prototype.position = function(viewport, d3selection) {
-  var defaultPositioner = function(viewport, d3selection) {
-    var hFactor = singleton.heightFactor(d3selection[0][0].__data__.category);
-    // var yscale=singleton.trackHeightFactorPerCategory[]
+    FeatureDisplayer.prototype.append = function(viewport, svgGroup, features) {
+        var self = this;
 
-    d3selection.attr('transform', function(ft) {
-      return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + hFactor * viewport.scales.y(0.12 + ft.displayTrack) + ')';
-    });
-    var ftWidth = function(ft) {
-      return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+        //add hirizontal line if needed for thecategory
+
+        var curCat = _.chain(features).pluck('category').uniq().value()[0];
+        if (self.strikeoutCategory[curCat]) {
+            var maxTrack = _.chain(features).pluck('displayTrack').max().value();
+            var g = svgGroup.append('g').attr('class', 'strikeout');
+            var hFactor = self.heightFactor(curCat);
+
+            for (var i = 0; i <= maxTrack; i++) {
+                var y = viewport.scales.y((i + 0.5)) * hFactor;
+                g.append('line').attr('x1', -100).attr('x2', 10000).attr('y1', y).attr('y2', y);
+            }
+        }
+
+        //append the feature
+        _.chain(features).groupBy(function(ft) {
+            return ft.type;
+        }).each(function(ftGroup, type) {
+            var sel = (self.appenders[type] || defaultAppender)(viewport, svgGroup, ftGroup, type)
+            sel.attr('fttype', type);
+            self.position(viewport, sel, ftGroup);
+        });
+
+           //register call back event handlers
+        var allSel = svgGroup.selectAll(".feature.data")
+        allSel.on('mouseover', function(ft) {
+            self.callMouseoverCallBacks(ft, this)
+        })
+        allSel.on('mouseout', function(ft) {
+            self.callMouseoutCallBacks(ft, this)
+        })
+        allSel.on('click', function(ft) {
+            self.callClickCallBacks(ft, this);
+        });
+
+        return allSel
     }
-    d3selection.selectAll("rect.feature").attr('width', ftWidth).attr('height', hFactor * viewport.scales.y(0.76));
-    d3selection.selectAll("rect.feature-block-end").attr('width', 10).attr('x', function(ft) {
-      return ftWidth(ft) - 10;
-    }).style('display', function(ft) {
-      return (ftWidth(ft) > 20) ? null : 'none';
-    }).attr('height', viewport.scales.y(hFactor * 0.76));
 
-    var fontSize = 9 * hFactor;
-    // self.fontSizeLine();
-    var selText = d3selection.selectAll("text");
-    selText.text(function(ft) {
-      var text = (ft.text !== undefined) ? ft.text : ft.type;
-      var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start);
-      if (w <= 5 || text.length == 0) {
-        return '';
-      }
-      var nchar = Math.floor(w / fontSize * 1.6);
-      if (nchar >= text.length)
-        return text;
-      if (nchar <= 2)
-        return '';
-      return text.substr(0, nchar);
-    }).style('font-size', fontSize);
-    return d3selection
-  }
-  var singleton = new FeatureDisplayer();
+    FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft, el) {
+        var self = this;
+        if (self.mouseoverCallBacks[ft.type] !== undefined) {
+            self.mouseoverCallBacks[ft.type](ft, el)
+        }
+    }
 
-  return singleton;
+    FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft, el) {
+        var self = this;
+        if (self.mouseoutCallBacks[ft.type] !== undefined) {
+            self.mouseoutCallBacks[ft.type](ft, el)
+        }
+    }
+    FeatureDisplayer.prototype.callClickCallBacks = function(ft, el) {
+        var self = this;
+        if (self.clickCallBacks[ft.type] !== undefined) {
+            self.clickCallBacks[ft.type](ft, el)
+        }
+    }
+    var defaultAppender = function(viewport, svgGroup, features, type) {
+        var sel = svgGroup.selectAll("rect.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+        sel.append("rect").attr('class', 'feature');
+        sel.append("rect").attr('class', 'feature-block-end').attr('fill', 'url(#grad_endFTBlock)');
+
+        sel.append("text").attr('y', viewport.scales.y(0.5)).attr('x', 2);
+
+        return sel
+    }
+
+    FeatureDisplayer.prototype.position = function(viewport, sel) {
+        var self = this;
+        _.chain(sel[0]).map(function(s) {
+            return s.attributes.fttype.nodeValue;
+        }).unique().each(function(type) {
+            (self.positioners[type] || defaultPositioner)(viewport, sel.filter(function(ft) {
+                return ft.type == type
+            }))
+        });
+
+        return sel
+    }
+    /**
+     * return the height factory associated with
+     */
+    FeatureDisplayer.prototype.heightFactor = function(o) {
+        if ( o instanceof Object) {
+            return this.heightFactor(o.type || o.name)
+        }
+
+        return this.trackHeightPerCategoryType[o] || 1
+    }
+    /**
+     * you can register a cetgory to have a strikeout line.
+     * Some people love it
+     */
+
+    FeatureDisplayer.prototype.setStrikeoutCategory = function(cat) {
+        this.strikeoutCategory[cat] = true;
+    };
+
+    /**
+     * refresh posiiton, font size ... at init or after zooming
+     *
+     * @param {Object}
+     *          viewport
+     * @param {Object}
+     *          d3selection
+     */
+    // FeatureDisplayer.prototype.position = function(viewport, d3selection) {
+    var defaultPositioner = function(viewport, d3selection) {
+        var hFactor = singleton.heightFactor(d3selection[0][0].__data__.category);
+        // var yscale=singleton.trackHeightFactorPerCategory[]
+
+        d3selection.attr('transform', function(ft) {
+            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + hFactor * viewport.scales.y(0.12 + ft.displayTrack) + ')';
+        });
+        var ftWidth = function(ft) {
+            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+        }
+        d3selection.selectAll("rect.feature").attr('width', ftWidth).attr('height', hFactor * viewport.scales.y(0.76));
+        d3selection.selectAll("rect.feature-block-end").attr('width', 10).attr('x', function(ft) {
+            return ftWidth(ft) - 10;
+        }).style('display', function(ft) {
+            return (ftWidth(ft) > 20) ? null : 'none';
+        }).attr('height', viewport.scales.y(hFactor * 0.76));
+
+        var fontSize = 9 * hFactor;
+        // self.fontSizeLine();
+        var selText = d3selection.selectAll("text");
+        selText.text(function(ft) {
+            var text = (ft.text !== undefined) ? ft.text : ft.type;
+            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start);
+            if (w <= 5 || text.length == 0) {
+                return '';
+            }
+            var nchar = Math.floor(w / fontSize * 1.6);
+            if (nchar >= text.length)
+                return text;
+            if (nchar <= 2)
+                return '';
+            return text.substr(0, nchar);
+        }).style('font-size', fontSize);
+        return d3selection
+    }
+    var singleton = new FeatureDisplayer();
+
+    return singleton;
 });
 
 /*
@@ -15969,25 +15996,36 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             if (options.xChangeCallback) {
                 xChangeCallbacks.push(options.xChangeCallback);
             }
+            
+            /* 
+             * add the callback to set the aabubble position and text (if needed) 
+             */
             if (!self.options.noPositionBubble) {
                 xChangeCallbacks.push(function(i0, i1) {
                     var gbubble = self.gAABubble;
+                    if(gbubble === undefined){
+                        return;
+                    }
                     if (self.viewport.scales.font > 10) {
                         gbubble.style('display', 'none');
 
                         return
                     }
 
-                    var i = Math.round((i0 + i1) / 2);
+                    var imid = (i0 + i1) / 2;
                     var xscales = self.viewport.scales.x;
-                    if (i < xscales.domain()[0] || i > xscales.domain()[1]) {
+                    if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
                         gbubble.style('display', 'none');
                         return;
 
                     }
                     gbubble.style('display', null);
-                    gbubble.selectAll('text').text(self.model.get('sequence').split('')[i] + ' '+ (i+1));
-                    gbubble.attr('transform', 'translate(' + (xscales(i)-13) + ',10)');
+                    gbubble.selectAll('text.pos').text(Math.round(imid + 1));
+                    var ic0 = Math.round(imid) - 4;
+                    var ic1 = Math.round(imid) + 4;
+                    var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
+                    gbubble.selectAll('text.subseq').text(subseq);
+                    gbubble.attr('transform', 'translate(' + xscales(imid) + ',10)');
                 });
 
             }
@@ -16139,9 +16177,10 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             });
 
             self.p_positionText(self.viewport, sel);
-            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble');
-            self.gAABubble .append('rect').attr('x', -5).attr('y', -13).attr('width', 65).attr('height', 16)
-            self.gAABubble.append('text');
+            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble').style('display', 'none');
+            self.gAABubble.append('rect').attr('x', -40).attr('y', -23).attr('width', 81).attr('height', 26)
+            self.gAABubble.append('text').attr('class', 'pos').attr('y', -12);
+            self.gAABubble.append('text').attr('class', 'subseq');
         },
         /*
          * group features by category, and build a lyer for each of them
@@ -16182,6 +16221,11 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                 self.layerViews.push(layerView);
 
                 var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                
+                //add tolltip based on description field
+                sel.append('title').text(function(ft) {
+                    return ft.description;
+                })
             });
         },
         p_setup_hidden_layers_container : function() {

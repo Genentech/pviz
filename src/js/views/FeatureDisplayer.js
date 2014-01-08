@@ -97,6 +97,21 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
     FeatureDisplayer.prototype.append = function(viewport, svgGroup, features) {
         var self = this;
 
+        //add hirizontal line if needed for thecategory
+
+        var curCat = _.chain(features).pluck('category').uniq().value()[0];
+        if (self.strikeoutCategory[curCat]) {
+            var maxTrack = _.chain(features).pluck('displayTrack').max().value();
+            var g = svgGroup.append('g').attr('class', 'strikeout');
+            var hFactor = self.heightFactor(curCat);
+
+            for (var i = 0; i <= maxTrack; i++) {
+                var y = viewport.scales.y((i + 0.5)) * hFactor;
+                g.append('line').attr('x1', -100).attr('x2', 10000).attr('y1', y).attr('y2', y);
+            }
+        }
+
+        //append the feature
         _.chain(features).groupBy(function(ft) {
             return ft.type;
         }).each(function(ftGroup, type) {
@@ -105,6 +120,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
             self.position(viewport, sel, ftGroup);
         });
 
+           //register call back event handlers
         var allSel = svgGroup.selectAll(".feature.data")
         allSel.on('mouseover', function(ft) {
             self.callMouseoverCallBacks(ft, this)
@@ -114,7 +130,8 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
         })
         allSel.on('click', function(ft) {
             self.callClickCallBacks(ft, this);
-        })
+        });
+
         return allSel
     }
 

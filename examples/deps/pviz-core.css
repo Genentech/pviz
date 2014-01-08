@@ -32,11 +32,12 @@ text.sequence {
 }
 
 g.aa-bubble text {
+    text-anchor: middle;
     font-family: monospace;
 }
 g.aa-bubble rect {
-    stroke:#777;
-    fill:white;
+    stroke: #777;
+    fill: white;
 }
 svg.pviz rect.background {
     fill: #f5f5f5;
@@ -54,9 +55,12 @@ g.layer:hover rect.layer-background {
     opacity: 1.0;
 }
 
+/**
+ *     color brewer 7 class paired #a6cee3 #1f78b4 #b2df8a #33a02c #fb9a99 #e31a1c #fdbf6f
+ */
 g.feature rect.feature {
-    fill: blue;
-    fill-opacity: 0.3;
+    fill: #a6cee3;
+    fill-opacity: 0.9;
     stroke: #555;
     stroke-opacity: 0.6;
 }
@@ -67,10 +71,15 @@ g.feature text {
 }
 
 g.feature.Region rect.feature {
-    fill: yellow;
+    fill: #1f78b4;
 }
 g.feature.Molecule_processing rect.feature {
-    fill: orange;
+    fill: #b2df8a;
+}
+
+g.layer g.strikeout line {
+    stroke: #bbb;
+    stroke-width: 2px;
 }
 
 /*menu*/

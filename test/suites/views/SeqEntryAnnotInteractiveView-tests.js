@@ -91,6 +91,8 @@ define(
         var div = addDZDiv('annot-interactive',
             'shorty layerMenu:"sticky", paddingCategory:3', 600, 'auto');
 
+        featureDisplayer.setStrikeoutCategory('Amino acid modification')
+
         var view = new SeqEntryAnnotInteractiveView({
           model : se,
           el : div,
