@@ -45,16 +45,20 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                         return
                     }
 
-                    var i = Math.round((i0 + i1) / 2);
+                    var imid = (i0+i1)/2;
                     var xscales = self.viewport.scales.x;
-                    if (i < xscales.domain()[0] || i > xscales.domain()[1]) {
+                    if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
                         gbubble.style('display', 'none');
                         return;
 
                     }
                     gbubble.style('display', null);
-                    gbubble.selectAll('text').text(self.model.get('sequence').split('')[i] + ' '+ (i+1));
-                    gbubble.attr('transform', 'translate(' + (xscales(i)-13) + ',10)');
+                    gbubble.selectAll('text.pos').text(Math.round(imid+1));
+                    var ic0 = Math.round(imid)-4;
+                    var ic1 = Math.round(imid)+4;
+                    var subseq = self.model.get('sequence').substring(ic0, ic1+1);
+                    gbubble.selectAll('text.subseq').text(subseq);
+                    gbubble.attr('transform', 'translate(' + xscales(imid) + ',10)');
                 });
 
             }
@@ -207,8 +211,9 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
 
             self.p_positionText(self.viewport, sel);
             self.gAABubble = view.g.append('g').attr('class', 'aa-bubble');
-            self.gAABubble .append('rect').attr('x', -5).attr('y', -13).attr('width', 65).attr('height', 16)
-            self.gAABubble.append('text');
+            self.gAABubble.append('rect').attr('x', -40).attr('y', -23).attr('width', 81).attr('height', 26)
+            self.gAABubble.append('text').attr('class', 'pos').attr('y',-12);
+            self.gAABubble.append('text').attr('class', 'subseq');
         },
         /*
          * group features by category, and build a lyer for each of them
