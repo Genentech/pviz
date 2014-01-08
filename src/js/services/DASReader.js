@@ -80,8 +80,8 @@ define(['underscore', 'pviz/models/SeqEntry', 'pviz/models/PositionedFeature'], 
         }).map(function(n) {
             var node = $(n);
             var f = new PositionedFeature({
-                start : parseInt(node.find('START:first').text()),
-                end : parseInt(node.find('END:first').text()),
+                start : parseInt(node.find('START:first').text())-1,
+                end : parseInt(node.find('END:first').text())-1,
                 type : node.find('TYPE:first').text(),
                 category : node.find('TYPE:first').attr('category'),
                 //note : node.getElementsByTagName('NOTE')[0].childNodes[0].nodeValue

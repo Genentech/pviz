@@ -96,8 +96,12 @@ g.one-hidden-layer text {
 /*
  * axis
  */
-g.axis line.tick {
+g.axis g.tick line {
     stroke: black;
+}
+g.axis path.domain{
+    stroke: black;
+    fill:none;
 }
 
 /* icons sections!! */

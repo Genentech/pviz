@@ -6,10 +6,13 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
     var SeqEntryViewport = function(options) {
         var self = this;
 
+        self.margins = _.extend({
+            left : 0,
+            right : 0,
+            top : 0,
+            bottom : 0
+        })
         self.yShift = (options && options.yShift)
-        if (self.yShift === undefined)
-            self.yShift = 25;
-        self.xShift = (options && options.xShift) || 0;
 
         for (n in options) {
             self[n] = options[n];
@@ -29,7 +32,7 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
             }
         });
         self.svg.on('mouseout', function() {
-            self.xBar.style('display','none');
+            self.xBar.style('display', 'none');
         }).on('mouseover', function() {
             self.xBar.style('display', null);
         })
@@ -48,8 +51,14 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
         function brushZoom() {
             self.rectClear()
             var bounds = brush.extent();
+            if(bounds[0]<0){
+                bounds[0]=0;
+            }
+            if(bounds[1]>self.length-1){
+                bounds[1]=self.length-1;
+            }
             if (bounds[1] < bounds[0] + 0.3) {
-                self.scales.x.domain([-1, self.length + 1]);
+                self.scales.x.domain([0, self.length - 1]);
             } else {
                 self.scales.x.domain([Math.floor(bounds[0]), Math.ceil(bounds[1])]);
             }
@@ -88,7 +97,10 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
         // });
         // }
         var domain = self.scales.x.domain();
-        // console.log('a', domain)
+        if (domain[0] < 1)
+            domain[0] = 0;
+        if (domain[1] > self.length)
+            domain[1] = self.length
 
         if (domain[1] - domain[0] < 4) {
             var d = 2 - (domain[1] - domain[0]) / 2;
@@ -97,10 +109,6 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
         }
 
         //console.log('b', domain)
-        if (domain[0] < -1)
-            domain[0] = -1;
-        if (domain[1] > self.length + 1)
-            domain[1] = self.length + 1
 
         //console.log('c', domain)
 
@@ -134,7 +142,7 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
             w = $(document).height();
             self.dim.height = h;
         }
-
+        self.dim.innerWidth = self.dim.width - self.margins.left - self.margins.right;
         self.computeScaling()
     };
 
@@ -144,13 +152,14 @@ define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) 
             options = {};
         }
         var xMin = options.xMin || 0;
-        var xMax = options.xMax || (self.length + 1);
+        var xMax = options.xMax || (self.length - 1);
         var lineHeight = 15;
 
         if (self.scales == undefined)
             self.scales = {};
         if (self.scales.x == undefined) {
-            self.scales.x = d3.scale.linear().domain([xMin - 1, xMax]).range([self.xShift, self.dim.width])
+            self.scales.x = d3.scale.linear().domain([xMin, xMax]).range([self.margins.left, self.dim.width - self.margins.right])
+            console.log()
         } else {
             self.scales.x.domain([xMin, xMax]);
         }

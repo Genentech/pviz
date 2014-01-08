@@ -41,40 +41,35 @@ define(
         })
         se.set('features', [ {
           category : 'full',
-          start : 1,
-          end : 26,
+          start : 0,
+          end : 25,
           type : 'ttt'
         }, {
           category : 'Region',
-          start : 2,
-          end : 5,
+          start : 1,
+          end : 4,
           type : 'ttt',
           text : '2-5'
         }, {
           category : 'Region',
-          start : 7,
-          end : 12,
+          start : 6,
+          end : 11,
           type : 'xxx'
         }, {
           category : 'Amino acid modification',
-          start : 7,
-          end : 7,
+          start : 6,
+          end : 6,
           type : 'xxx',
           text : '7-7'
         }, {
           category : 'Amino acid modification',
-          start : 12,
-          end : 12,
+          start : 11,
+          end : 11,
           type : 'xxx'
         }, {
           category : 'Amino acid modification',
-          start : 15,
-          end : 15,
-          type : 'xxx'
-        }, {
-          category : 'Amino acid modification',
-          start : 26,
-          end : 26,
+          start : 14,
+          end : 14,
           type : 'xxx'
         }, {
           category : 'Amino acid modification',
@@ -83,8 +78,13 @@ define(
           type : 'xxx'
         }, {
           category : 'Amino acid modification',
-          start : 22,
-          end : 26,
+          start : 24,
+          end : 24,
+          type : 'xxx'
+        }, {
+          category : 'Amino acid modification',
+          start : 21,
+          end : 25,
           type : 'xxx'
         } ])
 
@@ -116,40 +116,35 @@ define(
             })
             se.set('features', [ {
               category : 'full',
-              start : 1,
-              end : 26,
+              start : 0,
+              end : 25,
               type : 'ttt'
             }, {
               category : 'Region',
-              start : 2,
-              end : 5,
+              start : 1,
+              end : 4,
               type : 'ttt',
               text : '2-5'
             }, {
               category : 'Region',
-              start : 7,
-              end : 12,
+              start : 6,
+              end : 11,
               type : 'xxx'
             }, {
               category : 'Amino acid modification',
-              start : 7,
-              end : 7,
+              start : 6,
+              end : 6,
               type : 'xxx',
               text : '7-7'
             }, {
               category : 'Amino acid modification',
-              start : 12,
-              end : 12,
+              start : 11,
+              end : 11,
               type : 'xxx'
             }, {
               category : 'Amino acid modification',
-              start : 15,
-              end : 15,
-              type : 'xxx'
-            }, {
-              category : 'Amino acid modification',
-              start : 26,
-              end : 26,
+              start : 14,
+              end : 14,
               type : 'xxx'
             }, {
               category : 'Amino acid modification',
@@ -158,27 +153,33 @@ define(
               type : 'xxx'
             }, {
               category : 'Amino acid modification',
-              start : 22,
-              end : 26,
+              start : 24,
+              end : 24,
+              type : 'xxx'
+            }, {
+              category : 'Amino acid modification',
+              start : 21,
+              end : 25,
               type : 'xxx'
             } ])
 
-            var div = addDZDiv('annot-interactive', 'interactive one', 600,
+            var div = addDZDiv('annot-interactive', 'interactive one, marginLeft:150', 600,
                 'auto');
 
             featureDisplayer.addMouseoverCallback(['xxx'], function(ft){
-              console.log('MOUSEOVER', ft)
-            })
+              console.log('MOUSEOVER', ft);
+            });
               featureDisplayer.addMouseoutCallback(['xxx'], function(ft){
-                console.log('MOPUSOUT', ft)
-              })
-              featureDisplayer.addClickCallback(['xxx'], function(ft){
-                console.log('CLICK', ft)
+                console.log('MOPUSOUT', ft);
               });
+              featureDisplayer.addClickCallback(['xxx'], function(ft){
+                console.log('CLICK', ft);
+              });;
             var view = new SeqEntryAnnotInteractiveView({
               model : se,
               el : div,
-              layerMenu : 'interact'
+              layerMenu : 'interact',
+              marginLeft:150
             })
             view.render();
 
@@ -198,30 +199,30 @@ define(
         })
         se.set('features', [ {
           category : 'full',
-          start : 1,
-          end : 26,
+          start : 0,
+          end : 25,
           type : 'ttt'
         }, {
           category : 'Region',
-          start : 2,
-          end : 5,
+          start : 1,
+          end : 4,
           type : 'ttt',
           text : '2-5'
         }, {
           category : 'Region',
-          start : 7,
-          end : 12,
+          start : 6,
+          end : 11,
           type : 'xxx'
-        },{category:'Amino acid modification', start:7, end:7, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
-        {category:'Amino acid modification', start:12, end:12, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
-        {category:'Amino acid modification', start:15, end:15, type:'xxx', text:'B', groupSet:'BBB'},
-        {category:'Amino acid modification', start:26, end:26, type:'xxx', text:'B', groupSet:'BBB'},
-        {category:'Amino acid modification', start:25, end:25, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
-        {category:'Amino acid modification', start:22, end:26, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
-        {category:'Amino acid modification', start:7, end:7, type:'xxx', text:'C', groupSet:'CCC'},
-        {category:'Amino acid modification', start:12, end:12, type:'xxx', text:'C', groupSet:'CCC'},
-        {category:'Amino acid modification', start:25, end:25, type:'xxx', text:'C', groupSet:'CCC'},
-        {category:'Amino acid modification', start:22, end:26, type:'xxx', text:'C', groupSet:'CCC'}
+        },{category:'Amino acid modification', start:6, end:6, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+        {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+        {category:'Amino acid modification', start:14, end:14, type:'xxx', text:'B', groupSet:'BBB'},
+        {category:'Amino acid modification', start:25, end:25, type:'xxx', text:'B', groupSet:'BBB'},
+        {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+        {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+        {category:'Amino acid modification', start:6, end:6, type:'xxx', text:'C', groupSet:'CCC'},
+        {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'C', groupSet:'CCC'},
+        {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'C', groupSet:'CCC'},
+        {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'C', groupSet:'CCC'}
         ])
 
         var div = addDZDiv('annot-interactive', 'shorty', 600, 'auto');
@@ -287,33 +288,33 @@ PMFNVHTGERLPPRVDSAQVPLILDQH';
                     category : 'regions',
                     type : 'topological domain',
                     text : 'extra cellular',
-                    start : 22,
-                    end : 650
+                    start : 0,
+                    end : 649
                   }, {
                     category : 'secondary structure',
                     type : 'beta_strand',
-                    start : 24,
-                    end : 26
+                    start : 23,
+                    end : 25
                   }, {
                     category : 'secondary structure',
                     type : 'helix',
-                    start : 38,
-                    end : 49
+                    start : 37,
+                    end : 48
                   }, {
                     category : 'secondary structure',
                     type : 'beta_strand',
-                    start : 53,
-                    end : 57
+                    start : 52,
+                    end : 56
                   }, {
                     category : 'secondary structure',
                     type : 'turn',
-                    start : 59,
-                    end : 63
+                    start : 58,
+                    end : 62
                   }, {
                     category : 'secondary structure',
                     type : 'helix',
-                    start : 71,
-                    end : 73
+                    start : 70,
+                    end : 72
                   } ]);
                   new SeqEntryAnnotInteractiveView({
                     model : seqEntry,
