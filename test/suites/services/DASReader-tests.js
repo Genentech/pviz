@@ -90,8 +90,8 @@ define(['jquery', 'underscore', 'suites/ExpServer', 'pviz/models/SeqEntry', 'pvi
                     runs(function() {
                         expect(seqEntry.get('features').length).toEqual(84);
                         var first = seqEntry.get('features')[0];
-                        expect(first.start).toBe(1);
-                        expect(first.end).toBe(24);
+                        expect(first.start).toBe(0);
+                        expect(first.end).toBe(23);
                         expect(first.type).toEqual('signal_peptide');
                         expect(first.category).toEqual('Molecule processing');
                         //                         expect(first.label).toEqual('UNIPROTKB_Q01279_SIGNAL_1_24');
