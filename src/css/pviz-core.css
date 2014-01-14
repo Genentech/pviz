@@ -33,6 +33,7 @@ text.sequence {
 
 g.aa-bubble text {
     text-anchor: middle;
+    alignment-baseline: middle;
     font-family: monospace;
 }
 g.aa-bubble rect {

@@ -18,6 +18,9 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
 
             self.paddingCategory = options.paddingCategory || 0;
 
+            self.bubbleSequenceNb = 4;
+            self.clipperId = 'clipper_'+Math.round(100000*Math.random());
+
             $(self.el).empty();
             var el = $(tmpl);
             $(self.el).append(el)
@@ -36,14 +39,14 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             if (options.xChangeCallback) {
                 xChangeCallbacks.push(options.xChangeCallback);
             }
-            
-            /* 
-             * add the callback to set the aabubble position and text (if needed) 
+
+            /*
+             * add the callback to set the aabubble position and text (if needed)
              */
             if (!self.options.noPositionBubble) {
                 xChangeCallbacks.push(function(i0, i1) {
                     var gbubble = self.gAABubble;
-                    if(gbubble === undefined){
+                    if (gbubble === undefined) {
                         return;
                     }
                     if (self.viewport.scales.font > 10) {
@@ -61,10 +64,25 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                     }
                     gbubble.style('display', null);
                     gbubble.selectAll('text.pos').text(Math.round(imid + 1));
-                    var ic0 = Math.round(imid) - 4;
-                    var ic1 = Math.round(imid) + 4;
+                    var ic0 = Math.round(imid) - self.bubbleSequenceNb;
+                    var ic1 = Math.round(imid) + self.bubbleSequenceNb;
                     var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
-                    gbubble.selectAll('text.subseq').text(subseq);
+
+                    var ts = gbubble.selectAll('text.subseq').data(subseq.split(''));
+                    ts.exit().remove();
+                    ts.enter().append("text").attr('class', 'subseq');
+                    ts.text(function(d) {
+                        return d;
+                    }).attr('x', function(t, i){
+                        var d = Math.abs(i-4);
+                        return (i-self.bubbleSequenceNb)*10/(1+d*0.1)
+                    }).style('font-size', function(t, i){
+                        var d = Math.abs(i-4);
+                        return ''+(120*(0.2 + 0.2*(4-d)))+'%';
+                    }).attr('y', -5);
+                    
+
+                    //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
                     gbubble.attr('transform', 'translate(' + xscales(imid) + ',10)');
                 });
 
@@ -188,7 +206,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
 
             var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
-            defs.append('clipPath').attr('id', 'clipper').append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
+            defs.append('clipPath').attr('id', self.clipperId).append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
         },
         /*
          * build the Sequence layer
@@ -208,7 +226,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                 cssClass : 'sequence',
                 noMenu : true,
                 margins : self.margins,
-                clipper : '#clipper'
+                clipper : '#'+self.clipperId
             })
             self.layerViews.push(view)
 
@@ -219,7 +237,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             self.p_positionText(self.viewport, sel);
             self.gAABubble = view.g.append('g').attr('class', 'aa-bubble').style('display', 'none');
             self.gAABubble.append('rect').attr('x', -40).attr('y', -23).attr('width', 81).attr('height', 26)
-            self.gAABubble.append('text').attr('class', 'pos').attr('y', -12);
+            self.gAABubble.append('text').attr('class', 'pos').attr('y', -17);
             self.gAABubble.append('text').attr('class', 'subseq');
         },
         /*
@@ -256,12 +274,12 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                     cssClass : cssClass,
                     layerMenu : self.options.layerMenu,
                     margins : self.margins,
-                    clipper : '#clipper'
+                    clipper : '#'+self.clipperId
                 });
                 self.layerViews.push(layerView);
 
                 var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
-                
+
                 //add tolltip based on description field
                 sel.append('title').text(function(ft) {
                     return ft.description;
