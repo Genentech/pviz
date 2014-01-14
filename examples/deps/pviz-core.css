@@ -30,12 +30,17 @@ text.sequence {
     text-anchor: middle;
     font-family: monospace;
 }
+line.sequence-bg{
+    stroke-width:3px;
+    stroke:#aaa;
+}
 
-g.aa-bubble text {
+g.axis-bubble text {
     text-anchor: middle;
+    alignment-baseline: middle;
     font-family: monospace;
 }
-g.aa-bubble rect {
+g.axis-bubble rect {
     stroke: #777;
     fill: white;
 }

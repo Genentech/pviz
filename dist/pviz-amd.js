@@ -1,4 +1,4 @@
-/*! pviz - v0.1.1 - 2014-01-08 */
+/*! pviz - v0.1.2 - 2014-01-13 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -1568,6 +1568,9 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
 
             self.paddingCategory = options.paddingCategory || 0;
 
+            self.bubbleSequenceNb = 4;
+            self.clipperId = 'clipper_' + Math.round(100000 * Math.random());
+
             $(self.el).empty();
             var el = $(tmpl);
             $(self.el).append(el)
@@ -1586,36 +1589,53 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             if (options.xChangeCallback) {
                 xChangeCallbacks.push(options.xChangeCallback);
             }
-            
-            /* 
-             * add the callback to set the aabubble position and text (if needed) 
+
+            /*
+             * add the callback to set the aabubble position and text (if needed)
              */
             if (!self.options.noPositionBubble) {
                 xChangeCallbacks.push(function(i0, i1) {
-                    var gbubble = self.gAABubble;
-                    if(gbubble === undefined){
-                        return;
-                    }
+                    var gbubbles = self.svg.selectAll('g.axis-bubble');
                     if (self.viewport.scales.font > 10) {
-                        gbubble.style('display', 'none');
-
+                        gbubbles.style('display', 'none');
+                        self.svg.select('line.sequence-bg').style('display', 'none');
                         return
                     }
+                    self.svg.select('line.sequence-bg').style('display', null);
 
                     var imid = (i0 + i1) / 2;
                     var xscales = self.viewport.scales.x;
                     if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
-                        gbubble.style('display', 'none');
+                        gbubbles.style('display', 'none');
                         return;
 
                     }
-                    gbubble.style('display', null);
-                    gbubble.selectAll('text.pos').text(Math.round(imid + 1));
-                    var ic0 = Math.round(imid) - 4;
-                    var ic1 = Math.round(imid) + 4;
-                    var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
-                    gbubble.selectAll('text.subseq').text(subseq);
-                    gbubble.attr('transform', 'translate(' + xscales(imid) + ',10)');
+                    gbubbles.style('display', null);
+                    if (self.gPosBubble) {
+                        self.gPosBubble.selectAll('text').text(Math.round(imid + 1));
+                    }
+
+                    if (self.gAABubble) {
+                        var ic0 = Math.round(imid) - self.bubbleSequenceNb;
+                        var ic1 = Math.round(imid) + self.bubbleSequenceNb;
+                        var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
+
+                        var ts = self.gAABubble.selectAll('text.subseq').data(subseq.split(''));
+                        ts.exit().remove();
+                        ts.enter().append("text").attr('class', 'subseq');
+                        ts.text(function(d) {
+                            return d;
+                        }).attr('x', function(t, i) {
+                            var d = Math.abs(i - 4);
+                            return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
+                        }).style('font-size', function(t, i) {
+                            var d = Math.abs(i - 4);
+                            return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
+                        }).attr('y', -3);
+                    }
+
+                    //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
+                    gbubbles.attr('transform', 'translate(' + xscales(imid) + ',10)');
                 });
 
             }
@@ -1639,9 +1659,8 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             self.drawContainer = self.svg.append('g');
             //.attr('transform', 'translate(' + self.margins.left + ',' + self.margins.top + ')');
             self.axisContainer = self.drawContainer.append('g').attr('class', 'axis')
-            var yyshift = self.options.hideSequence ? 0 : 30
-            self.axisContainer.attr('transform', 'translate(0, ' + yyshift + ')');
             //var yshiftScale = self.options.hideAxis ? 0 : 20;
+
             self.layerContainer = self.drawContainer.append('g').attr('class', 'layers');
 
             self.detailsPane = new DetailsPane({
@@ -1664,6 +1683,10 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                 return (p == 0) ? '' : p
             }).ticks(4);
             self.axisContainer.call(xAxis);
+            self.gPosBubble = self.axisContainer.append('g').attr('class', 'axis-bubble').style('display', 'none');
+            self.gPosBubble.append('rect').attr('x', -30).attr('y', -4).attr('width', 60).attr('height', 17)
+            self.gPosBubble.append('text').attr('class', 'pos').attr('y', 6);
+
         },
         update : function() {
             var self = this;
@@ -1718,11 +1741,16 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             });
             self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(tot + 1) + 20) + ")");
 
-            var heightAdd = 60;
-            if (self.options.hideAxis)
-                heightAdd -= 30
-            if (self.options.hideSequene)
-                heightAdd -= 25
+            var heightAdd = 0;
+            if (!self.options.hideAxis) {
+                heightAdd += 30;
+                self.axisY = self.viewport.scales.y(tot) + heightAdd;
+                self.axisContainer.attr('transform', 'translate(0, ' + self.axisY + ')');
+            }
+            if (!self.options.hideSequene) {
+                heightAdd += 25;
+            }
+
             self.svg.attr("height", self.viewport.scales.y(tot) + heightAdd)
         },
         /*
@@ -1738,7 +1766,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
 
             var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
-            defs.append('clipPath').attr('id', 'clipper').append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
+            defs.append('clipPath').attr('id', self.clipperId).append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
         },
         /*
          * build the Sequence layer
@@ -1758,19 +1786,19 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                 cssClass : 'sequence',
                 noMenu : true,
                 margins : self.margins,
-                clipper : '#clipper'
+                clipper : '#' + self.clipperId
             })
             self.layerViews.push(view)
 
+            view.gFeatures.append('line').attr('x1', -100).attr('x2', 2000).attr('class', 'sequence-bg').attr('y1', 7).attr('y2', 7);
             var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function(d) {
                 return d;
             });
 
             self.p_positionText(self.viewport, sel);
-            self.gAABubble = view.g.append('g').attr('class', 'aa-bubble').style('display', 'none');
-            self.gAABubble.append('rect').attr('x', -40).attr('y', -23).attr('width', 81).attr('height', 26)
-            self.gAABubble.append('text').attr('class', 'pos').attr('y', -12);
-            self.gAABubble.append('text').attr('class', 'subseq');
+            self.gAABubble = view.g.append('g').attr('class', 'axis-bubble').style('display', 'none');
+            self.gAABubble.append('rect').attr('x', -30).attr('y', -12).attr('width', 61).attr('height', 16)
+            self.gAABubble.append('text').attr('class', 'subseq').attr('y', 2);
         },
         /*
          * group features by category, and build a lyer for each of them
@@ -1806,12 +1834,12 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                     cssClass : cssClass,
                     layerMenu : self.options.layerMenu,
                     margins : self.margins,
-                    clipper : '#clipper'
+                    clipper : '#' + self.clipperId
                 });
                 self.layerViews.push(layerView);
 
                 var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
-                
+
                 //add tolltip based on description field
                 sel.append('title').text(function(ft) {
                     return ft.description;
