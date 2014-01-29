@@ -41,8 +41,8 @@ A <code>SeqEntry</code> object contains a sequence, a list of features (and what
 
 ###Structure
 
-Features are add to the model (if the view is already instanciated, it will be updated once the features are received, thanks to backbone.js).
-A feature is an JavaScript object (a plain hashmap, though), containing several fields
+Features are added to the model (if the view is already instantiated, it will be updated once the features are received, thanks to backbone.js).
+A feature is a JavaScript object (a plain hashmap, though), containing several fields
 
  * **groupSet [optional]:** a group of categories information,allowing to have features with the same category name, to be regrouped at first into the same meta-group;
  * **category:** all features from the same category will be handled in the same layer;
@@ -87,8 +87,8 @@ Easier than a full documentation, we bring some demonstration use cases:
 
 ##And more
 ###A few comments on the code
-The JavaScript library relies on seom "modern" language components. It is not aimed at running on IE 7.
-That said, you can either use the bundled library (with all dependencies) or created you own application using require.js and checked out source code.
+The JavaScript library relies on some "modern" language components. It is not aimed at running on IE 7.
+That said, you can either use the bundled library (with all dependencies) or create your own application using require.js and checked out source code.
 
 ####Unit testing
 Via jasmine, either in the browser ([test/index.html](test/index.html)) or command line with phantom.js
