@@ -7,7 +7,7 @@
  Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
 
  */
-define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function($, _, Backbone, d3, typedDisplayer) {
+define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer', '../utils/GGplot2Adapter'], function($, _, Backbone, d3, typedDisplayer, ggplot2Adapter) {
 
     /**
      * display array of features passed as d3selection.
@@ -18,6 +18,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
 
         self.positioners = {};
         self.appenders = {};
+        self.categoryPlots ={};
 
         self.mouseoverCallBacks = {};
         self.mouseoutCallBacks = {};
@@ -115,12 +116,11 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
         _.chain(features).groupBy(function(ft) {
             return ft.type;
         }).each(function(ftGroup, type) {
-            var sel = (self.appenders[type] || defaultAppender)(viewport, svgGroup, ftGroup, type)
-            sel.attr('fttype', type);
-            self.position(viewport, sel, ftGroup);
-        });
+                var sel = (self.appenders[type] || defaultAppender)(viewport, svgGroup, ftGroup, type)
+                self.position(viewport, sel, ftGroup);
+            });
 
-           //register call back event handlers
+        //register call back event handlers
         var allSel = svgGroup.selectAll(".feature.data")
         allSel.on('mouseover', function(ft) {
             self.callMouseoverCallBacks(ft, this)
@@ -166,15 +166,24 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
 
     FeatureDisplayer.prototype.position = function(viewport, sel) {
         var self = this;
-        _.chain(sel[0]).map(function(s) {
-            return s.attributes.fttype.nodeValue;
-        }).unique().each(function(type) {
-            (self.positioners[type] || defaultPositioner)(viewport, sel.filter(function(ft) {
-                return ft.type == type
-            }))
+
+        var ftIsNotPloted = _.filter(sel.data(), function(e){
+            return self.categoryPlots[e.category] === undefined;
         });
 
-        return sel
+        _.chain(ftIsNotPloted).map(function(s) {
+            return s.type;
+        }).unique().each(function(type) {
+                (self.positioners[type] || defaultPositioner)(viewport, sel.filter(function(ft) {
+                    return ft.type == type
+                }))
+            });
+
+        var selPlot = sel.filter(function(ft){
+            return self.categoryPlots[ft.category] !== undefined
+        });//
+        self.categoryPlotPosition(viewport, selPlot)
+        return sel;
     }
     /**
      * return the height factory associated with
@@ -218,8 +227,8 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
         d3selection.selectAll("rect.feature-block-end").attr('width', 10).attr('x', function(ft) {
             return ftWidth(ft) - 10;
         }).style('display', function(ft) {
-            return (ftWidth(ft) > 20) ? null : 'none';
-        }).attr('height', viewport.scales.y(hFactor * 0.76));
+                return (ftWidth(ft) > 20) ? null : 'none';
+            }).attr('height', viewport.scales.y(hFactor * 0.76));
 
         var fontSize = 9 * hFactor;
         // self.fontSizeLine();
@@ -239,7 +248,127 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer'], function(
         }).style('font-size', fontSize);
         return d3selection
     }
-    var singleton = new FeatureDisplayer();
 
+    /**
+     *
+     * @param cat: category name
+     * @param opts: the plot definitions
+     */
+    FeatureDisplayer.prototype.setCategoryPlot = function(cat, opts) {
+        var _this = this;
+        //define default values
+        var plot = _.extend({
+            height: 100,
+            ylim: [-1, 1],
+            shape: 1,
+            scale:'linear',
+            y:0,
+            shape:1,
+            size:10,
+            fillPalette:'Paired:12',
+            fill:1,
+            colorPalette:'Paired:12',
+            color:1,
+            lwd:1,
+            opacity:0.7
+        }, opts);
+
+        plot._y = d3.scale[plot.scale]().domain(plot.ylim).range([plot.height,0]);
+
+        var afCol = plot.fillPalette.split(':');
+        var fPalette = ggplot2Adapter.discrete_palettes[afCol[0]][afCol[1]];
+        plot._fill = _.isFunction(plot.fill)?(function(ft){
+            var v = plot.fill(ft);
+            if(_.isNumber(v) && v>fPalette.length){
+                return '#444';
+            }
+            return _.isNumber(v)?fPalette[v-1]:v;
+        }):(_.isNumber(plot.fill)?fPalette[plot.fill-1]:plot.fill);
+
+        var acCol = plot.colorPalette.split(':');
+        var cPalette = ggplot2Adapter.discrete_palettes[acCol[0]][acCol[1]];
+        plot._color = _.isFunction(plot.color)?(function(ft){
+            var v = plot.color(ft);
+            if(_.isNumber(v) && v>cPalette.length){
+                return '#111';
+            }
+            return _.isNumber(v)?cPalette[v-1]:v;
+        }):(_.isNumber(plot.color)?cPalette[plot.color-1]:plot.color);
+
+        plot._shape = _.isFunction(plot.shape)?(function(ft){
+            return ggplot2Adapter.shapePaths[plot.shape(ft)];
+        }):ggplot2Adapter.shapePaths[plot.shape];
+
+        plot._lwd = _.isFunction(plot.lwd)?(function(ft){
+            return plot.lwd(ft)+'px';
+        }):plot.lwd+'px';
+
+
+        _this.categoryPlots[cat]=plot;
+
+    };
+
+    /**
+     *
+     * @param cat
+     */
+    FeatureDisplayer.prototype.isCategoryPlot = function(cat) {
+        var _this = this;
+        return _this.categoryPlots[cat] !== undefined;
+    };
+
+    FeatureDisplayer.prototype.getCategoryPlot = function(cat){
+        return this.categoryPlots[cat];
+    };
+
+    /**
+     *
+     * @param cat
+     * @param viewport
+     * @param svgGroup
+     * @param features
+     */
+    FeatureDisplayer.prototype.categoryPlotAppend = function(cat, viewport, svgGroup, features) {
+        var _this = this;
+
+        var plot = _this.categoryPlots[cat];
+        var g = svgGroup.append('g').attr('class', 'plot');
+        var sel = svgGroup.selectAll("g._plot-point").data(features).enter().append("g").attr('class', 'feature data _plot-point').attr('category', cat);
+
+        sel.style('opacity', plot.opacity);
+        var path = sel.append('path').attr('d',plot._shape).style('fill', plot._fill).style('stroke', plot._color).style('stroke-width', plot._lwd).attr('vector-effect', 'non-scaling-stroke');
+
+
+       _.isFunction(plot.size)?(function(ft){
+            return ggplot2Adapter.shapePaths[plot.shape](ft);
+        }):ggplot2Adapter.shapePaths[plot.shape];
+
+        _this.categoryPlotPosition(viewport, sel);
+        return sel;
+    };
+
+    /**
+     *
+     * @param cat
+     * @param d3selection
+     */
+    FeatureDisplayer.prototype.categoryPlotPosition = function(viewport, d3selection) {
+        var _this = this;
+
+        d3selection.attr('transform', function(ft) {
+            var plot = _this.categoryPlots[ft.category];
+
+            var fty = plot.y;
+            var y=_.isFunction(fty)?fty(ft):fty;
+
+            ftsize = plot.size;
+            var s=_.isFunction(ftsize)?ftsize(ft):ftsize;
+            return 'translate(' + (viewport.scales.x(ft.pos)) + ',' + plot._y(y) + '),scale('+s+')';
+
+        });
+
+    };
+
+    var singleton = new FeatureDisplayer();
     return singleton;
 });

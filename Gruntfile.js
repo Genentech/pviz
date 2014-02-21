@@ -127,12 +127,25 @@ module.exports = function(grunt) {
                 flatten:true,
                 expand:true
             }
+        },
+        "mocha-server": {
+            'default': {
+                src: 'test/suites/**/*.js',
+                options: {
+                    ui: 'bdd',
+                    require: [
+                        'should',
+                    ],
+                },
+            }
         }
+
     });
 
     // Load the plugin that provides tasks.
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-server-mocha');
     //grunt.loadNpmTasks('grunt-bower-requirejs');
     grunt.loadNpmTasks('grunt-requirejs');
     grunt.loadNpmTasks('grunt-devserver');
@@ -143,6 +156,8 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('build', ['requirejs', 'concat:concat_copyright']);
     grunt.registerTask('default', ['build']);
+    grunt.registerTask('test', ['mocha-server']);
+
     grunt.registerTask('dist', ['build', 'copy:dist', 'copy:dist-examples']);
 
 };

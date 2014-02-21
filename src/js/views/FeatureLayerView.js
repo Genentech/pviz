@@ -19,6 +19,7 @@ define(['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplay
             })
             self.options.layerMenu = self.options.layerMenu || 'sticky';
 
+
             self.build(options);
         },
         build : function() {
@@ -86,8 +87,14 @@ define(['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplay
             return this;
         },
         height : function() {
+            var _this = this;
+            if(_this.model.get('isPlot')){
+                return featureDisplayer.getCategoryPlot(this.model.get('category')).height;
+            }
             return this.model.get('nbTracks') * featureDisplayer.heightFactor(this.model.attributes);
+
         }
+
     });
 
     return FeatureLayerView;

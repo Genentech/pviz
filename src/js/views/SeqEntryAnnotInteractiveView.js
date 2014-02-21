@@ -10,7 +10,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             self.margins = {
                 left : self.options.marginLeft || 20,
                 right : self.options.marginRight || 20,
-                top : self.options.marginTop || 25,
+                top : self.options.marginTop || 25
             };
             self.layers = [];
             self.layerViews = [];
@@ -76,12 +76,12 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                         ts.text(function(d) {
                             return d;
                         }).attr('x', function(t, i) {
-                            var d = Math.abs(i - 4);
-                            return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
-                        }).style('font-size', function(t, i) {
-                            var d = Math.abs(i - 4);
-                            return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
-                        }).attr('y', -3);
+                                var d = Math.abs(i - 4);
+                                return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
+                            }).style('font-size', function(t, i) {
+                                var d = Math.abs(i - 4);
+                                return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
+                            }).attr('y', -3);
                     }
 
                     //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
@@ -166,42 +166,49 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
         render : function() {
             var self = this;
 
-            var tot = 0
-            var previousGroupSet = undefined
+            var totTracks = 0;
+            var totHeight = 0
+
+            var previousGroupSet = undefined;
             _.chain(self.layerViews).filter(function(layerViews) {
                 return true;
             }).each(function(view) {
-                if (view.model.get('visible')) {
-                    var currentGroupSet = view.model.get('groupSet');
-                    if (currentGroupSet != previousGroupSet) {
-                        var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
-                        tot += 2
-                        previousGroupSet = currentGroupSet;
-                        var yshiftScale = self.options.hideAxis ? -20 : 0;
-                        self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(tot + 1) + yshiftScale)
-                    }
-                    var yshift = self.viewport.scales.y(tot + 1)
-                    view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
-                    tot += view.height() + 1 + self.paddingCategory;
-                    view.g.style('display', null);
+                    if (view.model.get('visible')) {
+                        var currentGroupSet = view.model.get('groupSet');
+                        if (currentGroupSet != previousGroupSet) {
+                            var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
+                            totTracks += 2
+                            previousGroupSet = currentGroupSet;
+                            var yshiftScale = self.options.hideAxis ? -20 : 0;
+                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks + 1) + totHeight + yshiftScale)
+                        }
+                        var yshift = self.viewport.scales.y(totTracks + 1)
+                        view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
+                        if(view.model.get('isPlot')){
+                            totHeight+=view.height();
+                            totTracks +=  1 + self.paddingCategory;
+                        }else{
+                            totTracks += view.height() + 1 + self.paddingCategory;
+                        }
+                        view.g.style('display', null);
 
-                } else {
-                    view.g.style('display', 'none');
-                }
-            });
-            self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(tot + 1) + 20) + ")");
+                    } else {
+                        view.g.style('display', 'none');
+                    }
+                });
+            self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(totTracks + 1) + totHeight + 20) + ")");
 
             var heightAdd = 0;
             if (!self.options.hideAxis) {
                 heightAdd += 30;
-                self.axisY = self.viewport.scales.y(tot) + heightAdd;
+                self.axisY = self.viewport.scales.y(totTracks) + heightAdd + totHeight;
                 self.axisContainer.attr('transform', 'translate(0, ' + self.axisY + ')');
             }
             if (!self.options.hideSequene) {
                 heightAdd += 25;
             }
 
-            self.svg.attr("height", self.viewport.scales.y(tot) + heightAdd)
+            self.svg.attr("height", self.viewport.scales.y(totTracks) + totHeight + heightAdd)
         },
         /*
          * define gradients to be used.
@@ -259,10 +266,16 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             var groupedFeatures = _.groupBy(self.model.get('features'), function(ft) {
                 return (ft.groupSet ? (ft.groupSet + '/') : '') + ft.category;
 
-            })
-            _.each(groupedFeatures, function(group, groupConcatName) {
-                var nbTracks = featureManager.assignTracks(group);
+            });
 
+            _.chain(groupedFeatures).each(function(group, groupConcatName) {
+                var nbTracks, isPlot;
+                if(featureDisplayer.isCategoryPlot(group[0].category)){
+                    nbTracks = 1;
+                    isPlot = true;
+                }else{
+                    nbTracks = featureManager.assignTracks(group);
+                }
                 var groupName = group[0].category;
                 var groupType = group[0].categoryType || groupName;
                 var groupSet = group[0].groupSet;
@@ -271,9 +284,11 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                 var layer = new FeatureLayer({
                     name : (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
                     type : groupType,
+                    category:groupName,
                     groupSet : groupSet,
                     id : 'features-' + cssClass,
-                    nbTracks : nbTracks
+                    nbTracks : nbTracks,
+                    isPlot:isPlot
                 });
                 self.layers.push(layer)
 
@@ -288,13 +303,19 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                 });
                 self.layerViews.push(layerView);
 
-                var sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                var sel;
+                if(isPlot){
+                    sel = featureDisplayer.categoryPlotAppend(groupName, self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                }else{
+                    sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
 
+                }
                 //add tolltip based on description field
                 sel.append('title').text(function(ft) {
                     return ft.description;
-                })
+                });
             });
+
         },
         p_setup_hidden_layers_container : function() {
             var self = this;
@@ -313,15 +334,15 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             var groupSetNames = _.chain(self.model.get('features')).map(function(ft) {
                 return ft.groupSet
             }).unique().filter(function(t) {
-                return t
-            }).value();
+                    return t
+                }).value();
 
             self.gGroupSets = self.svg.append('g').attr('class', 'groupset-title');
             self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function(x) {
                 return x;
             }).attr('x', 7).attr('y', 10).attr('id', function(x) {
-                return 'groupset-title-' + (x || '').replace(/\W/g, '_');
-            })
+                    return 'groupset-title-' + (x || '').replace(/\W/g, '_');
+                })
 
             return self;
         },
