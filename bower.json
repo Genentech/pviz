@@ -27,7 +27,7 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": ">=2.0",
+    "jquery": "~1.9",
     "underscore-amd": "1.4.4",
     "bootstrap": "3.0.0",
     "backbone-amd": "1.0.0",
