@@ -1,15 +1,15 @@
-# pViz.js: a dynamic JavaScript & SVG library for visualization of protein sequence features
-## What is pViz.js?
+#pViz.js: a dynamic JavaScript & SVG library for visualization of protein sequence features
+##What is pViz.js?
 pViz.js is a <strike>protein</strike> sequence features viewer for modern browsers, based on a JavaScript library, SVG and css.
 
 Given sequence and a list of positioned features, it displays the sequence and the features aligning them on the sequence.
-Features are laid out not to overlaying each other, allowing zooming, interaction and a decent amount of customization.
+Features are layed out not to overlaying each other, allowing zooming, interaction and a decent amount of customization.
 
-Default sources can be explicitly defined in JavaScript (limit is the sky),  [DAS servers](http://en.wikipedia.org/wiki/Distributed_Annotation_System), [PEFF](http://www.psidev.info/node/363) (PSI extended Fasta format) or a mix of them.
+Default sources can be explictely defined in JavaScript (limit is the sky),  [DAS servers](http://en.wikipedia.org/wiki/Distributed_Annotation_System), [PEFF](http://www.psidev.info/node/363) (PSI extended Fasta format) or a mix of them.
 
 **Warning!** pViz target modern browsers, such as Firefox, Chrome and Safari. Do not expect it to work on IE7, just upgrade.
 
-## Hello World
+##Hello World
 
     <head>
       <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
@@ -41,8 +41,8 @@ A <code>SeqEntry</code> object contains a sequence, a list of features (and what
 
 ###Structure
 
-Features are add to the model (if the view is already instantiated, it will be updated once the features are received, thanks to backbone.js).
-A feature is an JavaScript object (a plain associative array, though), containing several fields
+Features are add to the model (if the view is already instanciated, it will be updated once the features are received, thanks to backbone.js).
+A feature is an JavaScript object (a plain hashmap, though), containing several fields
 
  * **groupSet [optional]:** a group of categories information,allowing to have features with the same category name, to be regrouped at first into the same meta-group;
  * **category:** all features from the same category will be handled in the same layer;
@@ -85,24 +85,20 @@ Easier than a full documentation, we bring some demonstration use cases:
  
 **NB**: download the project locally, at least on your file system, to get javascript executed;
 
-##Note
-The JavaScript library relies on some "modern" language components. It is not aimed at running on IE 7.
+##And more
+###A few comments on the code
+The JavaScript library relies on seom "modern" language components. It is not aimed at running on IE 7.
 That said, you can either use the bundled library (with all dependencies) or created you own application using require.js and checked out source code.
-
-##For the developers
-Check out the code, then to install dependencies, run
-   npm install
-   bower install
 
 ####Unit testing
 Via jasmine, either in the browser ([test/index.html](test/index.html)) or command line with phantom.js
 
 ####Continuous integration
-test, distribution etc. can be launched in a CI environment via grunt tasks <code>grunt dist...</code>
+test, distribution etc. can be launched in a CI environment via grunt tasks <code>grunt test, dist...</code>
 
 ###Authors
 This library was initiated by 
-Alexandre Masselot (masselot.alexandre@gene.com) & Kiran Mukhyala (mukhyala.kiran@gene.com) within Genentech BioInformatics & Computational Biology Department.
+Alexandre Masselot (masselot.alexandre@gene.com) & Kiran Mukhyala (mukhyala.kiran@gene.com) within Genentech Bioinformatics & Computational Biology Department.
             
 ###License
 The library is distributed under a BSD license. Full description can be found in [LICENSE.txt](LICENSE.txt)
