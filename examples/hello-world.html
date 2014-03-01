@@ -1,40 +1,19 @@
 <html>
-    <head>
-        <title>pViz hellow world</title>
-        <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="deps/pviz-core.css">
-        <script src="deps/pviz-bundle.min.js"></script>
-    </head>
-    <body>
-        <div id="main" ></div>
-
-        <script>
-            var pviz = this.pviz;
-
-            var seqEntry = new pviz.SeqEntry({
-                sequence : 'ABCDEFGIJKLMNOPQRSTUVWXYZ'
-            });
-
-            new pviz.SeqEntryAnnotInteractiveView({
-                model : seqEntry,
-                el : '#main'
-            }).render();
-
-            seqEntry.addFeatures([{
-                category : 'foo',
-                type : 'bar',
-                start : 5,
-                end : 12,
-                text : 'hello'
-            }, {
-                category : 'foo',
-                type : 'bar',
-                start : 9,
-                end : 15,
-                text : 'world'
-            }]);
-
-        </script>
-
-    </body>
+ <head>
+  <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css"/>
+  <link rel="stylesheet" type="text/css" href="deps/pviz-core.css"/>
+  <script src="deps/pviz-bundle.min.js"></script>
+ </head>
+ <body>
+  <div id="main"></div>
+  <script>
+    var seqEntry = new this.pviz.SeqEntry({sequence: 'ACDEFGHIKLMNPQRSTVWY'});
+    new this.pviz.SeqEntryAnnotInteractiveView({model: seqEntry, el: '#main'}).render();
+    seqEntry.addFeatures([
+        {category: 'foo', type: 'bar', start:  3, end:  9, text: 'BIOINFORMATICS'},
+        {category: 'foo', type: 'bar', start:  6, end: 12, text: 'APPLICATION'},
+        {category: 'foo', type: 'bar', start: 11, end: 15, text: 'NOTES'}
+    ]);
+  </script>
+ </body>
 </html>

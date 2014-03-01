@@ -1,50 +1,161 @@
 <html>
-    <head>
-        <title>pViz examples</title>
-        <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css">
-        <style type="text/css" media="screen">
-            div#footer {
-                background-color: #f5f5f5;
-            }
-        </style>
-    </head>
-    <body >
-        <div class="container">
-            <h1>pViz examples</h1>
+<head>
+    <title>pViz examples</title>
+    <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css">
+    <script src="deps/jquery.min.js"></script>
+    <script src="deps/bootstrap.min.js"></script>
 
-            Easier than a full documentation, we bring some demonstration use cases:
-            <ul>
+    <style type="text/css" media="screen">
+        div#footer {
+            background-color: #f5f5f5;
+        }
+
+        div.example-tile {
+            padding-bottom: 3em;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand">pViz.js examples</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="example-0.html">basic interactive</a>: 2 categories, a few features and an interactive view;
+                    <a href="https://github.com/Genentech/pviz">github</a>
                 </li>
-                <li>
-                    <a href="example-custom-display-css.html">custom feature display with CSS</a>: css depending on category and feature type;
-                </li>
-                <li>
-                    <a href="example-custom-display.html">custom feature display with SVG</a>: drawing special ideogram depending on the feature type;
-                </li>
-                <li>
-                    <a href="example-different-track-heights.html">different track heights</a>: getting more of less extend tracks depending on the category;
-                </li>
-                <li>
-                    <a href="example-interaction.html">interactive features display</a>: mouse over some feature to see more happen;
-                </li>
-                <li>
-                    <a href="example-das-reader.html">DAS source</a>: loading sequence & features from <a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an interactive view;
-                </li>
-                <li>
-                    <a href="example-two-das-reader.html">multiple DAS source</a>: ebi/uniprot DAS server is used to populate the sequence, and Pride server to add features and customize the parsing;
-                </li>
-                <li>
-                    <a href="example-peff-reader.html">peff reader</a>: PSI Extended Fasta Format handles classic fasta information plus annotations
-                </li>
-                <li>
-                    <a href="example-one-liner.html">one liner</a>: displaying features in a simple, non interactive ideogram (and potentially showing thousands of them on the same page)
-                </li>
-                <li>
-                    <a href="example-one-liner-multiple-categories.html">one liner, with multiple categories</a>: the same ideogram, but showing multiple categories at once
-                </li>
+
             </ul>
         </div>
-    </body>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-0.html">
+                <h4>basic interactive</h4>
+                <img src="images/example-0.jpg"/>
+                <br/>
+                Two categories, a few features and an interactive view.
+            </a>
+        </div>
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-custom-display-css.html">
+                <h4>custom feature display with CSS</h4>
+                <img src="images/example-custom-display-css.jpg"/>
+                <br/>
+                CSS depending on category and feature type.
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-custom-display.html">
+                <h4>custom feature display with SVG</h4>
+                <img src="images/example-custom-display.jpg"/>
+                <br/>
+                Drawing special ideogram depending on
+                the feature type.
+            </a>
+        </div>
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-different-track-heights.html">
+                <h4>different track heights</h4>
+                <img src="images/example-different-track-heights.jpg"/>
+                <br/>
+                Getting more of less extend tracks
+                depending on the category.
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-interaction.html">
+                <h4>interactive features display</h4>
+                <img src="images/example-interaction.jpg"/>
+                <br/>
+                Mouse over some feature to see more happen.
+            </a>
+        </div>
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-das-reader.html">
+                <h4>DAS source</h4>
+                <img src="images/example-das-reader.jpg"/>
+                <br/>
+                Loading sequence & features from
+                <br/><a href="http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot">EBI/Uniprot DAS server</a> in an
+                interactive
+                view.
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-two-das-reader.html">
+                <h4>multiple DAS source</h4>
+                <img src="images/example-two-das-reader.jpg"/>
+                <br/>
+                EBI/Uniprot DAS server is used to populate the sequence,
+                <br/>and Pride server to add features and customize the parsing.
+            </a>
+        </div>
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-peff-reader.html">
+                <h4>peff reader</h4>
+                <img src="images/example-peff-reader.jpg"/>
+                <br/>
+                PSI Extended Fasta Format
+                <br/>
+                Handles classic fasta information plus annotations.
+            </a>
+        </div>
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-one-liner.html">
+                <h4>one liner</h4>
+                <img src="images/example-one-liner.jpg"/>
+                <br/>
+                Displaying features in a simple, non interactive ideogram
+                <br/>
+                (and potentially showing thousands of them on the same page).
+            </a>
+        </div>
+        <div class="col-md-6 example-tile text-center">
+            <a href="example-one-liner-multiple-categories.html">
+                <h4>one liner, with multiple categories</h4>
+                <img src="images/example-one-liner-multiple-categories.jpg"/>
+                <br/>
+                The same ideogram, but showing multiple categories at once.
+            </a>
+        </div>
+
+    </div>
+    <div class="row">
+    </div>
+
+</div>
+
+<script>
+    $('.dropdown-toggle').dropdown();
+
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] ||
+                function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-46645179-1', 'gene.com');
+    ga('send', 'pageview', 'examples');
+
+</script>
+</body>
 </html>
