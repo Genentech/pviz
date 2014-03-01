@@ -59,6 +59,8 @@ pViz library uses [D3](http://d3js.org) for SVG generation, [backbone.js](http:/
 But do not worry, including the [packaged distribution](dist/pviz-bundle-min.js) bundles all of them for you.
 
 ##Examples
+###The working examples and demo applications can be found [here](http://research-pub.gene.com/pviz/examples/).
+
 Easier than a full documentation, we bring some demonstration use cases:
 <table style="border-spacing: 0px">
 	<tr>
