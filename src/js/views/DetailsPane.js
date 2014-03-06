@@ -7,7 +7,7 @@
  */
 define(['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function (_, $, bb, undefined, tmpl) {
     return bb.View.extend({
-        initialize: function () {
+        initialize: function (options) {
             var self = this;
             self.options = options;
 
