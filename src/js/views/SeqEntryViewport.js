@@ -5,6 +5,7 @@
 define(['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) {
     var SeqEntryViewport = function(options) {
         var self = this;
+        self.options = options;
 
         self.margins = _.extend({
             left : 0,

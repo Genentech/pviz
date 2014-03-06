@@ -1548,6 +1548,7 @@ define('pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', 
 define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) {
     var SeqEntryViewport = function(options) {
         var self = this;
+        self.options = options;
 
         self.margins = _.extend({
             left : 0,
@@ -1749,7 +1750,10 @@ define('pviz/views/FeatureLayerView',['underscore', 'backbone', 'pviz/services/I
     var FeatureLayerView = bb.View.extend({
         initialize : function(options) {
             var self = this;
+
             options = options || {}
+            self.options = options;
+
             self.clipper = self.options.clipper;
 
             _.each(['container', 'viewport'], function(n) {
@@ -1866,80 +1870,82 @@ define('pviz/collections/FeatureLayerCollection',['backbone', '../models/Positio
  * All rights reserved.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
  */
-define('pviz/views/HiddenLayersView',['underscore', 'backbone', 'd3', 'pviz/collections/FeatureLayerCollection', 'pviz/services/IconFactory'], function(_, bb, d3, FeatureLayerCollection, iconFactory) {
-  var HiddenLayersView = bb.View.extend({
-    initialize : function(options) {
-      var self = this;
-      self.model = new FeatureLayerCollection(options.layers);
-      self.model.bind('change', function() {
-        self.render()
-      });
+define('pviz/views/HiddenLayersView',['underscore', 'backbone', 'd3', 'pviz/collections/FeatureLayerCollection', 'pviz/services/IconFactory'], function (_, bb, d3, FeatureLayerCollection, iconFactory) {
+    var HiddenLayersView = bb.View.extend({
+        initialize: function (options) {
+            var self = this;
+            self.options = options;
 
-      self.container = options.container;
+            self.model = new FeatureLayerCollection(options.layers);
+            self.model.bind('change', function () {
+                self.render()
+            });
 
-      var g = self.container.append('g').attr('class', 'hidden-layers');
-      self.g = g
+            self.container = options.container;
 
-      var gbuts = g.selectAll('g.one-hidden-layer').data(self.model.models).enter().append('g').attr('class', 'one-hidden-layer').style('display', 'none');
+            var g = self.container.append('g').attr('class', 'hidden-layers');
+            self.g = g
 
-      //function of layer hidden...
+            var gbuts = g.selectAll('g.one-hidden-layer').data(self.model.models).enter().append('g').attr('class', 'one-hidden-layer').style('display', 'none');
 
-      gbuts.append('rect').attr('class', 'button').attr('height', 20).attr('rx', 5).attr('ry', 5);
-      gbuts.append('text').text(function(layer) {
-        return layer.get('name')
-      }).attr('y', 11).attr('x', 4);
+            //function of layer hidden...
 
-      var gih = gbuts.append('g').attr('class', 'icon-holder');
-      gih.each(function() {
-        iconFactory.append(d3.select(this), 'view', 20)
-      });
-      gbuts.on('mousedown', function(l) {
-        l.set('visible', true);
-      })
+            gbuts.append('rect').attr('class', 'button').attr('height', 20).attr('rx', 5).attr('ry', 5);
+            gbuts.append('text').text(function (layer) {
+                return layer.get('name')
+            }).attr('y', 11).attr('x', 4);
 
-      self.gbuts = gbuts;
-      self.render();
-    },
+            var gih = gbuts.append('g').attr('class', 'icon-holder');
+            gih.each(function () {
+                iconFactory.append(d3.select(this), 'view', 20)
+            });
+            gbuts.on('mousedown', function (l) {
+                l.set('visible', true);
+            })
 
-    /**
-     * rendering: we push on x the blocks fir the button to be displayed
-     */
-    render : function() {
-      var self = this;
-      var xPlus = 33;
+            self.gbuts = gbuts;
+            self.render();
+        },
 
-      self.gbuts.style('display', function(l) {
-        return l.get('visible') ? 'none' : null;
-      });
+        /**
+         * rendering: we push on x the blocks fir the button to be displayed
+         */
+        render: function () {
+            var self = this;
+            var xPlus = 33;
 
-      var allLength = [];
-      self.gbuts.selectAll('text').each(function(d, i) {
-        allLength.push(d3.select(this).node().getComputedTextLength() + xPlus);
-      });
+            self.gbuts.style('display', function (l) {
+                return l.get('visible') ? 'none' : null;
+            });
 
-      var j = 0
-      self.gbuts.selectAll('rect.button').attr('width', function(l) {
-        return allLength[j++] - 4;
-      });
+            var allLength = [];
+            self.gbuts.selectAll('text').each(function (d, i) {
+                allLength.push(d3.select(this).node().getComputedTextLength() + xPlus);
+            });
 
-      j = 0
-      self.gbuts.selectAll('g.icon-holder').attr('transform', function(l) {
-        return 'translate(' + (allLength[j++] - 27) + ',0)';
-      })
-      var tot = 0;
-      self.gbuts.attr('transform', function(l, i) {
-        var r = 'translate(' + tot + ',0)';
-        if (! l.get('visible')) {
-          tot += allLength[i];
+            var j = 0
+            self.gbuts.selectAll('rect.button').attr('width', function (l) {
+                return allLength[j++] - 4;
+            });
+
+            j = 0
+            self.gbuts.selectAll('g.icon-holder').attr('transform', function (l) {
+                return 'translate(' + (allLength[j++] - 27) + ',0)';
+            })
+            var tot = 0;
+            self.gbuts.attr('transform', function (l, i) {
+                var r = 'translate(' + tot + ',0)';
+                if (!l.get('visible')) {
+                    tot += allLength[i];
+                }
+                return r
+            })
+        },
+        height: function () {
+            return 1;
         }
-        return r
-      })
-    },
-    height : function() {
-      return 1;
-    }
-  });
-  return HiddenLayersView;
+    });
+    return HiddenLayersView;
 });
 
 define('text!pviz_templates/details-pane.html',[],function () { return '<div class="details-pane">\n    <div class="" style="width:100%">\n        <div class="nav" style="display:none">\n            <ul class="nav nav-tabs">\n                <li class="pull-right">\n                    <label class="checkbox">\n                        <input type="checkbox" id="raise-active" checked=checked/>\n                        show active pane </label>\n                </li>\n            </ul>\n        </div>\n    </div>\n    <div class="tab-content">\n\n    </div>\n</div>\n';});
@@ -1951,101 +1957,103 @@ define('text!pviz_templates/details-pane.html',[],function () { return '<div cla
  * All rights reserved.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
  */
-define('pviz/views/DetailsPane',['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function(_, $, bb, undefined, tmpl) {
-  return bb.View.extend({
-    initialize : function() {
-      var self = this;
-      var el = $(self.el);
-      el.empty();
-      el.append($(tmpl));
+define('pviz/views/DetailsPane',['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function (_, $, bb, undefined, tmpl) {
+    return bb.View.extend({
+        initialize: function () {
+            var self = this;
+            self.options = options;
 
-      self.containers = {
-        menu : el.find('ul'),
-        tabs : el.find('div.tab-content'),
-        divRaiseActive : el.find('div.nav')
-      }
+            var el = $(self.el);
+            el.empty();
+            el.append($(tmpl));
 
-      self.templates = {
-        menuItem : '<li><a href="#<%=id%>" data-toggle="tab"><%=name%></a></li>',
-        contents : '<div class="tab-pane" id="<%=id%>"></div>'
-      }
+            self.containers = {
+                menu: el.find('ul'),
+                tabs: el.find('div.tab-content'),
+                divRaiseActive: el.find('div.nav')
+            }
 
-      self.tabs = {};
-    },
-    render : function() {
-      var self = this;
+            self.templates = {
+                menuItem: '<li><a href="#<%=id%>" data-toggle="tab"><%=name%></a></li>',
+                contents: '<div class="tab-pane" id="<%=id%>"></div>'
+            }
 
-      return self;
-    },
-    /**
-     * return a jquery elment for the tab pointed bby the given name
-     * if no tab exist, a tab + menu are created
-     * the obect return is a map with 'menuItem' and 'contents' elements
-     * @param {Object} name
-     */
-    getTab : function(name) {
-      var self = this;
-      var tid = self.name2id(name);
-      if (self.tabs[tid] === undefined) {
-        var emi = $(_.template(self.templates.menuItem, {
-          name : name,
-          id : tid
-        }))
-        emi.find('a').click(function(e) {
-          e.preventDefault();
-          $(this).tab('show');
-        })
-        var ec = $(_.template(self.templates.contents, {
-          name : name,
-          id : tid
-        }))
+            self.tabs = {};
+        },
+        render: function () {
+            var self = this;
 
-        self.containers.menu.append(emi);
-        self.containers.tabs.append(ec);
+            return self;
+        },
+        /**
+         * return a jquery elment for the tab pointed bby the given name
+         * if no tab exist, a tab + menu are created
+         * the obect return is a map with 'menuItem' and 'contents' elements
+         * @param {Object} name
+         */
+        getTab: function (name) {
+            var self = this;
+            var tid = self.name2id(name);
+            if (self.tabs[tid] === undefined) {
+                var emi = $(_.template(self.templates.menuItem, {
+                    name: name,
+                    id: tid
+                }))
+                emi.find('a').click(function (e) {
+                    e.preventDefault();
+                    $(this).tab('show');
+                })
+                var ec = $(_.template(self.templates.contents, {
+                    name: name,
+                    id: tid
+                }))
 
-        self.tabs[tid] = {
-          menuItem : emi,
-          contents : ec
-        };
-        if (_.size(self.tabs) >= 2) {
-          self.containers.divRaiseActive.show();
+                self.containers.menu.append(emi);
+                self.containers.tabs.append(ec);
+
+                self.tabs[tid] = {
+                    menuItem: emi,
+                    contents: ec
+                };
+                if (_.size(self.tabs) >= 2) {
+                    self.containers.divRaiseActive.show();
+                }
+            }
+            return self.tabs[tid];
+        },
+        raiseTab: function (tab) {
+            var self = this;
+            tab.menuItem.find('a').tab('show')
+        },
+        /**
+         * raise the tab if the "raise-active" checkbox is set
+         */
+        focusOnTab: function (tab) {
+            var self = this;
+            if (tab.menuItem.hasClass('active')) {
+                return
+            }
+            if ($(self.el).find('input#raise-active').is(':checked')) {
+                self.raiseTab(tab)
+                return
+            }
+
+            tab.menuItem.animate({
+                opacity: 0.1
+            }, 100, function () {
+                tab.menuItem.animate({
+                    opacity: 1.0
+                }, 100)
+            })
+        },
+
+        /*
+         * trim, lowercase and convert non character symbols to dash
+         */
+        name2id: function (name) {
+            return name.trim().toLowerCase().replace(/\W+/g, '-');
         }
-      }
-      return self.tabs[tid];
-    },
-    raiseTab : function(tab) {
-      var self = this;
-      tab.menuItem.find('a').tab('show')
-    },
-    /**
-     * raise the tab if the "raise-active" checkbox is set
-     */
-    focusOnTab : function(tab) {
-      var self = this;
-      if (tab.menuItem.hasClass('active')) {
-        return
-      }
-      if ($(self.el).find('input#raise-active').is(':checked')) {
-        self.raiseTab(tab)
-        return
-      }
-
-      tab.menuItem.animate({
-        opacity : 0.1
-      }, 100, function() {
-        tab.menuItem.animate({
-          opacity : 1.0
-        }, 100)
-      })
-    },
-
-    /*
-     * trim, lowercase and convert non character symbols to dash
-     */
-    name2id : function(name) {
-      return name.trim().toLowerCase().replace(/\W+/g, '-');
-    }
-  });
+    });
 });
 
 define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { return '<div class=\'seq-entry-annot-interactive\'>\n    <div id=\'feature-viewer\'>\n        \n    </div>\n    <div id=\'details-viewer\'>\n        \n    </div>\n    \n</div>\n';});
@@ -2422,33 +2430,33 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
 
-define('pviz/views/SeqEntryFastaView',['jquery', 'underscore', 'backbone'], function($, _, Backbone) {
-  var SeqEntryFastaView = Backbone.View.extend({
-    initialize : function(options) {
-      var self = this;
+define('pviz/views/SeqEntryFastaView',['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
+    var SeqEntryFastaView = Backbone.View.extend({
+        initialize: function (options) {
+            var self = this;
+            self.options = options;
 
-    },
-    render : function() {
-      var self = this;
-      $(self.el).empty();
-      var seq = self.model.get('sequence');
-      var seq60 = '';
-      for ( i = 0; i < seq.length; i += 10) {
-        seq60 += seq.substring(i, i + 10)
-        if ((i + 10) % 60 == 0) {
-          seq60 += "\n";
-        } else {
-          seq60 += " ";
+        },
+        render: function () {
+            var self = this;
+            $(self.el).empty();
+            var seq = self.model.get('sequence');
+            var seq60 = '';
+            for (i = 0; i < seq.length; i += 10) {
+                seq60 += seq.substring(i, i + 10)
+                if ((i + 10) % 60 == 0) {
+                    seq60 += "\n";
+                } else {
+                    seq60 += " ";
+                }
+
+            }
+
+            $(self.el).append("<pre>>" + self.model.get('id') + "\n" + seq60 + "</pre>")
         }
-
-      }
-
-      $(self.el).append("<pre>>" + self.model.get('id') + "\n" + seq60 + "</pre>")
-    }
-  });
-  return SeqEntryFastaView;
+    });
+    return SeqEntryFastaView;
 });
-
 /**
  * OneLiner project all feature on  a non-zoomable, monochromatic icon
  *
@@ -2457,70 +2465,71 @@ define('pviz/views/SeqEntryFastaView',['jquery', 'underscore', 'backbone'], func
  * Copyright (c) 2013, Genentech Inc.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
-define('pviz/views/OneLiner',['jquery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function($, _, bb, d3, tmpl) {
-  return bb.View.extend({
-    initialize : function() {
-      var self = this;
+define('pviz/views/OneLiner',['jquery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function ($, _, bb, d3, tmpl) {
+    return bb.View.extend({
+        initialize: function (options) {
+            var self = this;
+            self.options = options;
 
-      self.height = 16;
+            self.height = 16;
 
-      self.svg = d3.select(self.el).append("svg").attr("width", '100%').attr('height', self.height).attr('class', 'pviz one-liner');
-      self.svg.append('line').attr('x1', 0).attr('x2', '100%').attr('y1', self.height / 2).attr('y2', self.height / 2);
+            self.svg = d3.select(self.el).append("svg").attr("width", '100%').attr('height', self.height).attr('class', 'pviz one-liner');
+            self.svg.append('line').attr('x1', 0).attr('x2', '100%').attr('y1', self.height / 2).attr('y2', self.height / 2);
 
-      self.update();
-      self.listenTo(self.model, 'change', function() {
-        self.update();
-        self.render();
-      });
+            self.update();
+            self.listenTo(self.model, 'change', function () {
+                self.update();
+                self.render();
+            });
 
-    },
-    categories : function() {
-      return this.options.categories;
-    },
-    xscale : function() {
-      var self = this;
-      return d3.scale.linear().domain([0, self.model.length()]).range([0, $(self.el).width()])
-    },
-    update : function() {
-      var self = this;
-      self.svg.selectAll("rect").remove();
+        },
+        categories: function () {
+            return this.options.categories;
+        },
+        xscale: function () {
+            var self = this;
+            return d3.scale.linear().domain([0, self.model.length()]).range([0, $(self.el).width()])
+        },
+        update: function () {
+            var self = this;
+            self.svg.selectAll("rect").remove();
 
-      var features = self.model.get('features');
+            var features = self.model.get('features');
 
-      var cat2line = {}
-      _.each(self.categories(), function(c, i) {
-        cat2line[c] = i
-      })
-      self.cat2line = cat2line;
-      var features = _.filter(features, function(ft) {
-        return (self.categories() === undefined) || (cat2line[ft.category] !== undefined)
-      })
+            var cat2line = {}
+            _.each(self.categories(), function (c, i) {
+                cat2line[c] = i
+            })
+            self.cat2line = cat2line;
+            var features = _.filter(features, function (ft) {
+                return (self.categories() === undefined) || (cat2line[ft.category] !== undefined)
+            })
 
-      self.rectangles = self.svg.selectAll('rect').data(features).enter();
+            self.rectangles = self.svg.selectAll('rect').data(features).enter();
 
-      self.rectangles.append('rect').attr('height', (self.categories() ? (self.height / self.categories().length) : self.height))
-    },
+            self.rectangles.append('rect').attr('height', (self.categories() ? (self.height / self.categories().length) : self.height))
+        },
 
-    render : function() {
-      var self = this;
-      var x = self.xscale()
-      self.svg.selectAll('rect').attr('x', function(ft) {
-        return x(ft.start)
-      }).attr('width', function(ft) {
-        return x(ft.end - ft.start + 1)
-      }).attr('y', function(ft) {
-        if (self.categories()) {
-          return self.cat2line[ft.category] * self.height / self.categories().length
-        } else {
-          return 0
+        render: function () {
+            var self = this;
+            var x = self.xscale()
+            self.svg.selectAll('rect').attr('x',function (ft) {
+                return x(ft.start)
+            }).attr('width',function (ft) {
+                return x(ft.end - ft.start + 1)
+            }).attr('y',function (ft) {
+                if (self.categories()) {
+                    return self.cat2line[ft.category] * self.height / self.categories().length
+                } else {
+                    return 0
+                }
+            }).attr('class', function (ft) {
+                if (self.categories() === undefined)
+                    return '';
+                return 'subline-' + self.cat2line[ft.category]
+            });
         }
-      }).attr('class', function(ft) {
-        if (self.categories() === undefined)
-          return '';
-        return 'subline-' + self.cat2line[ft.category]
-      });
-    }
-  })
+    })
 
 });
 

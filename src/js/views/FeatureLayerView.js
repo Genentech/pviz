@@ -10,7 +10,10 @@ define(['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplay
     var FeatureLayerView = bb.View.extend({
         initialize : function(options) {
             var self = this;
+
             options = options || {}
+            self.options = options;
+
             self.clipper = self.options.clipper;
 
             _.each(['container', 'viewport'], function(n) {
