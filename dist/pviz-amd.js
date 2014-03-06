@@ -2059,6 +2059,8 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
 
         initialize : function(options) {
             var self = this;
+            self.options = options;
+
             self.margins = {
                 left : options.marginLeft || 20,
                 right : options.marginRight || 20,
