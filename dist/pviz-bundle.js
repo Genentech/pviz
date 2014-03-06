@@ -1,4 +1,4 @@
-/*! pviz - v0.1.2 - 2014-02-28 */
+/*! pviz - v0.1.2 - 2014-03-05 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -17248,9 +17248,9 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
         initialize : function(options) {
             var self = this;
             self.margins = {
-                left : self.options.marginLeft || 20,
-                right : self.options.marginRight || 20,
-                top : self.options.marginTop || 25
+                left : options.marginLeft || 20,
+                right : options.marginRight || 20,
+                top : options.marginTop || 25
             };
             self.layers = [];
             self.layerViews = [];
@@ -17283,7 +17283,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             /*
              * add the callback to set the aabubble position and text (if needed)
              */
-            if (!self.options.noPositionBubble) {
+            if (!options.noPositionBubble) {
                 xChangeCallbacks.push(function(i0, i1) {
                     var gbubbles = self.svg.selectAll('g.axis-bubble');
                     if (self.viewport.scales.font > 10) {
@@ -17338,7 +17338,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                     self.p_positionText(vp, self.svg.selectAll('text.data'));
                     featureDisplayer.position(vp, self.svg.selectAll('g.data'));
 
-                    if (!self.options.hideAxis)
+                    if (!options.hideAxis)
                         self.updateAxis();
                     // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
                     // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
@@ -17349,7 +17349,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             self.drawContainer = self.svg.append('g');
             //.attr('transform', 'translate(' + self.margins.left + ',' + self.margins.top + ')');
             self.axisContainer = self.drawContainer.append('g').attr('class', 'axis')
-            //var yshiftScale = self.options.hideAxis ? 0 : 20;
+            //var yshiftScale = options.hideAxis ? 0 : 20;
 
             self.layerContainer = self.drawContainer.append('g').attr('class', 'layers');
 
@@ -17358,7 +17358,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             })
 
             self.update()
-            if (!self.options.hideAxis)
+            if (!options.hideAxis)
                 self.updateAxis();
 
             self.listenTo(self.model, 'change', self.update)
