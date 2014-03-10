@@ -26,8 +26,11 @@ define([], function() {
             return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
           }
           d3selection.selectAll("path.helix").attr('d', function(ft) {
+            //width in pixels
             var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
-            var n = Math.round(w / 20)
+            //number of waves, should not be larger than 20 px
+            var n = Math.max(1, Math.round(w / 20));
+            // half period
             var hwStep = w / n / 2;
             var d = _.times(n, function(i) {
               return "q" + (hwStep / 2) + ",-10," + hwStep + ",0," + (hwStep / 2) + ",10," + hwStep + ",0"
