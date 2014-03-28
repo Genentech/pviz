@@ -96,7 +96,7 @@ That said, you can either use the bundled library (with all dependencies) or cre
 Via jasmine, either in the browser ([test/index.html](test/index.html)) or command line with phantom.js
 
 ####Continuous integration
-test, distribution etc. can be launched in a CI environment via grunt tasks <code>grunt test, dist...</code>
+test, distribution etc. can be launched in a CI environment via grunt tasks <code>grunt test, build...</code>
 
 ###Authors
 This library was initiated by 

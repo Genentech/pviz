@@ -154,10 +154,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default task(s).
-    grunt.registerTask('build', ['requirejs', 'concat:concat_copyright']);
+    grunt.registerTask('build_x', ['requirejs', 'concat:concat_copyright']);
     grunt.registerTask('default', ['build']);
     grunt.registerTask('test', ['mocha-server']);
 
-    grunt.registerTask('dist', ['build', 'copy:dist', 'copy:dist-examples']);
+    grunt.registerTask('build', ['build_x', 'copy:dist', 'copy:dist-examples']);
 
 };
