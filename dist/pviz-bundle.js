@@ -1,4 +1,4 @@
-/*! pviz - v0.1.2 - 2014-03-05 */
+/*! pviz - v0.1.2 - 2014-03-28 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -62,8 +62,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
     }
 }(this, function () {
     //almond, and your modules will be inlined here
-    
-/**
+    /**
  * @license almond 0.2.9 Copyright (c) 2011-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/almond for details
@@ -13220,8 +13219,11 @@ define('pviz/views/TypedDisplayer',[], function() {
             return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
           }
           d3selection.selectAll("path.helix").attr('d', function(ft) {
+            //width in pixels
             var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
-            var n = Math.round(w / 20)
+            //number of waves, should not be larger than 20 px
+            var n = Math.max(1, Math.round(w / 20));
+            // half period
             var hwStep = w / n / 2;
             var d = _.times(n, function(i) {
               return "q" + (hwStep / 2) + ",-10," + hwStep + ",0," + (hwStep / 2) + ",10," + hwStep + ",0"
@@ -17137,6 +17139,7 @@ define('text',['module'], function (module) {
     return text;
 });
 
+
 define('text!pviz_templates/details-pane.html',[],function () { return '<div class="details-pane">\n    <div class="" style="width:100%">\n        <div class="nav" style="display:none">\n            <ul class="nav nav-tabs">\n                <li class="pull-right">\n                    <label class="checkbox">\n                        <input type="checkbox" id="raise-active" checked=checked/>\n                        show active pane </label>\n                </li>\n            </ul>\n        </div>\n    </div>\n    <div class="tab-content">\n\n    </div>\n</div>\n';});
 
 /*
@@ -17244,6 +17247,7 @@ define('pviz/views/DetailsPane',['underscore', 'jquery', 'backbone', 'bootstrap'
         }
     });
 });
+
 
 define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { return '<div class=\'seq-entry-annot-interactive\'>\n    <div id=\'feature-viewer\'>\n        \n    </div>\n    <div id=\'details-viewer\'>\n        \n    </div>\n    \n</div>\n';});
 
@@ -17927,7 +17931,8 @@ define('PVizExport',['pviz/models/SeqEntry', 'pviz/services/DASReader', 'pviz/se
   }
   return exp;
 })
-;    //The modules for your project will be inlined above
+;
+    //The modules for your project will be inlined above
     //this snippet. Ask almond to synchronously require the
     //module value for 'main' here and return it as the
     //value to use for the public API for the built file.
