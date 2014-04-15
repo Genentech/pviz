@@ -1,4 +1,4 @@
-/*! pviz - v0.1.2 - 2014-03-28 */
+/*! pviz - v0.1.2 - 2014-04-15 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -14008,6 +14008,7 @@ define('pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', 
         var g = svgGroup.append('g').attr('class', 'plot');
         var sel = svgGroup.selectAll("g._plot-point").data(features).enter().append("g").attr('class', 'feature data _plot-point').attr('category', cat);
 
+
         sel.style('opacity', plot.opacity);
         var path = sel.append('path').attr('d',plot._shape).style('fill', plot._fill).style('stroke', plot._color).style('stroke-width', plot._lwd).attr('vector-effect', 'non-scaling-stroke');
 
@@ -17435,7 +17436,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                             totTracks += 2
                             previousGroupSet = currentGroupSet;
                             var yshiftScale = self.options.hideAxis ? -20 : 0;
-                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks + 1) + totHeight + yshiftScale)
+                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks) + totHeight + yshiftScale)
                         }
                         var yshift = self.viewport.scales.y(totTracks + 1)
                         view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
@@ -17519,11 +17520,20 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             var self = this;
 
             var groupedFeatures = _.groupBy(self.model.get('features'), function(ft) {
-                return (ft.groupSet ? (ft.groupSet + '/') : '') + ft.category;
+                var gcid = (ft.groupSet ? (ft.groupSet + '/') : ' /') + ft.category;
+                ft._groupCatId = gcid;
+                return gcid;
 
             });
 
-            _.chain(groupedFeatures).each(function(group, groupConcatName) {
+            _.chain(groupedFeatures)
+                .sortBy(function(group){
+                    if(!group[0].groupSet){
+                        return -99999;
+                    }
+                    return group[0].groupSet;
+                })
+                .each(function(group, groupConcatName) {
                 var nbTracks, isPlot;
                 if(featureDisplayer.isCategoryPlot(group[0].category)){
                     nbTracks = 1;

@@ -220,21 +220,24 @@ define(
                 description:'another description'
             },{category:'Amino acid modification', start:6, end:6, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
                 {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+                {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'C', groupSet:'CCC'},
                 {category:'Amino acid modification', start:14, end:14, type:'xxx', text:'B', groupSet:'BBB'},
                 {category:'Amino acid modification', start:25, end:25, type:'xxx', text:'B', groupSet:'BBB'},
                 {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
                 {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
                 {category:'Amino acid modification', start:6, end:6, type:'xxx', text:'C', groupSet:'CCC'},
                 {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'C', groupSet:'CCC'},
-                {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'C', groupSet:'CCC'},
-                {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'C', groupSet:'CCC'}
-            ])
+                {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'C1', groupSet:'CCC'},
+                {category:'catP', categoryName:'cat catP', start:11, end:11, type:'xxx', text:'C_P', groupSet:'CCC'},
+                {category:'catP', categoryName:'cat catP', start:6, end:6, type:'xxx', text:'A_P', groupSet:'AAA (pouet)'},
+                {category:'catP', categoryName:'cat catP', start:25, end:25, type:'xxx', text:'B_P', groupSet:'BBB'}
+            ]);
 
             var div = addDZDiv('annot-interactive', 'shorty', 600, 'auto');
             var view = new SeqEntryAnnotInteractiveView({
                 model : se,
                 el : div,
-                layerMenu : 'off'
+                //layerMenu : 'off'
             })
             view.render();
 

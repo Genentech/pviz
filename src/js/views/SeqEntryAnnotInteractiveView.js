@@ -182,7 +182,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
                             totTracks += 2
                             previousGroupSet = currentGroupSet;
                             var yshiftScale = self.options.hideAxis ? -20 : 0;
-                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks + 1) + totHeight + yshiftScale)
+                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks) + totHeight + yshiftScale)
                         }
                         var yshift = self.viewport.scales.y(totTracks + 1)
                         view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
@@ -266,11 +266,20 @@ define(['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager'
             var self = this;
 
             var groupedFeatures = _.groupBy(self.model.get('features'), function(ft) {
-                return (ft.groupSet ? (ft.groupSet + '/') : '') + ft.category;
+                var gcid = (ft.groupSet ? (ft.groupSet + '/') : ' /') + ft.category;
+                ft._groupCatId = gcid;
+                return gcid;
 
             });
 
-            _.chain(groupedFeatures).each(function(group, groupConcatName) {
+            _.chain(groupedFeatures)
+                .sortBy(function(group){
+                    if(!group[0].groupSet){
+                        return -99999;
+                    }
+                    return group[0].groupSet;
+                })
+                .each(function(group, groupConcatName) {
                 var nbTracks, isPlot;
                 if(featureDisplayer.isCategoryPlot(group[0].category)){
                     nbTracks = 1;

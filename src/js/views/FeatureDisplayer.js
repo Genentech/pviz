@@ -335,6 +335,7 @@ define(['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer', '../utils/
         var g = svgGroup.append('g').attr('class', 'plot');
         var sel = svgGroup.selectAll("g._plot-point").data(features).enter().append("g").attr('class', 'feature data _plot-point').attr('category', cat);
 
+
         sel.style('opacity', plot.opacity);
         var path = sel.append('path').attr('d',plot._shape).style('fill', plot._fill).style('stroke', plot._color).style('stroke-width', plot._lwd).attr('vector-effect', 'non-scaling-stroke');
 
