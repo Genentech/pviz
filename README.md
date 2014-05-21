@@ -10,7 +10,17 @@ Default sources can be explictely defined in JavaScript (limit is the sky),  [DA
 **Warning!** pViz target modern browsers, such as Firefox, Chrome and Safari. Do not expect it to work on IE7, just upgrade.
 
 ##Hello World
-To create a basic pViz application, * download two files from [github](https://github.com/Genentech/pviz/tree/master/dist). -`pviz-bundle.min.js` -`pviz-core.css` * Create an HTML file in the directory, with the content shown below. * Open this file in your browser... Et voilà.
+Creating a basic pViz application takes only three steps: 
+
+1. Download two files from [github](https://github.com/Genentech/pviz/tree/master/dist).
+
+	  -`pviz-bundle.min.js` 
+
+	  -`pviz-core.css` 
+2. Create an HTML file in the directory, with the content shown below. 
+3. Open the file in your browser.
+
+.
 
     <head>
       <link rel="stylesheet" type="text/css" href="pviz-core.css">
@@ -33,7 +43,7 @@ To create a basic pViz application, * download two files from [github](https://g
       </script>
     </body>
 
-**The rendered features. In practice, the widget is zoomable**
+Et voilà...**The rendered features. In practice, the widget is zoomable**
 ![](images/hello-world.jpg)
 
 ##How does it work?
