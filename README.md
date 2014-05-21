@@ -10,10 +10,11 @@ Default sources can be explictely defined in JavaScript (limit is the sky),  [DA
 **Warning!** pViz target modern browsers, such as Firefox, Chrome and Safari. Do not expect it to work on IE7, just upgrade.
 
 ##Hello World
+To create a basic pViz application, download `pviz-bundle.min.js` and `pviz-core.css` from [github](https://github.com/Genentech/pviz/tree/master/dist) beside a file containing the following html content. Open this file in your browser... Et voilà.
 
     <head>
-      <link rel="stylesheet" type="text/css" href="../dist/pviz-core.css">
-      <script src="../dist/pviz-bundle-min.js"></script>
+      <link rel="stylesheet" type="text/css" href="pviz-core.css">
+      <script src="pviz-bundle.min.js"></script>
     </head>
     <body>
       <div id="main"></div>
