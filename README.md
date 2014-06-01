@@ -1,6 +1,7 @@
 #pViz.js: a dynamic JavaScript & SVG library for visualization of protein sequence features
 
 ##Head straight for working examples and demo applications [here](http://research-pub.gene.com/pviz/examples/)
+
 ##What is pViz.js?
 pViz.js is a <strike>protein</strike> sequence features viewer for modern browsers, based on a JavaScript library, SVG and css.
 
