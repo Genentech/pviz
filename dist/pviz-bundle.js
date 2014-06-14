@@ -1,4 +1,4 @@
-/*! pviz - v0.1.5 - 2014-04-15 */
+/*! pviz - v0.1.5 - 2014-06-13 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -13122,73 +13122,74 @@ define("d3", (function (global) {
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
 
-define('pviz/services/FeatureManager',['underscore'], function(_) {
-  var FeatureManager = function() {
-  }
-  /**
-   *
-   *
-   * @param {Array[]}
-   *
-   * @param {Map}
-   *          options can have several fields: -
-   */
-  FeatureManager.prototype.sortFeatures = function(features, options) {
-    var self = this;
-
-    if (options === undefined) {
-      options = {}
+define('pviz/services/FeatureManager',['underscore'], function (_) {
+    var FeatureManager = function () {
     }
-    return _.sortBy(features, function(a) {
-      return a.start;
-    });
-  }
-  /**
-   *
-   * @param {Object} fta
-   * @param {Object} ftb
-   */
-  FeatureManager.prototype.featuresIntersect = function(fta, ftb) {
-    return !((fta.end < ftb.start) || (ftb.end < fta.start))
-    // /(fta.start >= ftb.start && fta.start <= ftb.end) || (fta.end >= ftb.start && fta.end <= ftb.end)
-  };
+    /**
+     *
+     *
+     * @param {Array[]}
+     *
+     * @param {Map}
+     *          options can have several fields:
+     */
+    FeatureManager.prototype.sortFeatures = function (features, options) {
+        var self = this;
 
-  //only works on sorted features
-  FeatureManager.prototype._getOverlaps = function(fNum, features) {
-    var self = this;
-    var feat = features[fNum];
+        if (options === undefined) {
+            options = {}
+        }
 
-    return _.filter(features.slice(0, fNum), function(ft) {
-      //we check that we can have several time the same feature???
-      return (!_.isEqual(feat, ft)) && (self.featuresIntersect(feat, ft));
-    });
 
-  }
-  /**
-   *
-   * @param {Object} features and array of featues. We add a displayTrack attribute to each element.
-   * @return the number of tracks
-   */
-  FeatureManager.prototype.assignTracks = function(features) {
-    var sortedFeats = this.sortFeatures(features);
+        return _.sortBy(features, function (a) {
 
-    var nbTracks = 0;
-    var lastPosPerTrack = []
-    _.chain(sortedFeats).sortBy(function(ft) {
-      return ft.start
-    }).each(function(ft) {
-      var ftStart = ft.start;
-      for ( itrack = 0; itrack < lastPosPerTrack.length && lastPosPerTrack[itrack] >= ftStart; itrack++) {
-      }
-      lastPosPerTrack[itrack] = ft.end
-      ft.displayTrack = itrack
-    })
-    return lastPosPerTrack.length
-  }
-  /*
-   * singleton contructor
-   */
-  return new FeatureManager()
+            return a.start;
+        });
+    }
+    /**
+     *
+     * @param {Object} fta
+     * @param {Object} ftb
+     */
+    FeatureManager.prototype.featuresIntersect = function (fta, ftb) {
+        return !((fta.end < ftb.start) || (ftb.end < fta.start))
+        // /(fta.start >= ftb.start && fta.start <= ftb.end) || (fta.end >= ftb.start && fta.end <= ftb.end)
+    };
+
+    //only works on sorted features
+    FeatureManager.prototype._getOverlaps = function (fNum, features) {
+        var self = this;
+        var feat = features[fNum];
+
+        return _.filter(features.slice(0, fNum), function (ft) {
+            //we check that we can have several time the same feature???
+            return (!_.isEqual(feat, ft)) && (self.featuresIntersect(feat, ft));
+        });
+
+    }
+    /**
+     *
+     * @param {Object} features and array of featues. We add a displayTrack attribute to each element.
+     * @return the number of tracks
+     */
+    FeatureManager.prototype.assignTracks = function (features, options) {
+        var sortedFeats = this.sortFeatures(features, options);
+
+        var nbTracks = 0;
+        var lastPosPerTrack = []
+        _.chain(sortedFeats).each(function (ft) {
+            var ftStart = ft.start;
+            for (itrack = 0; itrack < lastPosPerTrack.length && lastPosPerTrack[itrack] >= ftStart; itrack++) {
+            }
+            lastPosPerTrack[itrack] = ft.end
+            ft.displayTrack = itrack
+        })
+        return lastPosPerTrack.length
+    }
+    /*
+     * singleton contructor
+     */
+    return new FeatureManager()
 });
 
 /**
@@ -17256,17 +17257,17 @@ define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { r
  * Copyright (c) 2013, Genentech Inc.
  * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
  */
-define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager', './FeatureDisplayer', './SeqEntryViewport', 'pviz/models/FeatureLayer', './FeatureLayerView', './HiddenLayersView', './DetailsPane', 'text!pviz_templates/seq-entry-annot-interactive.html'], function($, _, Backbone, d3, featureManager, featureDisplayer, SeqEntryViewport, FeatureLayer, FeatureLayerView, HiddenLayersView, DetailsPane, tmpl) {
+define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager', './FeatureDisplayer', './SeqEntryViewport', 'pviz/models/FeatureLayer', './FeatureLayerView', './HiddenLayersView', './DetailsPane', 'text!pviz_templates/seq-entry-annot-interactive.html'], function ($, _, Backbone, d3, featureManager, featureDisplayer, SeqEntryViewport, FeatureLayer, FeatureLayerView, HiddenLayersView, DetailsPane, tmpl) {
     var SeqEntryAnnotInteractiveView = Backbone.View.extend({
 
-        initialize : function(options) {
+        initialize: function (options) {
             var self = this;
             self.options = options;
 
             self.margins = {
-                left : options.marginLeft || 20,
-                right : options.marginRight || 20,
-                top : options.marginTop || 25
+                left: options.marginLeft || 20,
+                right: options.marginRight || 20,
+                top: options.marginTop || 25
             };
             self.layers = [];
             self.layerViews = [];
@@ -17282,8 +17283,8 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             $(self.el).append(el)
 
             self.components = {
-                features : el.find('#feature-viewer'),
-                details : el.find('#details-viewer')
+                features: el.find('#feature-viewer'),
+                details: el.find('#details-viewer')
             }
 
             self.svg = d3.select(self.components.features[0]).append("svg").attr("width", '100%').attr("height", '123').attr('class', 'pviz');
@@ -17300,7 +17301,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
              * add the callback to set the aabubble position and text (if needed)
              */
             if (!options.noPositionBubble) {
-                xChangeCallbacks.push(function(i0, i1) {
+                xChangeCallbacks.push(function (i0, i1) {
                     var gbubbles = self.svg.selectAll('g.axis-bubble');
                     if (self.viewport.scales.font > 10) {
                         gbubbles.style('display', 'none');
@@ -17329,15 +17330,15 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                         var ts = self.gAABubble.selectAll('text.subseq').data(subseq.split(''));
                         ts.exit().remove();
                         ts.enter().append("text").attr('class', 'subseq');
-                        ts.text(function(d) {
+                        ts.text(function (d) {
                             return d;
-                        }).attr('x', function(t, i) {
-                                var d = Math.abs(i - 4);
-                                return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
-                            }).style('font-size', function(t, i) {
-                                var d = Math.abs(i - 4);
-                                return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
-                            }).attr('y', -3);
+                        }).attr('x', function (t, i) {
+                            var d = Math.abs(i - 4);
+                            return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
+                        }).style('font-size', function (t, i) {
+                            var d = Math.abs(i - 4);
+                            return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
+                        }).attr('y', -3);
                     }
 
                     //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
@@ -17346,11 +17347,11 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
 
             }
             self.viewport = new SeqEntryViewport({
-                el : self.components.features,
-                svg : self.svg,
-                length : self.model.length(),
-                margins : self.margins,
-                changeCallback : function(vp) {
+                el: self.components.features,
+                svg: self.svg,
+                length: self.model.length(),
+                margins: self.margins,
+                changeCallback: function (vp) {
                     self.p_positionText(vp, self.svg.selectAll('text.data'));
                     featureDisplayer.position(vp, self.svg.selectAll('g.data'));
 
@@ -17359,7 +17360,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
                     // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
                     // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
                 },
-                xChangeCallback : xChangeCallbacks
+                xChangeCallback: xChangeCallbacks
             });
 
             self.drawContainer = self.svg.append('g');
@@ -17370,7 +17371,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             self.layerContainer = self.drawContainer.append('g').attr('class', 'layers');
 
             self.detailsPane = new DetailsPane({
-                el : self.components.details
+                el: self.components.details
             })
 
             self.update()
@@ -17380,12 +17381,12 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             self.listenTo(self.model, 'change', self.update)
 
         },
-        updateAxis : function() {
+        updateAxis: function () {
             var self = this;
 
             var vpXScale = self.viewport.scales.x;
             var scale = d3.scale.linear().domain([vpXScale.domain()[0] + 1, vpXScale.domain()[1] + 1]).range(vpXScale.range());
-            var xAxis = d3.svg.axis().scale(scale).tickSize(6, 5, 5).tickFormat(function(p) {
+            var xAxis = d3.svg.axis().scale(scale).tickSize(6, 5, 5).tickFormat(function (p) {
                 return (p == 0) ? '' : p
             }).ticks(4);
             self.axisContainer.call(xAxis);
@@ -17394,7 +17395,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             self.gPosBubble.append('text').attr('class', 'pos').attr('y', 6);
 
         },
-        update : function() {
+        update: function () {
             var self = this;
             self.layerContainer.selectAll('g').remove()
             self.svg.select('g.groupset-title').remove()
@@ -17410,8 +17411,8 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
             self.p_setup_groupset_titles()
             self.render()
 
-            _.each(self.layers, function(layer) {
-                layer.on('change', function() {
+            _.each(self.layers, function (layer) {
+                layer.on('change', function () {
                     self.render();
                 })
             });
@@ -17419,39 +17420,39 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
         /**
          * render: show the visible layers and pile them up.
          */
-        render : function() {
+        render: function () {
             var self = this;
 
             var totTracks = 0;
             var totHeight = 0
 
             var previousGroupSet = undefined;
-            _.chain(self.layerViews).filter(function(layerViews) {
+            _.chain(self.layerViews).filter(function (layerViews) {
                 return true;
-            }).each(function(view) {
-                    if (view.model.get('visible')) {
-                        var currentGroupSet = view.model.get('groupSet');
-                        if (currentGroupSet != previousGroupSet) {
-                            var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
-                            totTracks += 2
-                            previousGroupSet = currentGroupSet;
-                            var yshiftScale = self.options.hideAxis ? -20 : 0;
-                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks) + totHeight + yshiftScale)
-                        }
-                        var yshift = self.viewport.scales.y(totTracks + 1)
-                        view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
-                        if(view.model.get('isPlot')){
-                            totHeight+=view.height();
-                            totTracks +=  1 + self.paddingCategory;
-                        }else{
-                            totTracks += view.height() + 1 + self.paddingCategory;
-                        }
-                        view.g.style('display', null);
-
-                    } else {
-                        view.g.style('display', 'none');
+            }).each(function (view) {
+                if (view.model.get('visible')) {
+                    var currentGroupSet = view.model.get('groupSet');
+                    if (currentGroupSet != previousGroupSet) {
+                        var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
+                        totTracks += 2
+                        previousGroupSet = currentGroupSet;
+                        var yshiftScale = self.options.hideAxis ? -20 : 0;
+                        self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks) + totHeight + yshiftScale)
                     }
-                });
+                    var yshift = self.viewport.scales.y(totTracks + 1)
+                    view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
+                    if (view.model.get('isPlot')) {
+                        totHeight += view.height();
+                        totTracks += 1 + self.paddingCategory;
+                    } else {
+                        totTracks += view.height() + 1 + self.paddingCategory;
+                    }
+                    view.g.style('display', null);
+
+                } else {
+                    view.g.style('display', 'none');
+                }
+            });
             self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(totTracks + 1) + totHeight + 20) + ")");
 
             var heightAdd = 0;
@@ -17470,7 +17471,7 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
          * define gradients to be used.
          * This should certainly lie elsewhere...
          */
-        p_setup_defs : function() {
+        p_setup_defs: function () {
             var self = this;
             var defs = self.svg.append('defs');
 
@@ -17484,27 +17485,27 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
         /*
          * build the Sequence layer
          */
-        p_setup_layer_sequence : function() {
+        p_setup_layer_sequence: function () {
             var self = this;
 
             var layer = new FeatureLayer({
-                name : 'sequence',
-                nbTracks : 2,
+                name: 'sequence',
+                nbTracks: 2
             })
             self.layers.push(layer)
             var view = new FeatureLayerView({
-                model : layer,
-                container : self.layerContainer,
-                viewport : self.viewport,
-                cssClass : 'sequence',
-                noMenu : true,
-                margins : self.margins,
-                clipper : '#' + self.clipperId
+                model: layer,
+                container: self.layerContainer,
+                viewport: self.viewport,
+                cssClass: 'sequence',
+                noMenu: true,
+                margins: self.margins,
+                clipper: '#' + self.clipperId
             })
             self.layerViews.push(view)
 
             view.gFeatures.append('line').attr('x1', -100).attr('x2', 2000).attr('class', 'sequence-bg').attr('y1', 7).attr('y2', 7);
-            var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function(d) {
+            var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function (d) {
                 return d;
             });
 
@@ -17516,98 +17517,110 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
         /*
          * group features by category, and build a lyer for each of them
          */
-        p_setup_layer_features : function() {
+        p_setup_layer_features: function () {
             var self = this;
 
-            var groupedFeatures = _.groupBy(self.model.get('features'), function(ft) {
+            var groupedFeatures = _.groupBy(self.model.get('features'), function (ft) {
                 var gcid = (ft.groupSet ? (ft.groupSet + '/') : ' /') + ft.category;
                 ft._groupCatId = gcid;
                 return gcid;
 
             });
 
+            //it is possible to pass the category Order, thus sort on it at first
+            var categoryOrder;
+            if (self.options.categoryOrder !== undefined) {
+                categoryOrder = {};
+                _.each(self.options.categoryOrder, function (n, i) {
+                    categoryOrder[n] = i + 1;
+                });
+            }
+
             _.chain(groupedFeatures)
-                .sortBy(function(group){
-                    if(!group[0].groupSet){
+                .sortBy(function (group) {
+                    if(categoryOrder!==undefined){
+                        return 1000000*(categoryOrder[group[0].category] || 100);
+                    }
+                    if (!group[0].groupSet) {
                         return -99999;
                     }
                     return group[0].groupSet;
                 })
-                .each(function(group, groupConcatName) {
-                var nbTracks, isPlot;
-                if(featureDisplayer.isCategoryPlot(group[0].category)){
-                    nbTracks = 1;
-                    isPlot = true;
-                }else{
-                    nbTracks = featureManager.assignTracks(group);
-                }
-                var groupName = group[0].category;
-                var groupType = group[0].categoryType || groupName;
-                var groupSet = group[0].groupSet;
-                var cssClass = groupName.replace(/\s+/g, '_')
+                .each(function (group, groupConcatName) {
+                    var nbTracks, isPlot;
+                    if (featureDisplayer.isCategoryPlot(group[0].category)) {
+                        nbTracks = 1;
+                        isPlot = true;
+                    } else {
+                        nbTracks = featureManager.assignTracks(group);
+                    }
+                    var groupName = group[0].category;
+                    var groupType = group[0].categoryType || groupName;
+                    var groupSet = group[0].groupSet;
+                    var cssClass = groupName.replace(/\s+/g, '_')
 
-                var layer = new FeatureLayer({
-                    name : (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
-                    type : groupType,
-                    category:groupName,
-                    groupSet : groupSet,
-                    id : 'features-' + cssClass,
-                    nbTracks : nbTracks,
-                    isPlot:isPlot
+                    var layer = new FeatureLayer({
+                        name: (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
+                        type: groupType,
+                        category: groupName,
+                        groupSet: groupSet,
+                        id: 'features-' + cssClass,
+                        nbTracks: nbTracks,
+                        isPlot: isPlot
+                    });
+                    self.layers.push(layer)
+
+                    var layerView = new FeatureLayerView({
+                        model: layer,
+                        container: self.layerContainer,
+                        viewport: self.viewport,
+                        cssClass: cssClass,
+                        layerMenu: self.options.layerMenu,
+                        margins: self.margins,
+                        clipper: '#' + self.clipperId
+                    });
+                    self.layerViews.push(layerView);
+
+                    var sel;
+                    if (isPlot) {
+                        sel = featureDisplayer.categoryPlotAppend(groupName, self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                    } else {
+                        sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+
+                    }
+                    //add tolltip based on description field
+                    sel.append('title').text(function (ft) {
+                        return ft.description;
+                    });
                 });
-                self.layers.push(layer)
-
-                var layerView = new FeatureLayerView({
-                    model : layer,
-                    container : self.layerContainer,
-                    viewport : self.viewport,
-                    cssClass : cssClass,
-                    layerMenu : self.options.layerMenu,
-                    margins : self.margins,
-                    clipper : '#' + self.clipperId
-                });
-                self.layerViews.push(layerView);
-
-                var sel;
-                if(isPlot){
-                    sel = featureDisplayer.categoryPlotAppend(groupName, self.viewport, layerView.gFeatures, group).classed(cssClass, true);
-                }else{
-                    sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
-
-                }
-                //add tolltip based on description field
-                sel.append('title').text(function(ft) {
-                    return ft.description;
-                });
-            });
 
         },
-        p_setup_hidden_layers_container : function() {
+        p_setup_hidden_layers_container: function () {
             var self = this;
 
             self.hiddenLayers = new HiddenLayersView({
 
-                container : self.svg,
-                layers : self.layers,
-                nbTracks : 1
+                container: self.svg,
+                layers: self.layers,
+                nbTracks: 1
             });
             // /self.layers.push(layer)
 
         },
-        p_setup_groupset_titles : function() {
+        p_setup_groupset_titles: function () {
             var self = this;
-            var groupSetNames = _.chain(self.model.get('features')).map(function(ft) {
+            var groupSetNames = _.chain(self.model.get('features')).map(function (ft) {
                 return ft.groupSet
-            }).unique().filter(function(t) {
-                    return t
-                }).value();
+            }).unique().filter(function (t) {
+                return t
+            }).value();
 
             self.gGroupSets = self.svg.append('g').attr('class', 'groupset-title');
-            self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function(x) {
+            self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function (x) {
                 return x;
-            }).attr('x', 7).attr('y', 10).attr('id', function(x) {
-                    return 'groupset-title-' + (x || '').replace(/\W/g, '_');
-                })
+            }).attr('x', 7).attr('y', 10).attr('id', function (x) {
+                return 'groupset-title-' + (x || '').replace(/\W/g, '_');
+            })
 
             return self;
         },
@@ -17616,9 +17629,9 @@ define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backb
          * @param {Object} viewport
          * @param {Object} sel
          */
-        p_positionText : function(viewport, sel) {
+        p_positionText: function (viewport, sel) {
             var self = this;
-            sel.attr('x', function(d, i) {
+            sel.attr('x', function (d, i) {
                 return viewport.scales.x(i);
             }).attr('y', viewport.scales.y(1) - 7).style('font-size', '' + viewport.scales.font + 'px').style('letter-spacing', '' + (viewport.scales.x(2) - viewport.scales.x(1) - viewport.scales.font) + 'px')
             return sel
