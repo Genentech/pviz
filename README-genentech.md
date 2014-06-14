@@ -13,3 +13,7 @@ Then visit [jenkins](http://rescode03:8080/build/job/synch_to_research-pub-dmz/)
     grunt build
     git commit -m "..."
     npm version patch
+
+
+##update dependent projects
+    bower update pviz
