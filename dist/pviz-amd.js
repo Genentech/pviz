@@ -1,4 +1,4 @@
-/*! pviz - v0.1.5 - 2014-06-13 */
+/*! pviz - v0.1.5 - 2014-08-01 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -17,380 +17,472 @@
 	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/models/SeqEntry',['underscore', 'backbone'], function(_, Backbone) {
-  var SeqEntry = Backbone.Model.extend({
-    defaults : {
-
-    },
-    initialize : function() {
-      this.set('features', []);
-    },
-    length : function() {
-      var seq = this.get('sequence');
-      return (seq === undefined) ? 0 : seq.length
-    },
-    addFeatures : function(feats, options) {
-      var self = this;
-      options = options || {};
-
-      var triggerChange = options.triggerChange || (options.triggerChange === undefined);
-
-      if (_.isArray(feats)) {
-        _.each(feats, function(ft) {
-          ft.start = parseInt(ft.start);
-          ft.end = parseInt(ft.end);
-          self.get('features').push(ft);
-        })
-        if (triggerChange)
-          self.trigger('change');
-        return self;
-      }
-      self.get('features').push(feats);
-      if (triggerChange)
-        self.trigger('change');
-      return self;
-    },
-    clear : function() {
-      this.get('features').length = 0
-      this.trigger('change');
-      return this;
-
-    }
-    //urlRoot:'das/json'
-  })
-  return SeqEntry;
-});
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/models/PositionedFeature',['underscore'], function(_) {
-  var PositionedFeature = function(options) {
-    var self = this;
-    _.each(['start', 'end', 'type', 'category', 'description', 'displayTrack', 'text', 'groupSet'], function(name) {
-      self[name] = options[name]
-    })
-  }
-
-  return PositionedFeature;
-});
-
-/**
- * a singleton service that goes and grab information from DAS service, buil
- * SeqEntry and add annotation
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-
-define('pviz/services/DASReader',['underscore', 'pviz/models/SeqEntry', 'pviz/models/PositionedFeature'], function(_, SeqEntry, PositionedFeature) {
-    var DASReader = function(url, options) {
-        var self = this;
-        options = options || {}
-        self.urlRoot = url || 'http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot'
-        self.xmlMapper = options.xmlMapper || {}
-    }
+define(
     /**
-     * build a new SeqEntry, with sequence, from an id
-     *
-     * @param {String}
-     *          id
-     * @param {Map}
-     *          options can have several fields: - NYI getFeatures
-     *          (true|false): once the sequence is loaded, we load the
-     *          features - success: a function to be exeuted upon success of
-     *          loading seq, with the newly created seqEntry as argument
+     @exports SeqEntry
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
      */
-    DASReader.prototype.buildSeqEntry = function(id, options) {
-        var self = this;
-        var url = self.urlRoot + '/sequence?segment=' + id;
+    'pviz/models/SeqEntry',['underscore', 'backbone'], function (_, Backbone) {
+        /**
+         * A SeqEntry object holds the sequence and the list of PositionedFeature
+         * @constructor
+         * @augments Backbone.Model
+         *
+         * @param {Map} options
+         * @param {String} options.sequence is the layer to be shown. Default is true
+         * @param {Array} options.features an array of object (will be mapped into PositionedFeature)
+         */
+        var SeqEntry = Backbone.Model.extend(
+            /**
+             * @lends module:SeqEntry~SeqEntry.prototype
+             */
+            {
+                defaults: {
 
-        if (options === undefined) {
-            options = {}
-        }
+                },
+                initialize: function () {
+                    this.set('features', []);
+                },
+                /**
+                 *
+                 * @return {integer} sequence length
+                 */
+                length: function () {
+                    var seq = this.get('sequence');
+                    return (seq === undefined) ? 0 : seq.length
+                },
+                /**
+                 * Add san array or a single feature to the seq entry. A 'change' event will be triggered by default. The Backbone view will be binded to such changes
+                 * @param {Array|Object} feats
+                 * @param {Map} options
+                 * @param {boolean} options.triggerChange defines is a 'change' event is to be fired (default is true)
+                 * @return {SeqEntry}
+                 */
+                addFeatures: function (feats, options) {
+                    var self = this;
+                    options = options || {};
 
-        $.get(url, function(xml) {
-            var seqEntry = self.xml2seqEntry(xml);
+                    var triggerChange = options.triggerChange || (options.triggerChange === undefined);
 
-            if (options.getFeatures) {
-                delete options.getFeatures;
-                self.addFeatures(seqEntry, options)
-                return;
-                // no need to call success, it should be done at the end
-                // of getFeatures
-            }
+                    if (_.isArray(feats)) {
+                        _.each(feats, function (ft) {
+                            ft.start = parseInt(ft.start);
+                            ft.end = parseInt(ft.end);
+                            self.get('features').push(ft);
+                        })
+                        if (triggerChange)
+                            self.trigger('change');
+                        return self;
+                    }
+                    self.get('features').push(feats);
+                    if (triggerChange)
+                        self.trigger('change');
+                    return self;
+                },
+                /**
+                 * Removes all the features (and fire a 'change' event
+                 * @return {SeqEntry}
+                 */
+                clear: function () {
+                    this.get('features').length = 0
+                    this.trigger('change');
+                    return this;
 
-            if (options.success !== undefined) {
-                options.success(seqEntry);
-
-            }
-        })
-    }
-    /**
-     * from a DAS xml (the /sequence one), it builds up a SeqEntry
-     * @param {Object} xml
-     */
-    DASReader.prototype.xml2seqEntry = function(xmlStr, options) {
-        options = options || {};
-
-        var xml =$(xmlStr);
-        var el = xml.find('SEQUENCE:first');
-        return new SeqEntry({
-            id : el.attr('id'),
-            description : el.attr('label'),
-            sequence : el.text().trim()
-        });
-    };
-
-    /**
-     * from a DAS xml (the /features one), it add positional features to a seq entry
-     * @param {SeqEntry} seqEntry
-     * @param {Object} xml
-     */
-    DASReader.prototype.xml2features = function(seqEntry, xmlStr, options) {
-        var self = this;
-        options = options || {};
-
-        var xml = $(xmlStr);
-        var el = xml.find('SEQUENCE')[0];
-        var features = _.chain(xml.find('FEATURE')).filter(function(node) {
-            return $(node).find('START').length == 1
-        }).map(function(n) {
-            var node = $(n);
-            var f = new PositionedFeature({
-                start : parseInt(node.find('START:first').text())-1,
-                end : parseInt(node.find('END:first').text())-1,
-                type : node.find('TYPE:first').text(),
-                category : node.find('TYPE:first').attr('category'),
-                description : node.find('NOTE:first').text()
+                }
             });
-            if (options.groupSet) {
-                f.groupSet = options.groupSet;
-            }
-            _.each(self.xmlMapper, function(fct, field) {
-                f[field] = fct(f[field], f, node)
+        return SeqEntry;
+    });
+
+define(
+    /**
+     @exports PositionedFeature
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/models/PositionedFeature',['underscore'], function (_) {
+        /**
+         * @class PositionedFeature, corresponding to the basic component to be displayed. There is no limit among the feature member. However, a few a given by default
+         * @constructor
+         * @param {Map} options
+         * @param {int} options.start [compulsory] the starting position, (first one is 0)
+         * @param {int} options.end  [compulsory] the ending position
+         * @param {String} options.type [compulsory] will be used to define how to draw the feature
+         * @param {String} options.category [compulsory] all the feature below the same category are regrouped together
+         * @param {String} options.groupSet  a super category
+         * @param {String} options.text  a description to be displayed by default
+         *
+         */
+        var PositionedFeature = function (options) {
+            var self = this;
+            _.each(['start', 'end', 'type', 'category', 'description', 'displayTrack', 'text', 'groupSet'], function (name) {
+                self[name] = options[name]
             })
-            return f;
-        }).filter(function(ft) {
-            if (options.skipCategory && options.skipCategory[ft.category])
-                return false
-            return true;
-        }).value();
-        // each(function(node){console.log(node)});
-        seqEntry.addFeatures(features);
-    };
+        }
 
-    DASReader.prototype.addFeatures = function(seqEntry, options) {
-        var self = this;
-        options = options || {}
+        return PositionedFeature;
+    });
 
-        var url = self.urlRoot + '/features?segment=' + seqEntry.get('id');
-        $.get(url, function(xml) {
-            self.xml2features(seqEntry, xml, options)
-            if (options.success !== undefined) {
-                options.success(seqEntry);
+define(
+    /**
+     @exports DASReader
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/services/DASReader',['underscore', 'pviz/models/SeqEntry', 'pviz/models/PositionedFeature'],
+
+    function (_, SeqEntry, PositionedFeature) {
+        /**
+         * A service that goes and grab information from a DAS service, builds SeqEntry and add positioned annotations
+         @constructor
+         @param {String} url to get the info (default is  http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot)
+         @param {Map} options
+         @param {Map} options.xmlMapper a map of string (field names) to function to transform the loaded DAS entry (see examples)
+         */
+
+        var DASReader = function (url, options) {
+            var self = this;
+            options = options || {}
+            self.urlRoot = url || 'http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot'
+            self.xmlMapper = options.xmlMapper || {}
+        }
+        /**
+         * build a new SeqEntry, with sequence, from an id
+         *
+         * @param {String}
+         *          id
+         * @param {Map} options can have several fields
+         * @param {boolean} options.getFeatures once the sequence is loaded, we load the features
+         * @param {function} options.success: a function to be executed upon success of loading seq, with the newly created seqEntry as argument
+         */
+        DASReader.prototype.buildSeqEntry = function (id, options) {
+            var self = this;
+            var url = self.urlRoot + '/sequence?segment=' + id;
+
+            if (options === undefined) {
+                options = {}
+            }
+
+            $.get(url, function (xml) {
+                var seqEntry = self.xml2seqEntry(xml);
+
+                if (options.getFeatures) {
+                    delete options.getFeatures;
+                    self.addFeatures(seqEntry, options)
+                    return;
+                    // no need to call success, it should be done at the end
+                    // of getFeatures
+                }
+
+                if (options.success !== undefined) {
+                    options.success(seqEntry);
+                }
+            })
+        }
+        /**
+         * from a DAS xml (the /sequence one), it builds up a SeqEntry
+         * @param {String} xmlStr xml string
+         */
+        DASReader.prototype.xml2seqEntry = function (xmlStr, options) {
+            options = options || {};
+
+            var xml = $(xmlStr);
+            var el = xml.find('SEQUENCE:first');
+            return new SeqEntry({
+                id: el.attr('id'),
+                description: el.attr('label'),
+                sequence: el.text().trim()
+            });
+        };
+
+        /**
+         * from a DAS xml (the /features one), adds positional features to a seq entry
+         * @param {SeqEntry} seqEntry
+         * @param {String} xmlStr xml string
+         * @param {Map} options
+         * @param {String} options.groupSet to group the feature in the meta category
+         * @param {Map} options.skipCategory a map string -> boolean to indicate whether a given category is to be skipped
+         */
+        DASReader.prototype.xml2features = function (seqEntry, xmlStr, options) {
+            var self = this;
+            options = options || {};
+
+            var xml = $(xmlStr);
+            var el = xml.find('SEQUENCE')[0];
+            var features = _.chain(xml.find('FEATURE')).filter(function (node) {
+                return $(node).find('START').length == 1
+            }).map(function (n) {
+                var node = $(n);
+                var f = new PositionedFeature({
+                    start: parseInt(node.find('START:first').text()) - 1,
+                    end: parseInt(node.find('END:first').text()) - 1,
+                    type: node.find('TYPE:first').text(),
+                    category: node.find('TYPE:first').attr('category'),
+                    description: node.find('NOTE:first').text()
+                });
+                if (options.groupSet) {
+                    f.groupSet = options.groupSet;
+                }
+                _.each(self.xmlMapper, function (fct, field) {
+                    f[field] = fct(f[field], f, node)
+                })
+                return f;
+            }).filter(function (ft) {
+                if (options.skipCategory && options.skipCategory[ft.category])
+                    return false
+                return true;
+            }).value();
+            // each(function(node){console.log(node)});
+            seqEntry.addFeatures(features);
+        };
+
+        /**
+         * make a call to the DAS server to add features to the passed SeqEntry
+         * @param {SeqEntry} seqEntry
+         * @param {Map} options
+         * @param {function} options.success callback function once the feature have been added
+         */
+        DASReader.prototype.addFeatures = function (seqEntry, options) {
+            var self = this;
+            options = options || {}
+
+            var url = self.urlRoot + '/features?segment=' + seqEntry.get('id');
+            $.get(url, function (xml) {
+                self.xml2features(seqEntry, xml, options)
+                if (options.success !== undefined) {
+                    options.success(seqEntry);
+
+                }
+            });
+        }
+
+        return DASReader
+    });
+
+define(
+    /**
+     @exports FastaReader
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+
+    'pviz/services/FastaReader',['underscore', 'pviz/models/SeqEntry', 'pviz/models/PositionedFeature'], function (_, SeqEntry, PositionedFeature) {
+        /**
+         * A service to read a fast file, enhanced with  PSI/PEFF annotation
+         @constructor
+         */
+
+        var FastaReader = function () {
+        }
+
+        /**
+         * builds a SeqEntry based on a string content
+         * @param {String} content
+         * @return {SeqEntry}
+         */
+        FastaReader.prototype.buildSeqEntry = function (content) {
+            var self = this;
+
+            var hs = self.headerAndSequence(content);
+            var seq = hs[1];
+            var header = self.peffHeader2map(hs[0])
+            var se = new SeqEntry({
+                id: header[0],
+                sequence: seq
+            })
+            if (header[1] == undefined) {
+                return se;
+            }
+            if (header[1].Pname) {
+                se.set('description', header[1].Pname)
+            }
+            self.parseFeatures(se, header[1])
+            return se;
+        }
+        /**
+         * parse textual features and add them into the SeqEntry
+         * @private
+         * @param seqEntry
+         * @param feats
+         */
+        FastaReader.prototype.parseFeatures = function (seqEntry, feats) {
+            var self = this;
+            if (feats == undefined) {
+                return;
+            }
+
+            var keepOnly = {
+                Processed: 'processed',
+                Variant: 'variants',
+                ModRes: 'amino acid modifications',
+                ModResPsi: 'amino acid modifications',
+            }
+
+            _.chain(feats).each(function (ftList, cat) {
+                if (!keepOnly[cat])
+                    return;
+
+                var posFeatures = _.map(ftList, function (ftTxt) {
+                    var arr = ftTxt.split('|')
+                    if (arr.length == 2) {
+                        arr.unshift(arr[0])
+                    }
+                    return new PositionedFeature({
+                        start: arr[0] - 1,
+                        end: arr[1] - 1,
+                        category: keepOnly[cat],
+                        type: cat,
+                        name: arr[2],
+                        text: arr[2]
+                    })
+                })
+                seqEntry.addFeatures(posFeatures);
+            })
+        }
+        /***
+         * split  a fasta text into header and sequence.
+         *  headeing '>' is removed on sequence
+         * sequence spaces are cleaned out
+         * @param {Text} text
+         * @return an array of [header, sequence]
+         */
+        FastaReader.prototype.headerAndSequence = function (text) {
+            var self = this;
+
+            var arr = text.split(/\n/);
+            var header = arr.shift();
+            header = header.replace(/^>/, '').trim();
+
+            var seq = arr.join('');
+            seq = seq.replace(/\s+/g, '');
+
+            return [header, seq];
+        }
+        /**
+         * parse the header line, with peff fashion
+         * returns an array [id, featMap]
+         * check tests to see how it works...
+         * if the value of a field is of '(...)' then an array is returned with the parenthesis content
+         * @private
+         * @param {String} line
+         */
+        FastaReader.prototype.peffHeader2map = function (line) {
+            var self = this;
+
+            line = line.trim();
+            var re = new RegExp("(.*)\\s\\\\(\\w+)=(.*)")
+            var reTokens = /\(([^\)]*)\)/g
+            var feats = {}
+            while (m = re.exec(line)) {
+                var key = m[2]
+                var val = m[3].trim()
+                line = m[1]
+                if (val[0] == '(' && val[val.length - 1] == ')') {
+                    var a = []
+                    while (m = reTokens.exec(val)) {
+                        a.push(m[1])
+                    }
+                    feats[key] = a
+                } else {
+                    feats[key] = val
+                }
 
             }
-        });
-    }
+            return [line.trim(), feats]
 
-    return DASReader
-});
-
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/services/FastaReader',['underscore', 'pviz/models/SeqEntry', 'pviz/models/PositionedFeature'], function(_, SeqEntry, PositionedFeature) {
-  var FastaReader = function() {
-
-  }
-
-  FastaReader.prototype.buildSeqEntry = function(content) {
-    var self = this;
-
-    var hs = self.headerAndSequence(content);
-    var seq = hs[1];
-    var header = self.peffHeader2map(hs[0])
-    var se = new SeqEntry({
-      id : header[0],
-      sequence : seq
-    })
-    if (header[1] == undefined) {
-      return se;
-    }
-    if (header[1].Pname) {
-      se.set('description', header[1].Pname)
-    }
-    self.parseFeatures(se, header[1])
-    return se;
-  }
-  FastaReader.prototype.parseFeatures = function(seqEntry, feats) {
-    var self = this;
-    if (feats == undefined) {
-      return;
-    }
-
-    var keepOnly = {
-      Processed : 'processed',
-      Variant : 'variants',
-      ModRes : 'amino acid modifications',
-      ModResPsi : 'amino acid modifications',
-    }
-
-    _.chain(feats).each(function(ftList, cat) {
-      if (!keepOnly[cat])
-        return;
-
-      var posFeatures = _.map(ftList, function(ftTxt) {
-        var arr = ftTxt.split('|')
-        if (arr.length == 2) {
-          arr.unshift(arr[0])
         }
-        return new PositionedFeature({
-          start : arr[0] - 1,
-          end : arr[1] - 1,
-          category : keepOnly[cat],
-          type : cat,
-          name : arr[2],
-          text : arr[2]
-        })
-      })
-      seqEntry.addFeatures(posFeatures);
+
+        return FastaReader;
     })
-  }
-  /***
-   * split  a fasta text into header and sequence.
-   *  headeing '>' is removed on sequence
-   * sequence spaces are cleaned out
-   * @param {Object} text
-   * @return an array of [header, sequence]
-   */
-  FastaReader.prototype.headerAndSequence = function(text) {
-    var self = this;
-
-    var arr = text.split(/\n/);
-    var header = arr.shift();
-    header = header.replace(/^>/, '').trim();
-
-    var seq = arr.join('');
-    seq = seq.replace(/\s+/g, '');
-
-    return [header, seq];
-  }
-  /**
-   * parse the header line, with peff fashion
-   * returns an array [id, featMap]
-   * check tests to see how it works...
-   * if the value of a field is of '(...)' then an array is returned with the parenthesis content
-   * @param {Object} line
-   */
-  FastaReader.prototype.peffHeader2map = function(line) {
-    var self = this;
-
-    line = line.trim();
-    var re = new RegExp("(.*)\\s\\\\(\\w+)=(.*)")
-    var reTokens = /\(([^\)]*)\)/g
-    var feats = {}
-    while ( m = re.exec(line)) {
-      var key = m[2]
-      var val = m[3].trim()
-      line = m[1]
-      if (val[0] == '(' && val[val.length - 1] == ')') {
-        var a = []
-        while ( m = reTokens.exec(val)) {
-          a.push(m[1])
-        }
-        feats[key] = a
-      } else {
-        feats[key] = val
-      }
-
-    }
-    return [line.trim(), feats]
-
-  }
-
-  return FastaReader;
-})
 ;
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-
-define('pviz/services/FeatureManager',['underscore'], function (_) {
-    var FeatureManager = function () {
-    }
+define(
     /**
-     *
-     *
-     * @param {Array[]}
-     *
-     * @param {Map}
-     *          options can have several fields:
+     @exports FeatureManager
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
      */
-    FeatureManager.prototype.sortFeatures = function (features, options) {
-        var self = this;
+    'pviz/services/FeatureManager',['underscore'], function (_) {
+        /**
+         * Distribute features under one category across different track so they do not overlap
+         * requiring this module will indeed return a singleton
+         @constructor
+         */
+        var FeatureManager = function () {
+        }
+        /**
+         * Sort the feature by starting positions
+         * @private
+         * @param {Array[]}
+         */
+        FeatureManager.prototype.sortFeatures = function (features, options) {
+            var self = this;
 
-        if (options === undefined) {
-            options = {}
+            if (options === undefined) {
+                options = {}
+            }
+            return _.sortBy(features, function (a) {
+                return a.start;
+            });
         }
 
+        /**
+         * Do two features overlap?
+         * @private
+         * @param {Object} fta
+         * @param {Object} ftb
+         */
+        FeatureManager.prototype.featuresIntersect = function (fta, ftb) {
+            return !((fta.end < ftb.start) || (ftb.end < fta.start))
+            // /(fta.start >= ftb.start && fta.start <= ftb.end) || (fta.end >= ftb.start && fta.end <= ftb.end)
+        };
 
-        return _.sortBy(features, function (a) {
+        /**
+         * get the overlapping features for the fnum^th one
+         * Only works on sorted features
+         * @param {int} fNum
+         * @param {Array} features array of PositionedFeature
+         * @private
+         */
+        FeatureManager.prototype._getOverlaps = function (fNum, features) {
+            var self = this;
+            var feat = features[fNum];
 
-            return a.start;
-        });
-    }
-    /**
-     *
-     * @param {Object} fta
-     * @param {Object} ftb
-     */
-    FeatureManager.prototype.featuresIntersect = function (fta, ftb) {
-        return !((fta.end < ftb.start) || (ftb.end < fta.start))
-        // /(fta.start >= ftb.start && fta.start <= ftb.end) || (fta.end >= ftb.start && fta.end <= ftb.end)
-    };
+            return _.filter(features.slice(0, fNum), function (ft) {
+                //we check that we can have several time the same feature???
+                return (!_.isEqual(feat, ft)) && (self.featuresIntersect(feat, ft));
+            });
 
-    //only works on sorted features
-    FeatureManager.prototype._getOverlaps = function (fNum, features) {
-        var self = this;
-        var feat = features[fNum];
+        }
+        /**
+         *  Distribute the features among tracks by adding a displayTrack attribute to each feature
+         *
+         * @param {Array} features and array of features. We add a displayTrack attribute to each element.
+         * @return the number of tracks
+         */
+        FeatureManager.prototype.assignTracks = function (features, options) {
+            var sortedFeats = this.sortFeatures(features, options);
 
-        return _.filter(features.slice(0, fNum), function (ft) {
-            //we check that we can have several time the same feature???
-            return (!_.isEqual(feat, ft)) && (self.featuresIntersect(feat, ft));
-        });
-
-    }
-    /**
-     *
-     * @param {Object} features and array of featues. We add a displayTrack attribute to each element.
-     * @return the number of tracks
-     */
-    FeatureManager.prototype.assignTracks = function (features, options) {
-        var sortedFeats = this.sortFeatures(features, options);
-
-        var nbTracks = 0;
-        var lastPosPerTrack = []
-        _.chain(sortedFeats).each(function (ft) {
-            var ftStart = ft.start;
-            for (itrack = 0; itrack < lastPosPerTrack.length && lastPosPerTrack[itrack] >= ftStart; itrack++) {
-            }
-            lastPosPerTrack[itrack] = ft.end
-            ft.displayTrack = itrack
-        })
-        return lastPosPerTrack.length
-    }
-    /*
-     * singleton contructor
-     */
-    return new FeatureManager()
-});
+            var nbTracks = 0;
+            var lastPosPerTrack = []
+            _.chain(sortedFeats).each(function (ft) {
+                var ftStart = ft.start;
+                for (itrack = 0; itrack < lastPosPerTrack.length && lastPosPerTrack[itrack] >= ftStart; itrack++) {
+                }
+                lastPosPerTrack[itrack] = ft.end
+                ft.displayTrack = itrack
+            })
+            return lastPosPerTrack.length
+        }
+        /*
+         * singleton contructor
+         */
+        return new FeatureManager()
+    });
 
 /**
  * these icons definitions are taken from Raphael http://raphaeljs.com/icons/icons.js
@@ -689,1876 +781,2144 @@ define('pviz/services/IconFactory',[], function() {
   return new IconFactory;
 })
 ;
-/**
- * features are by default displayed by rectangles with text.
- * However, it is possible to defined more complex information dependind on the type.
- * We define here a fwe default displayer for some types.
- *
- * It is possible of course to extend these displyers in a custom file
- *
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/views/TypedDisplayer',[], function() {
 
-  return {
-    init : function(featureDisplayer) {
-      featureDisplayer.setCustomHandler('helix', {
-        appender : function(viewport, svgGroup, features, type) {
-          var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
-          sel.append("path").attr('d', 'M0,0').attr('class', type)
-          return svgGroup.selectAll("g.feature.data." + type);
-        },
-        positioner : function(viewport, d3selection) {
-          d3selection.attr('transform', function(ft) {
-            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
-          });
-          var ftWidth = function(ft) {
-            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
-          }
-          d3selection.selectAll("path.helix").attr('d', function(ft) {
-            //width in pixels
-            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
-            //number of waves, should not be larger than 20 px
-            var n = Math.max(1, Math.round(w / 20));
-            // half period
-            var hwStep = w / n / 2;
-            var d = _.times(n, function(i) {
-              return "q" + (hwStep / 2) + ",-10," + hwStep + ",0," + (hwStep / 2) + ",10," + hwStep + ",0"
-            }).join(" ")
-            return "M0,0 " + d
-          })
-          return d3selection
-        }
-      })
+define(/**
+     @exports TypeDisplayer
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
 
-      featureDisplayer.setCustomHandler('beta_strand', {
-        appender : function(viewport, svgGroup, features, type) {
-          var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
-          sel.append("line").attr('class', type);
-          sel.append("path").attr('class', type).attr('d', "M0,0l-10,-5l0,10l10,-5");
+    'pviz/views/TypedDisplayer',[], function () {
+        /**
+         * Features are by default displayed by rectangles with text.
+         * However, it is possible to defined more complex information depending on the type.
+         * We define here a fwe default displayer for some types.
+         *
+         * It is possible of course to extend these displyers in a custom file
+         *
+         * @class SeqEntryViewport map the sequence scale domain to the dom element
+         * @constructor
+         */
+        var TypeDisplayer = {
+            init: function (featureDisplayer) {
+                featureDisplayer.setCustomHandler('helix', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        sel.append("path").attr('d', 'M0,0').attr('class', type)
+                        return svgGroup.selectAll("g.feature.data." + type);
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                        });
+                        var ftWidth = function (ft) {
+                            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+                        }
+                        d3selection.selectAll("path.helix").attr('d', function (ft) {
+                            //width in pixels
+                            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
+                            //number of waves, should not be larger than 20 px
+                            var n = Math.max(1, Math.round(w / 20));
+                            // half period
+                            var hwStep = w / n / 2;
+                            var d = _.times(n, function (i) {
+                                return "q" + (hwStep / 2) + ",-10," + hwStep + ",0," + (hwStep / 2) + ",10," + hwStep + ",0"
+                            }).join(" ")
+                            return "M0,0 " + d
+                        })
+                        return d3selection
+                    }
+                })
 
-          return svgGroup.selectAll("g.feature.data." + type);
-        },
-        positioner : function(viewport, d3selection) {
-          d3selection.attr('transform', function(ft) {
-            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
-          });
-          var ftWidth = function(ft) {
-            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
-          }
-          d3selection.selectAll("line.beta_strand").attr('x1', 0).attr('y1', 0).attr('x2', function(ft) {
-            return ftWidth(ft) - 4
-          }).attr('y2', 0)
-          d3selection.selectAll("path.beta_strand").attr('transform', function(ft) {
-            return 'translate(' + ftWidth(ft) + ',0)'
-          });
+                featureDisplayer.setCustomHandler('beta_strand', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        sel.append("line").attr('class', type);
+                        sel.append("path").attr('class', type).attr('d', "M0,0l-10,-5l0,10l10,-5");
 
-          return d3selection
-        }
-      })
+                        return svgGroup.selectAll("g.feature.data." + type);
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                        });
+                        var ftWidth = function (ft) {
+                            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+                        }
+                        d3selection.selectAll("line.beta_strand").attr('x1', 0).attr('y1', 0).attr('x2', function (ft) {
+                            return ftWidth(ft) - 4
+                        }).attr('y2', 0)
+                        d3selection.selectAll("path.beta_strand").attr('transform', function (ft) {
+                            return 'translate(' + ftWidth(ft) + ',0)'
+                        });
 
-      featureDisplayer.setCustomHandler('turn', {
-        appender : function(viewport, svgGroup, features, type) {
-          var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
-          sel.append("path").attr('class', type).attr('d', "M0,0");
-          return svgGroup.selectAll("g.feature.data." + type);
-        },
-        positioner : function(viewport, d3selection) {
-          d3selection.attr('transform', function(ft) {
-            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
-          });
+                        return d3selection
+                    }
+                })
 
-          d3selection.selectAll("path.turn").attr('d', function(ft) {
-            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
-            return 'M0,3 l' + (w - 10) + ',0 q10,-3,0,-6 l-' + (w - 10) + ',0'
-          })
+                featureDisplayer.setCustomHandler('turn', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        sel.append("path").attr('class', type).attr('d', "M0,0");
+                        return svgGroup.selectAll("g.feature.data." + type);
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                        });
 
-          return d3selection
-        }
-      });
-      featureDisplayer.setCustomHandler('circle', {
-        appender : function(viewport, svgGroup, features, type) {
-          var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
-          var g = sel.append("g");
-          g.append('circle');
-          g.append('text').text(function(ft) {
-            return ft.text;
-          })
-          return sel;
-        },
-        positioner : function(viewport, d3selection) {
-          d3selection.attr('transform', function(ft) {
-            return 'translate(' + viewport.scales.x(ft.start) + ',' + viewport.scales.y((0.5 + ft.displayTrack) * featureDisplayer.heightFactor(ft.category)) + ')';
-          });
-          d3selection.selectAll("circle").attr('r', function(ft) {
-            return ft.radius
-          });
+                        d3selection.selectAll("path.turn").attr('d', function (ft) {
+                            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
+                            return 'M0,3 l' + (w - 10) + ',0 q10,-3,0,-6 l-' + (w - 10) + ',0'
+                        })
 
-          return d3selection
-        }
-      });
-    }
-  }
+                        return d3selection
+                    }
+                });
+                featureDisplayer.setCustomHandler('circle', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        var g = sel.append("g");
+                        g.append('circle');
+                        g.append('text').text(function (ft) {
+                            return ft.text;
+                        })
+                        return sel;
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start) + ',' + viewport.scales.y((0.5 + ft.displayTrack) * featureDisplayer.heightFactor(ft.category)) + ')';
+                        });
+                        d3selection.selectAll("circle").attr('r', function (ft) {
+                            return ft.radius
+                        });
 
-});
+                        return d3selection
+                    }
+                });
+            }
+        };
+        return TypeDisplayer;
 
-/**
- * propose a series of wrapper for shape, colors to make it ggplot2 friendly
- *
- * This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
- * and copy/paste the javascript implementation by mike Bostock http://bl.ocks.org/mbostock/5577023
- *
- * Copyright (c) 2013, Genentech Inc.
- * All rights reserved.
- *
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
- */
+    });
 
-define('pviz/utils/GGplot2Adapter',[], function(){
-    return {
-        // list of shapes, bounded by [-0.5,0.5]x[-0.5,0.5]
-        shapePaths:{
-            1:'M-0.5,-0.5l1,0l0,1l-1,0l0,-1l1,0',
-            square:'M-0.5,-0.5l1,0l0,1l-1,0l0,-1l1,0',
-            2:'M-0.5,0 A0.5,0.5,0,0,0,0.5,0 A0.5,0.5,0,1,0,-0.5,0',
-            3:'M0,-0.5 L0.5,0.23 L-0.5,0.23 L0,-0.5 L0.5,0.23',
-            3:'M0,-0.5 L0,0.5 M-0.5,0 L0.5,0',
-            4:'M-0.35,-0.35 L0.35,0.35 M-0.35,0.35 L0.35,-0.35',
-            5:'M-0.5,0 L0,-0.5 L0.5,0 L0,0.5 L-0.5,0 L0,-0.5',
-            6:'M0,0.5 L0.5,-0.23 L-0.5,-0.23 L0,0.5 L0.5,-0.23',
-            7:'M0,-0.5 L0,0.5 M-0.5,0 L0.5,0 M-0.35,-0.35 L0.35,0.35 M-0.35,0.35 L0.35,-0.35'
+define(
+    /**
+     @exports GGPLot2Adapter
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/utils/GGplot2Adapter',[], function () {
+        /**
+         *
+         *  Propose a series of wrapper for shape, colors to make it ggplot2 friendly
+         *  This is a very restrictive set of ported features, but enough to make the pViz plot compatible
+         *
+         * This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
+         * and copy/paste the javascript implementation by mike Bostock http://bl.ocks.org/mbostock/5577023
+         * @return an Object
+         */
+        return {
+            /**
+             * list of shapes, bounded by [-0.5,0.5]x[-0.5,0.5]
+              */
+            shapePaths: {
+                1: 'M-0.5,-0.5l1,0l0,1l-1,0l0,-1l1,0',
+                square: 'M-0.5,-0.5l1,0l0,1l-1,0l0,-1l1,0',
+                2: 'M-0.5,0 A0.5,0.5,0,0,0,0.5,0 A0.5,0.5,0,1,0,-0.5,0',
+                3: 'M0,-0.5 L0.5,0.23 L-0.5,0.23 L0,-0.5 L0.5,0.23',
+                3: 'M0,-0.5 L0,0.5 M-0.5,0 L0.5,0',
+                4: 'M-0.35,-0.35 L0.35,0.35 M-0.35,0.35 L0.35,-0.35',
+                5: 'M-0.5,0 L0,-0.5 L0.5,0 L0,0.5 L-0.5,0 L0,-0.5',
+                6: 'M0,0.5 L0.5,-0.23 L-0.5,-0.23 L0,0.5 L0.5,-0.23',
+                7: 'M0,-0.5 L0,0.5 M-0.5,0 L0.5,0 M-0.35,-0.35 L0.35,0.35 M-0.35,0.35 L0.35,-0.35'
 
-        }, discrete_palettes:{
-            YlGn : {
-                3 : ["#f7fcb9", "#addd8e", "#31a354"],
-                4 : ["#ffffcc", "#c2e699", "#78c679", "#238443"],
-                5 : ["#ffffcc", "#c2e699", "#78c679", "#31a354", "#006837"],
-                6 : ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"],
-                7 : ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"],
-                8 : ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"],
-                9 : ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#006837", "#004529"]
             },
-            YlGnBu : {
-                3 : ["#edf8b1", "#7fcdbb", "#2c7fb8"],
-                4 : ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"],
-                5 : ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
-                6 : ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#2c7fb8", "#253494"],
-                7 : ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"],
-                8 : ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"],
-                9 : ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"]
-            },
-            GnBu : {
-                3 : ["#e0f3db", "#a8ddb5", "#43a2ca"],
-                4 : ["#f0f9e8", "#bae4bc", "#7bccc4", "#2b8cbe"],
-                5 : ["#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac"],
-                6 : ["#f0f9e8", "#ccebc5", "#a8ddb5", "#7bccc4", "#43a2ca", "#0868ac"],
-                7 : ["#f0f9e8", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#08589e"],
-                8 : ["#f7fcf0", "#e0f3db", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#08589e"],
-                9 : ["#f7fcf0", "#e0f3db", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#0868ac", "#084081"]
-            },
-            BuGn : {
-                3 : ["#e5f5f9", "#99d8c9", "#2ca25f"],
-                4 : ["#edf8fb", "#b2e2e2", "#66c2a4", "#238b45"],
-                5 : ["#edf8fb", "#b2e2e2", "#66c2a4", "#2ca25f", "#006d2c"],
-                6 : ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#2ca25f", "#006d2c"],
-                7 : ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"],
-                8 : ["#f7fcfd", "#e5f5f9", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"],
-                9 : ["#f7fcfd", "#e5f5f9", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#006d2c", "#00441b"]
-            },
-            PuBuGn : {
-                3 : ["#ece2f0", "#a6bddb", "#1c9099"],
-                4 : ["#f6eff7", "#bdc9e1", "#67a9cf", "#02818a"],
-                5 : ["#f6eff7", "#bdc9e1", "#67a9cf", "#1c9099", "#016c59"],
-                6 : ["#f6eff7", "#d0d1e6", "#a6bddb", "#67a9cf", "#1c9099", "#016c59"],
-                7 : ["#f6eff7", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"],
-                8 : ["#fff7fb", "#ece2f0", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"],
-                9 : ["#fff7fb", "#ece2f0", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016c59", "#014636"]
-            },
-            PuBu : {
-                3 : ["#ece7f2", "#a6bddb", "#2b8cbe"],
-                4 : ["#f1eef6", "#bdc9e1", "#74a9cf", "#0570b0"],
-                5 : ["#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d"],
-                6 : ["#f1eef6", "#d0d1e6", "#a6bddb", "#74a9cf", "#2b8cbe", "#045a8d"],
-                7 : ["#f1eef6", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"],
-                8 : ["#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"],
-                9 : ["#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#045a8d", "#023858"]
-            },
-            BuPu : {
-                3 : ["#e0ecf4", "#9ebcda", "#8856a7"],
-                4 : ["#edf8fb", "#b3cde3", "#8c96c6", "#88419d"],
-                5 : ["#edf8fb", "#b3cde3", "#8c96c6", "#8856a7", "#810f7c"],
-                6 : ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8856a7", "#810f7c"],
-                7 : ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"],
-                8 : ["#f7fcfd", "#e0ecf4", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"],
-                9 : ["#f7fcfd", "#e0ecf4", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#810f7c", "#4d004b"]
-            },
-            RdPu : {
-                3 : ["#fde0dd", "#fa9fb5", "#c51b8a"],
-                4 : ["#feebe2", "#fbb4b9", "#f768a1", "#ae017e"],
-                5 : ["#feebe2", "#fbb4b9", "#f768a1", "#c51b8a", "#7a0177"],
-                6 : ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#c51b8a", "#7a0177"],
-                7 : ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177"],
-                8 : ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177"],
-                9 : ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177", "#49006a"]
-            },
-            PuRd : {
-                3 : ["#e7e1ef", "#c994c7", "#dd1c77"],
-                4 : ["#f1eef6", "#d7b5d8", "#df65b0", "#ce1256"],
-                5 : ["#f1eef6", "#d7b5d8", "#df65b0", "#dd1c77", "#980043"],
-                6 : ["#f1eef6", "#d4b9da", "#c994c7", "#df65b0", "#dd1c77", "#980043"],
-                7 : ["#f1eef6", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"],
-                8 : ["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"],
-                9 : ["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#980043", "#67001f"]
-            },
-            OrRd : {
-                3 : ["#fee8c8", "#fdbb84", "#e34a33"],
-                4 : ["#fef0d9", "#fdcc8a", "#fc8d59", "#d7301f"],
-                5 : ["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"],
-                6 : ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#e34a33", "#b30000"],
-                7 : ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"],
-                8 : ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"],
-                9 : ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"]
-            },
-            YlOrRd : {
-                3 : ["#ffeda0", "#feb24c", "#f03b20"],
-                4 : ["#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c"],
-                5 : ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"],
-                6 : ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
-                7 : ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
-                8 : ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
-                9 : ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
-            },
-            YlOrBr : {
-                3 : ["#fff7bc", "#fec44f", "#d95f0e"],
-                4 : ["#ffffd4", "#fed98e", "#fe9929", "#cc4c02"],
-                5 : ["#ffffd4", "#fed98e", "#fe9929", "#d95f0e", "#993404"],
-                6 : ["#ffffd4", "#fee391", "#fec44f", "#fe9929", "#d95f0e", "#993404"],
-                7 : ["#ffffd4", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
-                8 : ["#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
-                9 : ["#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#993404", "#662506"]
-            },
-            Purples : {
-                3 : ["#efedf5", "#bcbddc", "#756bb1"],
-                4 : ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#6a51a3"],
-                5 : ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#756bb1", "#54278f"],
-                6 : ["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"],
-                7 : ["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"],
-                8 : ["#fcfbfd", "#efedf5", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"],
-                9 : ["#fcfbfd", "#efedf5", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#54278f", "#3f007d"]
-            },
-            Blues : {
-                3 : ["#deebf7", "#9ecae1", "#3182bd"],
-                4 : ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5"],
-                5 : ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"],
-                6 : ["#eff3ff", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"],
-                7 : ["#eff3ff", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
-                8 : ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
-                9 : ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"]
-            },
-            Greens : {
-                3 : ["#e5f5e0", "#a1d99b", "#31a354"],
-                4 : ["#edf8e9", "#bae4b3", "#74c476", "#238b45"],
-                5 : ["#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"],
-                6 : ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#31a354", "#006d2c"],
-                7 : ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"],
-                8 : ["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"],
-                9 : ["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#006d2c", "#00441b"]
-            },
-            Oranges : {
-                3 : ["#fee6ce", "#fdae6b", "#e6550d"],
-                4 : ["#feedde", "#fdbe85", "#fd8d3c", "#d94701"],
-                5 : ["#feedde", "#fdbe85", "#fd8d3c", "#e6550d", "#a63603"],
-                6 : ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#e6550d", "#a63603"],
-                7 : ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#8c2d04"],
-                8 : ["#fff5eb", "#fee6ce", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#8c2d04"],
-                9 : ["#fff5eb", "#fee6ce", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#a63603", "#7f2704"]
-            },
-            Reds : {
-                3 : ["#fee0d2", "#fc9272", "#de2d26"],
-                4 : ["#fee5d9", "#fcae91", "#fb6a4a", "#cb181d"],
-                5 : ["#fee5d9", "#fcae91", "#fb6a4a", "#de2d26", "#a50f15"],
-                6 : ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#de2d26", "#a50f15"],
-                7 : ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#99000d"],
-                8 : ["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#99000d"],
-                9 : ["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"]
-            },
-            Greys : {
-                3 : ["#f0f0f0", "#bdbdbd", "#636363"],
-                4 : ["#f7f7f7", "#cccccc", "#969696", "#525252"],
-                5 : ["#f7f7f7", "#cccccc", "#969696", "#636363", "#252525"],
-                6 : ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#636363", "#252525"],
-                7 : ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525"],
-                8 : ["#ffffff", "#f0f0f0", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525"],
-                9 : ["#ffffff", "#f0f0f0", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525", "#000000"]
-            },
-            PuOr : {
-                3 : ["#f1a340", "#f7f7f7", "#998ec3"],
-                4 : ["#e66101", "#fdb863", "#b2abd2", "#5e3c99"],
-                5 : ["#e66101", "#fdb863", "#f7f7f7", "#b2abd2", "#5e3c99"],
-                6 : ["#b35806", "#f1a340", "#fee0b6", "#d8daeb", "#998ec3", "#542788"],
-                7 : ["#b35806", "#f1a340", "#fee0b6", "#f7f7f7", "#d8daeb", "#998ec3", "#542788"],
-                8 : ["#b35806", "#e08214", "#fdb863", "#fee0b6", "#d8daeb", "#b2abd2", "#8073ac", "#542788"],
-                9 : ["#b35806", "#e08214", "#fdb863", "#fee0b6", "#f7f7f7", "#d8daeb", "#b2abd2", "#8073ac", "#542788"],
-                10 : ["#7f3b08", "#b35806", "#e08214", "#fdb863", "#fee0b6", "#d8daeb", "#b2abd2", "#8073ac", "#542788", "#2d004b"],
-                11 : ["#7f3b08", "#b35806", "#e08214", "#fdb863", "#fee0b6", "#f7f7f7", "#d8daeb", "#b2abd2", "#8073ac", "#542788", "#2d004b"]
-            },
-            BrBG : {
-                3 : ["#d8b365", "#f5f5f5", "#5ab4ac"],
-                4 : ["#a6611a", "#dfc27d", "#80cdc1", "#018571"],
-                5 : ["#a6611a", "#dfc27d", "#f5f5f5", "#80cdc1", "#018571"],
-                6 : ["#8c510a", "#d8b365", "#f6e8c3", "#c7eae5", "#5ab4ac", "#01665e"],
-                7 : ["#8c510a", "#d8b365", "#f6e8c3", "#f5f5f5", "#c7eae5", "#5ab4ac", "#01665e"],
-                8 : ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
-                9 : ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
-                10 : ["#543005", "#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#c7eae5", "#80cdc1", "#35978f", "#01665e", "#003c30"],
-                11 : ["#543005", "#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e", "#003c30"]
-            },
-            PRGn : {
-                3 : ["#af8dc3", "#f7f7f7", "#7fbf7b"],
-                4 : ["#7b3294", "#c2a5cf", "#a6dba0", "#008837"],
-                5 : ["#7b3294", "#c2a5cf", "#f7f7f7", "#a6dba0", "#008837"],
-                6 : ["#762a83", "#af8dc3", "#e7d4e8", "#d9f0d3", "#7fbf7b", "#1b7837"],
-                7 : ["#762a83", "#af8dc3", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#7fbf7b", "#1b7837"],
-                8 : ["#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837"],
-                9 : ["#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837"],
-                10 : ["#40004b", "#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837", "#00441b"],
-                11 : ["#40004b", "#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837", "#00441b"]
-            },
-            PiYG : {
-                3 : ["#e9a3c9", "#f7f7f7", "#a1d76a"],
-                4 : ["#d01c8b", "#f1b6da", "#b8e186", "#4dac26"],
-                5 : ["#d01c8b", "#f1b6da", "#f7f7f7", "#b8e186", "#4dac26"],
-                6 : ["#c51b7d", "#e9a3c9", "#fde0ef", "#e6f5d0", "#a1d76a", "#4d9221"],
-                7 : ["#c51b7d", "#e9a3c9", "#fde0ef", "#f7f7f7", "#e6f5d0", "#a1d76a", "#4d9221"],
-                8 : ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"],
-                9 : ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#f7f7f7", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"],
-                10 : ["#8e0152", "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221", "#276419"],
-                11 : ["#8e0152", "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#f7f7f7", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221", "#276419"]
-            },
-            RdBu : {
-                3 : ["#ef8a62", "#f7f7f7", "#67a9cf"],
-                4 : ["#ca0020", "#f4a582", "#92c5de", "#0571b0"],
-                5 : ["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"],
-                6 : ["#b2182b", "#ef8a62", "#fddbc7", "#d1e5f0", "#67a9cf", "#2166ac"],
-                7 : ["#b2182b", "#ef8a62", "#fddbc7", "#f7f7f7", "#d1e5f0", "#67a9cf", "#2166ac"],
-                8 : ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"],
-                9 : ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"],
-                10 : ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"],
-                11 : ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"]
-            },
-            RdGy : {
-                3 : ["#ef8a62", "#ffffff", "#999999"],
-                4 : ["#ca0020", "#f4a582", "#bababa", "#404040"],
-                5 : ["#ca0020", "#f4a582", "#ffffff", "#bababa", "#404040"],
-                6 : ["#b2182b", "#ef8a62", "#fddbc7", "#e0e0e0", "#999999", "#4d4d4d"],
-                7 : ["#b2182b", "#ef8a62", "#fddbc7", "#ffffff", "#e0e0e0", "#999999", "#4d4d4d"],
-                8 : ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#e0e0e0", "#bababa", "#878787", "#4d4d4d"],
-                9 : ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#ffffff", "#e0e0e0", "#bababa", "#878787", "#4d4d4d"],
-                10 : ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#e0e0e0", "#bababa", "#878787", "#4d4d4d", "#1a1a1a"],
-                11 : ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#ffffff", "#e0e0e0", "#bababa", "#878787", "#4d4d4d", "#1a1a1a"]
-            },
-            RdYlBu : {
-                3 : ["#fc8d59", "#ffffbf", "#91bfdb"],
-                4 : ["#d7191c", "#fdae61", "#abd9e9", "#2c7bb6"],
-                5 : ["#d7191c", "#fdae61", "#ffffbf", "#abd9e9", "#2c7bb6"],
-                6 : ["#d73027", "#fc8d59", "#fee090", "#e0f3f8", "#91bfdb", "#4575b4"],
-                7 : ["#d73027", "#fc8d59", "#fee090", "#ffffbf", "#e0f3f8", "#91bfdb", "#4575b4"],
-                8 : ["#d73027", "#f46d43", "#fdae61", "#fee090", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4"],
-                9 : ["#d73027", "#f46d43", "#fdae61", "#fee090", "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4"],
-                10 : ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"],
-                11 : ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090", "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"]
-            },
-            Spectral : {
-                3 : ["#fc8d59", "#ffffbf", "#99d594"],
-                4 : ["#d7191c", "#fdae61", "#abdda4", "#2b83ba"],
-                5 : ["#d7191c", "#fdae61", "#ffffbf", "#abdda4", "#2b83ba"],
-                6 : ["#d53e4f", "#fc8d59", "#fee08b", "#e6f598", "#99d594", "#3288bd"],
-                7 : ["#d53e4f", "#fc8d59", "#fee08b", "#ffffbf", "#e6f598", "#99d594", "#3288bd"],
-                8 : ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
-                9 : ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
-                10 : ["#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"],
-                11 : ["#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"]
-            },
-            RdYlGn : {
-                3 : ["#fc8d59", "#ffffbf", "#91cf60"],
-                4 : ["#d7191c", "#fdae61", "#a6d96a", "#1a9641"],
-                5 : ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"],
-                6 : ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"],
-                7 : ["#d73027", "#fc8d59", "#fee08b", "#ffffbf", "#d9ef8b", "#91cf60", "#1a9850"],
-                8 : ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850"],
-                9 : ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850"],
-                10 : ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"],
-                11 : ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"]
-            },
-            Accent : {
-                3 : ["#7fc97f", "#beaed4", "#fdc086"],
-                4 : ["#7fc97f", "#beaed4", "#fdc086", "#ffff99"],
-                5 : ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0"],
-                6 : ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f"],
-                7 : ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f", "#bf5b17"],
-                8 : ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f", "#bf5b17", "#666666"]
-            },
-            Dark2 : {
-                3 : ["#1b9e77", "#d95f02", "#7570b3"],
-                4 : ["#1b9e77", "#d95f02", "#7570b3", "#e7298a"],
-                5 : ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e"],
-                6 : ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02"],
-                7 : ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d"],
-                8 : ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#666666"]
-            },
-            Paired : {
-                3 : ["#a6cee3", "#1f78b4", "#b2df8a"],
-                4 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c"],
-                5 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"],
-                6 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c"],
-                7 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"],
-                8 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00"],
-                9 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6"],
-                10 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a"],
-                11 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99"],
-                12 : ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"]
-            },
-            Pastel1 : {
-                3 : ["#fbb4ae", "#b3cde3", "#ccebc5"],
-                4 : ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4"],
-                5 : ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6"],
-                6 : ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc"],
-                7 : ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd"],
-                8 : ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd", "#fddaec"],
-                9 : ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd", "#fddaec", "#f2f2f2"]
-            },
-            Pastel2 : {
-                3 : ["#b3e2cd", "#fdcdac", "#cbd5e8"],
-                4 : ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4"],
-                5 : ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9"],
-                6 : ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae"],
-                7 : ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae", "#f1e2cc"],
-                8 : ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae", "#f1e2cc", "#cccccc"]
-            },
-            Set1 : {
-                3 : ["#e41a1c", "#377eb8", "#4daf4a"],
-                4 : ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3"],
-                5 : ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"],
-                6 : ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"],
-                7 : ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628"],
-                8 : ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf"],
-                9 : ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999"]
-            },
-            Set2 : {
-                3 : ["#66c2a5", "#fc8d62", "#8da0cb"],
-                4 : ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3"],
-                5 : ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"],
-                6 : ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"],
-                7 : ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494"],
-                8 : ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494", "#b3b3b3"]
-            },
-            Set3 : {
-                3 : ["#8dd3c7", "#ffffb3", "#bebada"],
-                4 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072"],
-                5 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3"],
-                6 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462"],
-                7 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69"],
-                8 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5"],
-                9 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"],
-                10 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd"],
-                11 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5"],
-                12 : ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5", "#ffed6f"]
+            /**
+             * colorbrewer palettes
+             */
+            discrete_palettes: {
+                YlGn: {
+                    3: ["#f7fcb9", "#addd8e", "#31a354"],
+                    4: ["#ffffcc", "#c2e699", "#78c679", "#238443"],
+                    5: ["#ffffcc", "#c2e699", "#78c679", "#31a354", "#006837"],
+                    6: ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"],
+                    7: ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"],
+                    8: ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"],
+                    9: ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#006837", "#004529"]
+                },
+                YlGnBu: {
+                    3: ["#edf8b1", "#7fcdbb", "#2c7fb8"],
+                    4: ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"],
+                    5: ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
+                    6: ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#2c7fb8", "#253494"],
+                    7: ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"],
+                    8: ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"],
+                    9: ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"]
+                },
+                GnBu: {
+                    3: ["#e0f3db", "#a8ddb5", "#43a2ca"],
+                    4: ["#f0f9e8", "#bae4bc", "#7bccc4", "#2b8cbe"],
+                    5: ["#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac"],
+                    6: ["#f0f9e8", "#ccebc5", "#a8ddb5", "#7bccc4", "#43a2ca", "#0868ac"],
+                    7: ["#f0f9e8", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#08589e"],
+                    8: ["#f7fcf0", "#e0f3db", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#08589e"],
+                    9: ["#f7fcf0", "#e0f3db", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#0868ac", "#084081"]
+                },
+                BuGn: {
+                    3: ["#e5f5f9", "#99d8c9", "#2ca25f"],
+                    4: ["#edf8fb", "#b2e2e2", "#66c2a4", "#238b45"],
+                    5: ["#edf8fb", "#b2e2e2", "#66c2a4", "#2ca25f", "#006d2c"],
+                    6: ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#2ca25f", "#006d2c"],
+                    7: ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"],
+                    8: ["#f7fcfd", "#e5f5f9", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"],
+                    9: ["#f7fcfd", "#e5f5f9", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#006d2c", "#00441b"]
+                },
+                PuBuGn: {
+                    3: ["#ece2f0", "#a6bddb", "#1c9099"],
+                    4: ["#f6eff7", "#bdc9e1", "#67a9cf", "#02818a"],
+                    5: ["#f6eff7", "#bdc9e1", "#67a9cf", "#1c9099", "#016c59"],
+                    6: ["#f6eff7", "#d0d1e6", "#a6bddb", "#67a9cf", "#1c9099", "#016c59"],
+                    7: ["#f6eff7", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"],
+                    8: ["#fff7fb", "#ece2f0", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"],
+                    9: ["#fff7fb", "#ece2f0", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016c59", "#014636"]
+                },
+                PuBu: {
+                    3: ["#ece7f2", "#a6bddb", "#2b8cbe"],
+                    4: ["#f1eef6", "#bdc9e1", "#74a9cf", "#0570b0"],
+                    5: ["#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d"],
+                    6: ["#f1eef6", "#d0d1e6", "#a6bddb", "#74a9cf", "#2b8cbe", "#045a8d"],
+                    7: ["#f1eef6", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"],
+                    8: ["#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"],
+                    9: ["#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#045a8d", "#023858"]
+                },
+                BuPu: {
+                    3: ["#e0ecf4", "#9ebcda", "#8856a7"],
+                    4: ["#edf8fb", "#b3cde3", "#8c96c6", "#88419d"],
+                    5: ["#edf8fb", "#b3cde3", "#8c96c6", "#8856a7", "#810f7c"],
+                    6: ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8856a7", "#810f7c"],
+                    7: ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"],
+                    8: ["#f7fcfd", "#e0ecf4", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"],
+                    9: ["#f7fcfd", "#e0ecf4", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#810f7c", "#4d004b"]
+                },
+                RdPu: {
+                    3: ["#fde0dd", "#fa9fb5", "#c51b8a"],
+                    4: ["#feebe2", "#fbb4b9", "#f768a1", "#ae017e"],
+                    5: ["#feebe2", "#fbb4b9", "#f768a1", "#c51b8a", "#7a0177"],
+                    6: ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#c51b8a", "#7a0177"],
+                    7: ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177"],
+                    8: ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177"],
+                    9: ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177", "#49006a"]
+                },
+                PuRd: {
+                    3: ["#e7e1ef", "#c994c7", "#dd1c77"],
+                    4: ["#f1eef6", "#d7b5d8", "#df65b0", "#ce1256"],
+                    5: ["#f1eef6", "#d7b5d8", "#df65b0", "#dd1c77", "#980043"],
+                    6: ["#f1eef6", "#d4b9da", "#c994c7", "#df65b0", "#dd1c77", "#980043"],
+                    7: ["#f1eef6", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"],
+                    8: ["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"],
+                    9: ["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#980043", "#67001f"]
+                },
+                OrRd: {
+                    3: ["#fee8c8", "#fdbb84", "#e34a33"],
+                    4: ["#fef0d9", "#fdcc8a", "#fc8d59", "#d7301f"],
+                    5: ["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"],
+                    6: ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#e34a33", "#b30000"],
+                    7: ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"],
+                    8: ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"],
+                    9: ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"]
+                },
+                YlOrRd: {
+                    3: ["#ffeda0", "#feb24c", "#f03b20"],
+                    4: ["#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c"],
+                    5: ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"],
+                    6: ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
+                    7: ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
+                    8: ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
+                    9: ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
+                },
+                YlOrBr: {
+                    3: ["#fff7bc", "#fec44f", "#d95f0e"],
+                    4: ["#ffffd4", "#fed98e", "#fe9929", "#cc4c02"],
+                    5: ["#ffffd4", "#fed98e", "#fe9929", "#d95f0e", "#993404"],
+                    6: ["#ffffd4", "#fee391", "#fec44f", "#fe9929", "#d95f0e", "#993404"],
+                    7: ["#ffffd4", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
+                    8: ["#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
+                    9: ["#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#993404", "#662506"]
+                },
+                Purples: {
+                    3: ["#efedf5", "#bcbddc", "#756bb1"],
+                    4: ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#6a51a3"],
+                    5: ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#756bb1", "#54278f"],
+                    6: ["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"],
+                    7: ["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"],
+                    8: ["#fcfbfd", "#efedf5", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"],
+                    9: ["#fcfbfd", "#efedf5", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#54278f", "#3f007d"]
+                },
+                Blues: {
+                    3: ["#deebf7", "#9ecae1", "#3182bd"],
+                    4: ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5"],
+                    5: ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"],
+                    6: ["#eff3ff", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"],
+                    7: ["#eff3ff", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
+                    8: ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
+                    9: ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"]
+                },
+                Greens: {
+                    3: ["#e5f5e0", "#a1d99b", "#31a354"],
+                    4: ["#edf8e9", "#bae4b3", "#74c476", "#238b45"],
+                    5: ["#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"],
+                    6: ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#31a354", "#006d2c"],
+                    7: ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"],
+                    8: ["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"],
+                    9: ["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#006d2c", "#00441b"]
+                },
+                Oranges: {
+                    3: ["#fee6ce", "#fdae6b", "#e6550d"],
+                    4: ["#feedde", "#fdbe85", "#fd8d3c", "#d94701"],
+                    5: ["#feedde", "#fdbe85", "#fd8d3c", "#e6550d", "#a63603"],
+                    6: ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#e6550d", "#a63603"],
+                    7: ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#8c2d04"],
+                    8: ["#fff5eb", "#fee6ce", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#8c2d04"],
+                    9: ["#fff5eb", "#fee6ce", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#a63603", "#7f2704"]
+                },
+                Reds: {
+                    3: ["#fee0d2", "#fc9272", "#de2d26"],
+                    4: ["#fee5d9", "#fcae91", "#fb6a4a", "#cb181d"],
+                    5: ["#fee5d9", "#fcae91", "#fb6a4a", "#de2d26", "#a50f15"],
+                    6: ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#de2d26", "#a50f15"],
+                    7: ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#99000d"],
+                    8: ["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#99000d"],
+                    9: ["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"]
+                },
+                Greys: {
+                    3: ["#f0f0f0", "#bdbdbd", "#636363"],
+                    4: ["#f7f7f7", "#cccccc", "#969696", "#525252"],
+                    5: ["#f7f7f7", "#cccccc", "#969696", "#636363", "#252525"],
+                    6: ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#636363", "#252525"],
+                    7: ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525"],
+                    8: ["#ffffff", "#f0f0f0", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525"],
+                    9: ["#ffffff", "#f0f0f0", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525", "#000000"]
+                },
+                PuOr: {
+                    3: ["#f1a340", "#f7f7f7", "#998ec3"],
+                    4: ["#e66101", "#fdb863", "#b2abd2", "#5e3c99"],
+                    5: ["#e66101", "#fdb863", "#f7f7f7", "#b2abd2", "#5e3c99"],
+                    6: ["#b35806", "#f1a340", "#fee0b6", "#d8daeb", "#998ec3", "#542788"],
+                    7: ["#b35806", "#f1a340", "#fee0b6", "#f7f7f7", "#d8daeb", "#998ec3", "#542788"],
+                    8: ["#b35806", "#e08214", "#fdb863", "#fee0b6", "#d8daeb", "#b2abd2", "#8073ac", "#542788"],
+                    9: ["#b35806", "#e08214", "#fdb863", "#fee0b6", "#f7f7f7", "#d8daeb", "#b2abd2", "#8073ac", "#542788"],
+                    10: ["#7f3b08", "#b35806", "#e08214", "#fdb863", "#fee0b6", "#d8daeb", "#b2abd2", "#8073ac", "#542788", "#2d004b"],
+                    11: ["#7f3b08", "#b35806", "#e08214", "#fdb863", "#fee0b6", "#f7f7f7", "#d8daeb", "#b2abd2", "#8073ac", "#542788", "#2d004b"]
+                },
+                BrBG: {
+                    3: ["#d8b365", "#f5f5f5", "#5ab4ac"],
+                    4: ["#a6611a", "#dfc27d", "#80cdc1", "#018571"],
+                    5: ["#a6611a", "#dfc27d", "#f5f5f5", "#80cdc1", "#018571"],
+                    6: ["#8c510a", "#d8b365", "#f6e8c3", "#c7eae5", "#5ab4ac", "#01665e"],
+                    7: ["#8c510a", "#d8b365", "#f6e8c3", "#f5f5f5", "#c7eae5", "#5ab4ac", "#01665e"],
+                    8: ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
+                    9: ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
+                    10: ["#543005", "#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#c7eae5", "#80cdc1", "#35978f", "#01665e", "#003c30"],
+                    11: ["#543005", "#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e", "#003c30"]
+                },
+                PRGn: {
+                    3: ["#af8dc3", "#f7f7f7", "#7fbf7b"],
+                    4: ["#7b3294", "#c2a5cf", "#a6dba0", "#008837"],
+                    5: ["#7b3294", "#c2a5cf", "#f7f7f7", "#a6dba0", "#008837"],
+                    6: ["#762a83", "#af8dc3", "#e7d4e8", "#d9f0d3", "#7fbf7b", "#1b7837"],
+                    7: ["#762a83", "#af8dc3", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#7fbf7b", "#1b7837"],
+                    8: ["#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837"],
+                    9: ["#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837"],
+                    10: ["#40004b", "#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837", "#00441b"],
+                    11: ["#40004b", "#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837", "#00441b"]
+                },
+                PiYG: {
+                    3: ["#e9a3c9", "#f7f7f7", "#a1d76a"],
+                    4: ["#d01c8b", "#f1b6da", "#b8e186", "#4dac26"],
+                    5: ["#d01c8b", "#f1b6da", "#f7f7f7", "#b8e186", "#4dac26"],
+                    6: ["#c51b7d", "#e9a3c9", "#fde0ef", "#e6f5d0", "#a1d76a", "#4d9221"],
+                    7: ["#c51b7d", "#e9a3c9", "#fde0ef", "#f7f7f7", "#e6f5d0", "#a1d76a", "#4d9221"],
+                    8: ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"],
+                    9: ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#f7f7f7", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"],
+                    10: ["#8e0152", "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221", "#276419"],
+                    11: ["#8e0152", "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#f7f7f7", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221", "#276419"]
+                },
+                RdBu: {
+                    3: ["#ef8a62", "#f7f7f7", "#67a9cf"],
+                    4: ["#ca0020", "#f4a582", "#92c5de", "#0571b0"],
+                    5: ["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"],
+                    6: ["#b2182b", "#ef8a62", "#fddbc7", "#d1e5f0", "#67a9cf", "#2166ac"],
+                    7: ["#b2182b", "#ef8a62", "#fddbc7", "#f7f7f7", "#d1e5f0", "#67a9cf", "#2166ac"],
+                    8: ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"],
+                    9: ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"],
+                    10: ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"],
+                    11: ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"]
+                },
+                RdGy: {
+                    3: ["#ef8a62", "#ffffff", "#999999"],
+                    4: ["#ca0020", "#f4a582", "#bababa", "#404040"],
+                    5: ["#ca0020", "#f4a582", "#ffffff", "#bababa", "#404040"],
+                    6: ["#b2182b", "#ef8a62", "#fddbc7", "#e0e0e0", "#999999", "#4d4d4d"],
+                    7: ["#b2182b", "#ef8a62", "#fddbc7", "#ffffff", "#e0e0e0", "#999999", "#4d4d4d"],
+                    8: ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#e0e0e0", "#bababa", "#878787", "#4d4d4d"],
+                    9: ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#ffffff", "#e0e0e0", "#bababa", "#878787", "#4d4d4d"],
+                    10: ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#e0e0e0", "#bababa", "#878787", "#4d4d4d", "#1a1a1a"],
+                    11: ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#ffffff", "#e0e0e0", "#bababa", "#878787", "#4d4d4d", "#1a1a1a"]
+                },
+                RdYlBu: {
+                    3: ["#fc8d59", "#ffffbf", "#91bfdb"],
+                    4: ["#d7191c", "#fdae61", "#abd9e9", "#2c7bb6"],
+                    5: ["#d7191c", "#fdae61", "#ffffbf", "#abd9e9", "#2c7bb6"],
+                    6: ["#d73027", "#fc8d59", "#fee090", "#e0f3f8", "#91bfdb", "#4575b4"],
+                    7: ["#d73027", "#fc8d59", "#fee090", "#ffffbf", "#e0f3f8", "#91bfdb", "#4575b4"],
+                    8: ["#d73027", "#f46d43", "#fdae61", "#fee090", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4"],
+                    9: ["#d73027", "#f46d43", "#fdae61", "#fee090", "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4"],
+                    10: ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"],
+                    11: ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090", "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"]
+                },
+                Spectral: {
+                    3: ["#fc8d59", "#ffffbf", "#99d594"],
+                    4: ["#d7191c", "#fdae61", "#abdda4", "#2b83ba"],
+                    5: ["#d7191c", "#fdae61", "#ffffbf", "#abdda4", "#2b83ba"],
+                    6: ["#d53e4f", "#fc8d59", "#fee08b", "#e6f598", "#99d594", "#3288bd"],
+                    7: ["#d53e4f", "#fc8d59", "#fee08b", "#ffffbf", "#e6f598", "#99d594", "#3288bd"],
+                    8: ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
+                    9: ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
+                    10: ["#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"],
+                    11: ["#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"]
+                },
+                RdYlGn: {
+                    3: ["#fc8d59", "#ffffbf", "#91cf60"],
+                    4: ["#d7191c", "#fdae61", "#a6d96a", "#1a9641"],
+                    5: ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"],
+                    6: ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"],
+                    7: ["#d73027", "#fc8d59", "#fee08b", "#ffffbf", "#d9ef8b", "#91cf60", "#1a9850"],
+                    8: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850"],
+                    9: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850"],
+                    10: ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"],
+                    11: ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"]
+                },
+                Accent: {
+                    3: ["#7fc97f", "#beaed4", "#fdc086"],
+                    4: ["#7fc97f", "#beaed4", "#fdc086", "#ffff99"],
+                    5: ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0"],
+                    6: ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f"],
+                    7: ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f", "#bf5b17"],
+                    8: ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f", "#bf5b17", "#666666"]
+                },
+                Dark2: {
+                    3: ["#1b9e77", "#d95f02", "#7570b3"],
+                    4: ["#1b9e77", "#d95f02", "#7570b3", "#e7298a"],
+                    5: ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e"],
+                    6: ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02"],
+                    7: ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d"],
+                    8: ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#666666"]
+                },
+                Paired: {
+                    3: ["#a6cee3", "#1f78b4", "#b2df8a"],
+                    4: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c"],
+                    5: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"],
+                    6: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c"],
+                    7: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"],
+                    8: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00"],
+                    9: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6"],
+                    10: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a"],
+                    11: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99"],
+                    12: ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"]
+                },
+                Pastel1: {
+                    3: ["#fbb4ae", "#b3cde3", "#ccebc5"],
+                    4: ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4"],
+                    5: ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6"],
+                    6: ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc"],
+                    7: ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd"],
+                    8: ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd", "#fddaec"],
+                    9: ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd", "#fddaec", "#f2f2f2"]
+                },
+                Pastel2: {
+                    3: ["#b3e2cd", "#fdcdac", "#cbd5e8"],
+                    4: ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4"],
+                    5: ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9"],
+                    6: ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae"],
+                    7: ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae", "#f1e2cc"],
+                    8: ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae", "#f1e2cc", "#cccccc"]
+                },
+                Set1: {
+                    3: ["#e41a1c", "#377eb8", "#4daf4a"],
+                    4: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3"],
+                    5: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"],
+                    6: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"],
+                    7: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628"],
+                    8: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf"],
+                    9: ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999"]
+                },
+                Set2: {
+                    3: ["#66c2a5", "#fc8d62", "#8da0cb"],
+                    4: ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3"],
+                    5: ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"],
+                    6: ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"],
+                    7: ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494"],
+                    8: ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494", "#b3b3b3"]
+                },
+                Set3: {
+                    3: ["#8dd3c7", "#ffffb3", "#bebada"],
+                    4: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072"],
+                    5: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3"],
+                    6: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462"],
+                    7: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69"],
+                    8: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5"],
+                    9: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"],
+                    10: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd"],
+                    11: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5"],
+                    12: ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5", "#ffed6f"]
+                }
             }
         }
-    }
 
-});
-/*
- a singleton that handles all what is needed to actually display the features
-
- Copyright (c) 2013, Genentech Inc.
- All rights reserved.
-
- Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
-
- */
-define('pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer', '../utils/GGplot2Adapter'], function($, _, Backbone, d3, typedDisplayer, ggplot2Adapter) {
-
+    });
+define(
     /**
-     * display array of features passed as d3selection.
-     *
+     @exports FeatureDisplayer
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
      */
-    var FeatureDisplayer = function() {
-        var self = this;
 
-        self.positioners = {};
-        self.appenders = {};
-        self.categoryPlots ={};
+    'pviz/views/FeatureDisplayer',['jquery', 'underscore', 'backbone', 'd3', './TypedDisplayer', '../utils/GGplot2Adapter'], function ($, _, Backbone, d3, typedDisplayer, ggplot2Adapter) {
 
-        self.mouseoverCallBacks = {};
-        self.mouseoutCallBacks = {};
-        self.clickCallBacks = {};
+        /**
+         * Display array of features passed as d3selection. It will apply custom or default handler both for creation or positioning based on the PositionFeature type.
+         * It will also register the mouse events.
+         * A singleton is returned by this define clause.
+         *
+         * @constructor
+         */
+        var FeatureDisplayer = function () {
+            var self = this;
 
-        typedDisplayer.init(self);
-        self.trackHeightPerCategoryType = {};
-        self.strikeoutCategory = {}
-    }
-    /**
-     * that's the way to register other maner of displying info thatn mere
-     * rectangle
-     */
-    FeatureDisplayer.prototype.setCustomHandler = function(type, mFct) {
-        var self = this;
-        if (_.isArray(type)) {
-            _.each(type, function(t) {
-                self.setCustomHandler(t, mFct)
-            })
+            self.positioners = {};
+            self.appenders = {};
+            self.categoryPlots = {};
+
+            self.mouseoverCallBacks = {};
+            self.mouseoutCallBacks = {};
+            self.clickCallBacks = {};
+
+            typedDisplayer.init(self);
+            self.trackHeightPerCategoryType = {};
+            self.strikeoutCategory = {}
+        }
+        /**
+         * that's the way to register other manner of displaying info than a mere rectangle
+         * @param {String} type
+         * @param {Map} mFct
+         * @param {function} mFct.appender how to crete a new d3 element based on the feature
+         * @param {function} mFct.positioner how to position the feature
+         * @param {function} mFct.mouseoverCallback mouseover behavior
+         * @param {function} mFct.mouseoutCallback
+         * @param {function} mFct.clickCallback
+         *
+         */
+        FeatureDisplayer.prototype.setCustomHandler = function (type, mFct) {
+            var self = this;
+            if (_.isArray(type)) {
+                _.each(type, function (t) {
+                    self.setCustomHandler(t, mFct)
+                })
+                return self;
+            }
+            self.appenders[type] = mFct.appender
+            self.positioners[type] = mFct.positioner
+
+            self.addMouseoverCallback(type, mFct.mouseoverCallback)
+            self.addMouseoutCallback(type, mFct.mouseoutCallback)
+            self.addClickCallback(type, mFct.clickCallback)
+
+            return self
+        }
+
+        /**
+         * Instead of setCustomHandler, mousevent handler can be added directly
+         * @param {String} type  the feature type
+         * @param {Function} fct callback function
+         * @return {FeatureDisplayer}
+         */
+        FeatureDisplayer.prototype.addMouseoverCallback = function (type, fct) {
+            var self = this;
+
+            if (fct) {
+                if (_.isArray(type)) {
+                    _.each(type, function (n) {
+                        self.addMouseoverCallback(n, fct)
+                    })
+                    return self;
+                }
+            }
+            self.mouseoverCallBacks[type] = fct;
             return self;
         }
-        self.appenders[type] = mFct.appender
-        self.positioners[type] = mFct.positioner
+        /**
+         * mouseout callback
+         * @param {String} type
+         * @param {Function} fct
+         * @return {FeatureDisplayer}
+         */
+        FeatureDisplayer.prototype.addMouseoutCallback = function (type, fct) {
+            var self = this;
 
-        self.addMouseoverCallback(type, mFct.mouseoverCallback)
-        self.addMouseoutCallback(type, mFct.mouseoutCallback)
-        self.addClickCallback(type, mFct.clickCallback)
-
-        return self
-    }
-
-    FeatureDisplayer.prototype.addMouseoverCallback = function(name, fct) {
-        var self = this;
-
-        if (fct) {
-            if (_.isArray(name)) {
-                _.each(name, function(n) {
-                    self.addMouseoverCallback(n, fct)
-                })
-                return self;
+            if (fct) {
+                if (_.isArray(type)) {
+                    _.each(type, function (n) {
+                        self.addMouseoutCallback(n, fct)
+                    })
+                    return self;
+                }
             }
-        }
-        self.mouseoverCallBacks[name] = fct;
-        return self;
-    }
-
-    FeatureDisplayer.prototype.addMouseoutCallback = function(name, fct) {
-        var self = this;
-
-        if (fct) {
-            if (_.isArray(name)) {
-                _.each(name, function(n) {
-                    self.addMouseoutCallback(n, fct)
-                })
-                return self;
-            }
-        }
-        self.mouseoutCallBacks[name] = fct;
-        return self;
-    }
-
-    FeatureDisplayer.prototype.addClickCallback = function(name, fct) {
-        var self = this;
-
-        if (fct) {
-            if (_.isArray(name)) {
-                _.each(name, function(n) {
-                    self.addClickCallback(n, fct)
-                })
-                return self;
-            }
-        }
-        self.clickCallBacks[name] = fct;
-        return self;
-    }
-
-    FeatureDisplayer.prototype.append = function(viewport, svgGroup, features) {
-        var self = this;
-
-        //add hirizontal line if needed for thecategory
-
-        var curCat = _.chain(features).pluck('category').uniq().value()[0];
-        if (self.strikeoutCategory[curCat]) {
-            var maxTrack = _.chain(features).pluck('displayTrack').max().value();
-            var g = svgGroup.append('g').attr('class', 'strikeout');
-            var hFactor = self.heightFactor(curCat);
-
-            for (var i = 0; i <= maxTrack; i++) {
-                var y = viewport.scales.y((i + 0.5)) * hFactor;
-                g.append('line').attr('x1', -100).attr('x2', 10000).attr('y1', y).attr('y2', y);
-            }
+            self.mouseoutCallBacks[type] = fct;
+            return self;
         }
 
-        //append the feature
-        _.chain(features).groupBy(function(ft) {
-            return ft.type;
-        }).each(function(ftGroup, type) {
+        /**
+         * click callback
+         * @param {String} type
+         * @param {Function} fct
+         * @return {FeatureDisplayer}
+         */
+        FeatureDisplayer.prototype.addClickCallback = function (type, fct) {
+            var self = this;
+
+            if (fct) {
+                if (_.isArray(type)) {
+                    _.each(type, function (n) {
+                        self.addClickCallback(n, fct)
+                    })
+                    return self;
+                }
+            }
+            self.clickCallBacks[type] = fct;
+            return self;
+        }
+
+        /**
+         * Append a list of features into the svg element. This will call the default or the custom handlers.
+         * This function is called by the SeqEntryAnnotInteractiveView
+         * @param viewport
+         * @param svgGroup
+         * @param features
+         * @return {*}
+         */
+        FeatureDisplayer.prototype.append = function (viewport, svgGroup, features) {
+            var self = this;
+
+            //add hirizontal line if needed for thecategory
+
+            var curCat = _.chain(features).pluck('category').uniq().value()[0];
+            if (self.strikeoutCategory[curCat]) {
+                var maxTrack = _.chain(features).pluck('displayTrack').max().value();
+                var g = svgGroup.append('g').attr('class', 'strikeout');
+                var hFactor = self.heightFactor(curCat);
+
+                for (var i = 0; i <= maxTrack; i++) {
+                    var y = viewport.scales.y((i + 0.5)) * hFactor;
+                    g.append('line').attr('x1', -100).attr('x2', 10000).attr('y1', y).attr('y2', y);
+                }
+            }
+
+            //append the feature
+            _.chain(features).groupBy(function (ft) {
+                return ft.type;
+            }).each(function (ftGroup, type) {
                 var sel = (self.appenders[type] || defaultAppender)(viewport, svgGroup, ftGroup, type)
                 self.position(viewport, sel, ftGroup);
             });
 
-        //register call back event handlers
-        var allSel = svgGroup.selectAll(".feature.data")
-        allSel.on('mouseover', function(ft) {
-            self.callMouseoverCallBacks(ft, this)
-        })
-        allSel.on('mouseout', function(ft) {
-            self.callMouseoutCallBacks(ft, this)
-        })
-        allSel.on('click', function(ft) {
-            self.callClickCallBacks(ft, this);
-        });
+            //register call back event handlers
+            var allSel = svgGroup.selectAll(".feature.data")
+            allSel.on('mouseover', function (ft) {
+                self.callMouseoverCallBacks(ft, this)
+            })
+            allSel.on('mouseout', function (ft) {
+                self.callMouseoutCallBacks(ft, this)
+            })
+            allSel.on('click', function (ft) {
+                self.callClickCallBacks(ft, this);
+            });
 
-        return allSel
-    }
-
-    FeatureDisplayer.prototype.callMouseoverCallBacks = function(ft, el) {
-        var self = this;
-        if (self.mouseoverCallBacks[ft.type] !== undefined) {
-            self.mouseoverCallBacks[ft.type](ft, el)
+            return allSel
         }
-    }
 
-    FeatureDisplayer.prototype.callMouseoutCallBacks = function(ft, el) {
-        var self = this;
-        if (self.mouseoutCallBacks[ft.type] !== undefined) {
-            self.mouseoutCallBacks[ft.type](ft, el)
+        /**
+         * fire the call back (if any is linked to this feature type)
+         * @param {PositionFeature} ft feature
+         * @param {D3Element} el
+         */
+        FeatureDisplayer.prototype.callMouseoverCallBacks = function (ft, el) {
+            var self = this;
+            if (self.mouseoverCallBacks[ft.type] !== undefined) {
+                self.mouseoverCallBacks[ft.type](ft, el)
+            }
         }
-    }
-    FeatureDisplayer.prototype.callClickCallBacks = function(ft, el) {
-        var self = this;
-        if (self.clickCallBacks[ft.type] !== undefined) {
-            self.clickCallBacks[ft.type](ft, el)
+
+        /**
+         * fire the call back (if any is linked to this feature type)
+         * @param {PositionFeature} ft feature
+         * @param {D3Element} el
+         */
+        FeatureDisplayer.prototype.callMouseoutCallBacks = function (ft, el) {
+            var self = this;
+            if (self.mouseoutCallBacks[ft.type] !== undefined) {
+                self.mouseoutCallBacks[ft.type](ft, el)
+            }
         }
-    }
-    var defaultAppender = function(viewport, svgGroup, features, type) {
-        var sel = svgGroup.selectAll("rect.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
-        sel.append("rect").attr('class', 'feature');
-        sel.append("rect").attr('class', 'feature-block-end').attr('fill', 'url(#grad_endFTBlock)');
+        /**
+         * fire the call back (if any is linked to this feature type)
+         * @param {PositionFeature} ft feature
+         * @param {D3Element} el
+         */
+        FeatureDisplayer.prototype.callClickCallBacks = function (ft, el) {
+            var self = this;
+            if (self.clickCallBacks[ft.type] !== undefined) {
+                self.clickCallBacks[ft.type](ft, el)
+            }
+        }
+        /**
+         * @private
+         * @param viewport
+         * @param svgGroup
+         * @param features
+         * @param type
+         * @return {*}
+         */
+        var defaultAppender = function (viewport, svgGroup, features, type) {
+            var sel = svgGroup.selectAll("rect.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+            sel.append("rect").attr('class', 'feature');
+            sel.append("rect").attr('class', 'feature-block-end').attr('fill', 'url(#grad_endFTBlock)');
 
-        sel.append("text").attr('y', viewport.scales.y(0.5)).attr('x', 2);
+            sel.append("text").attr('y', viewport.scales.y(0.5)).attr('x', 2);
 
-        return sel
-    }
+            return sel
+        }
 
-    FeatureDisplayer.prototype.position = function(viewport, sel) {
-        var self = this;
+        FeatureDisplayer.prototype.position = function (viewport, sel) {
+            var self = this;
 
-        var ftIsNotPloted = _.filter(sel.data(), function(e){
-            return self.categoryPlots[e.category] === undefined;
-        });
+            var ftIsNotPloted = _.filter(sel.data(), function (e) {
+                return self.categoryPlots[e.category] === undefined;
+            });
 
-        _.chain(ftIsNotPloted).map(function(s) {
-            return s.type;
-        }).unique().each(function(type) {
-                (self.positioners[type] || defaultPositioner)(viewport, sel.filter(function(ft) {
+            _.chain(ftIsNotPloted).map(function (s) {
+                return s.type;
+            }).unique().each(function (type) {
+                (self.positioners[type] || defaultPositioner)(viewport, sel.filter(function (ft) {
                     return ft.type == type
                 }))
             });
 
-        var selPlot = sel.filter(function(ft){
-            return self.categoryPlots[ft.category] !== undefined
-        });//
-        self.categoryPlotPosition(viewport, selPlot)
-        return sel;
-    }
-    /**
-     * return the height factory associated with
-     */
-    FeatureDisplayer.prototype.heightFactor = function(o) {
-        if ( o instanceof Object) {
-            return this.heightFactor(o.type || o.name)
+            var selPlot = sel.filter(function (ft) {
+                return self.categoryPlots[ft.category] !== undefined
+            });//
+            self.categoryPlotPosition(viewport, selPlot)
+            return sel;
         }
-
-        return this.trackHeightPerCategoryType[o] || 1
-    }
-    /**
-     * you can register a cetgory to have a strikeout line.
-     * Some people love it
-     */
-
-    FeatureDisplayer.prototype.setStrikeoutCategory = function(cat) {
-        this.strikeoutCategory[cat] = true;
-    };
-
-    /**
-     * refresh posiiton, font size ... at init or after zooming
-     *
-     * @param {Object}
-     *          viewport
-     * @param {Object}
-     *          d3selection
-     */
-    // FeatureDisplayer.prototype.position = function(viewport, d3selection) {
-    var defaultPositioner = function(viewport, d3selection) {
-        var hFactor = singleton.heightFactor(d3selection[0][0].__data__.category);
-        // var yscale=singleton.trackHeightFactorPerCategory[]
-
-        d3selection.attr('transform', function(ft) {
-            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + hFactor * viewport.scales.y(0.12 + ft.displayTrack) + ')';
-        });
-        var ftWidth = function(ft) {
-            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+        /**
+         * return the height factory associated with
+         * @return Number
+         */
+        FeatureDisplayer.prototype.heightFactor = function (o) {
+            if (o instanceof Object) {
+                return this.heightFactor(o.type || o.name)
+            }
+            return this.trackHeightPerCategoryType[o] || 1
         }
-        d3selection.selectAll("rect.feature").attr('width', ftWidth).attr('height', hFactor * viewport.scales.y(0.76));
-        d3selection.selectAll("rect.feature-block-end").attr('width', 10).attr('x', function(ft) {
-            return ftWidth(ft) - 10;
-        }).style('display', function(ft) {
+        /**
+         * You can register a catgory to have a strikeout line.
+         * The strikeout is at the category level, because all the type below this category are concerned.
+         * This feature was add for better visibility in situations where features are sparsed
+         * Some people love it...
+         *
+         * @param {String} category
+         */
+
+        FeatureDisplayer.prototype.setStrikeoutCategory = function (category) {
+            this.strikeoutCategory[category] = true;
+        };
+
+        /**
+         * Refresh position, font size ... at init or after zooming
+         *
+         * @private
+         * @param {Object}  viewport
+         * @param {Object} d3selection
+         */
+        // FeatureDisplayer.prototype.position = function(viewport, d3selection) {
+        var defaultPositioner = function (viewport, d3selection) {
+            var hFactor = singleton.heightFactor(d3selection[0][0].__data__.category);
+            // var yscale=singleton.trackHeightFactorPerCategory[]
+
+            d3selection.attr('transform', function (ft) {
+                return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + hFactor * viewport.scales.y(0.12 + ft.displayTrack) + ')';
+            });
+            var ftWidth = function (ft) {
+                return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+            }
+            d3selection.selectAll("rect.feature").attr('width', ftWidth).attr('height', hFactor * viewport.scales.y(0.76));
+            d3selection.selectAll("rect.feature-block-end").attr('width', 10).attr('x', function (ft) {
+                return ftWidth(ft) - 10;
+            }).style('display', function (ft) {
                 return (ftWidth(ft) > 20) ? null : 'none';
             }).attr('height', viewport.scales.y(hFactor * 0.76));
 
-        var fontSize = 9 * hFactor;
-        // self.fontSizeLine();
-        var selText = d3selection.selectAll("text");
-        selText.text(function(ft) {
-            var text = (ft.text !== undefined) ? ft.text : ft.type;
-            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start);
-            if (w <= 5 || text.length == 0) {
-                return '';
-            }
-            var nchar = Math.floor(w / fontSize * 1.6);
-            if (nchar >= text.length)
-                return text;
-            if (nchar <= 2)
-                return '';
-            return text.substr(0, nchar);
-        }).style('font-size', fontSize);
-        return d3selection
-    }
-
-    /**
-     *
-     * @param cat: category name
-     * @param opts: the plot definitions
-     */
-    FeatureDisplayer.prototype.setCategoryPlot = function(cat, opts) {
-        var _this = this;
-        //define default values
-        var plot = _.extend({
-            height: 100,
-            ylim: [-1, 1],
-            shape: 1,
-            scale:'linear',
-            y:0,
-            shape:1,
-            size:10,
-            fillPalette:'Paired:12',
-            fill:1,
-            colorPalette:'Paired:12',
-            color:1,
-            lwd:1,
-            opacity:0.7
-        }, opts);
-
-        plot._y = d3.scale[plot.scale]().domain(plot.ylim).range([plot.height,0]);
-
-        var afCol = plot.fillPalette.split(':');
-        var fPalette = ggplot2Adapter.discrete_palettes[afCol[0]][afCol[1]];
-        plot._fill = _.isFunction(plot.fill)?(function(ft){
-            var v = plot.fill(ft);
-            if(_.isNumber(v) && v>fPalette.length){
-                return '#444';
-            }
-            return _.isNumber(v)?fPalette[v-1]:v;
-        }):(_.isNumber(plot.fill)?fPalette[plot.fill-1]:plot.fill);
-
-        var acCol = plot.colorPalette.split(':');
-        var cPalette = ggplot2Adapter.discrete_palettes[acCol[0]][acCol[1]];
-        plot._color = _.isFunction(plot.color)?(function(ft){
-            var v = plot.color(ft);
-            if(_.isNumber(v) && v>cPalette.length){
-                return '#111';
-            }
-            return _.isNumber(v)?cPalette[v-1]:v;
-        }):(_.isNumber(plot.color)?cPalette[plot.color-1]:plot.color);
-
-        plot._shape = _.isFunction(plot.shape)?(function(ft){
-            return ggplot2Adapter.shapePaths[plot.shape(ft)];
-        }):ggplot2Adapter.shapePaths[plot.shape];
-
-        plot._lwd = _.isFunction(plot.lwd)?(function(ft){
-            return plot.lwd(ft)+'px';
-        }):plot.lwd+'px';
-
-
-        _this.categoryPlots[cat]=plot;
-
-    };
-
-    /**
-     *
-     * @param cat
-     */
-    FeatureDisplayer.prototype.isCategoryPlot = function(cat) {
-        var _this = this;
-        return _this.categoryPlots[cat] !== undefined;
-    };
-
-    FeatureDisplayer.prototype.getCategoryPlot = function(cat){
-        return this.categoryPlots[cat];
-    };
-
-    /**
-     *
-     * @param cat
-     * @param viewport
-     * @param svgGroup
-     * @param features
-     */
-    FeatureDisplayer.prototype.categoryPlotAppend = function(cat, viewport, svgGroup, features) {
-        var _this = this;
-
-        var plot = _this.categoryPlots[cat];
-        var g = svgGroup.append('g').attr('class', 'plot');
-        var sel = svgGroup.selectAll("g._plot-point").data(features).enter().append("g").attr('class', 'feature data _plot-point').attr('category', cat);
-
-
-        sel.style('opacity', plot.opacity);
-        var path = sel.append('path').attr('d',plot._shape).style('fill', plot._fill).style('stroke', plot._color).style('stroke-width', plot._lwd).attr('vector-effect', 'non-scaling-stroke');
-
-
-       _.isFunction(plot.size)?(function(ft){
-            return ggplot2Adapter.shapePaths[plot.shape](ft);
-        }):ggplot2Adapter.shapePaths[plot.shape];
-
-        _this.categoryPlotPosition(viewport, sel);
-        return sel;
-    };
-
-    /**
-     *
-     * @param cat
-     * @param d3selection
-     */
-    FeatureDisplayer.prototype.categoryPlotPosition = function(viewport, d3selection) {
-        var _this = this;
-
-        d3selection.attr('transform', function(ft) {
-            var plot = _this.categoryPlots[ft.category];
-
-            var fty = plot.y;
-            var y=_.isFunction(fty)?fty(ft):fty;
-
-            ftsize = plot.size;
-            var s=_.isFunction(ftsize)?ftsize(ft):ftsize;
-            return 'translate(' + (viewport.scales.x(ft.pos)) + ',' + plot._y(y) + '),scale('+s+')';
-
-        });
-
-    };
-
-    var singleton = new FeatureDisplayer();
-    return singleton;
-});
-
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'], function($, _, Backbone, d3) {
-    var SeqEntryViewport = function(options) {
-        var self = this;
-        self.options = options;
-
-        self.margins = _.extend({
-            left : 0,
-            right : 0,
-            top : 0,
-            bottom : 0
-        })
-        self.yShift = (options && options.yShift)
-
-        for (n in options) {
-            self[n] = options[n];
-        };
-        self.dim = {};
-        self.computeDim();
-        self.xBar = self.svg.insert('line').attr('class', 'x-bar').attr('x1', -1).attr('x2', -1).attr('y1', self.yShift).attr('y2', '100%');
-        self.bgRect = self.svg.insert('rect').attr('width', '100%').attr('height', '100%').style('fill-opacity', '0').style('cursor', 'col-resize');
-
-        self.rectLeft = self.svg.append('rect').attr('class', 'brush left').attr('x', 0).attr('y', self.yShift).attr('height', '100%').style('display', 'none')
-        self.rectRight = self.svg.append('rect').attr('class', 'brush right').attr('x', 0).attr('y', self.yShift).attr('height', '100%').attr('width', '100%').style('display', 'none')
-        self.svg.on('mousemove', function() {
-            var i = d3.mouse(self.el[0])[0];
-            self.setXBar(self.scales.x.invert(i))
-            _.each(options.xChangeCallback, function(f) {
-                if (!f) {
-                    return;
+            var fontSize = 9 * hFactor;
+            // self.fontSizeLine();
+            var selText = d3selection.selectAll("text");
+            selText.text(function (ft) {
+                var text = (ft.text !== undefined) ? ft.text : ft.type;
+                var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start);
+                if (w <= 5 || text.length == 0) {
+                    return '';
                 }
-                f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5));
-            });
-        });
-        self.svg.on('mouseout', function() {
-            self.xBar.style('display', 'none');
-        }).on('mouseover', function() {
-            self.xBar.style('display', null);
-        })
-        initBrush(self);
-    }
-    function initBrush(self) {
-        var brush = d3.svg.brush().on("brushend", brushZoom);
-
-        brush.on('brush', function() {
-            self.setRect(brush.extent())
-        })
-        brush.x(self.scales.x);
-
-        brush(self.bgRect)
-
-        function brushZoom() {
-            self.rectClear()
-            var bounds = brush.extent();
-            if (bounds[0] < 0) {
-                bounds[0] = 0;
-            }
-            if (bounds[1] > self.length - 1) {
-                bounds[1] = self.length - 1;
-            }
-            if (bounds[1] < bounds[0] + 0.3) {
-                self.scales.x.domain([0, self.length - 1]);
-            } else {
-                self.scales.x.domain([Math.floor(bounds[0]), Math.ceil(bounds[1])]);
-            }
-            self.change();
-            self.setXBar(self.scales.x.invert(d3.mouse(self.el[0])[0]));
+                var nchar = Math.floor(w / fontSize * 1.6);
+                if (nchar >= text.length)
+                    return text;
+                if (nchar <= 2)
+                    return '';
+                return text.substr(0, nchar);
+            }).style('font-size', fontSize);
+            return d3selection
         }
-
-    }
-
-
-    SeqEntryViewport.prototype.setXBar = function(x) {
-        var self = this;
-        var i = self.scales.x(x)
-        self.xBar.attr('x1', i).attr('x2', i)
-
-    }
-    SeqEntryViewport.prototype.rectClear = function(i) {
-        var self = this;
-        self.rectLeft.style('display', 'none')
-        self.rectRight.style('display', 'none')
-    }
-    SeqEntryViewport.prototype.setRect = function(xs) {
-        var self = this;
-        self.rectLeft.attr('width', self.scales.x(xs[0])).style('display', null)
-        self.rectRight.attr('x', self.scales.x(xs[1])).style('display', null)
-
-    }
-    SeqEntryViewport.prototype.change = function() {
-        var self = this;
-        //xMax-xMin check makes sure we don't zoom to regions smaller than 4 AA
-        //undefined check for zoomout
-        // if (xMax - xMin > 3 || xMin == undefined) {
-        // self.computeScaling({
-        // xMin : xMin,
-        // xMax : xMax
-        // });
-        // }
-        var domain = self.scales.x.domain();
-        if (domain[0] < 1)
-            domain[0] = 0;
-        if (domain[1] > self.length)
-            domain[1] = self.length
-
-        if (domain[1] - domain[0] < 4) {
-            var d = 2 - (domain[1] - domain[0]) / 2;
-            domain[0] -= d;
-            domain[1] += d;
-        }
-
-        //console.log('b', domain)
-
-        //console.log('c', domain)
-
-        //self.scales.x.domain(domain)
-        //console.log('d', self.scales.x.domain())
-        self.scales.pxPerUnit = self.dim.width / (2 + self.length );
-        self.scales.font = Math.min(0.9 * self.dim.width / (domain[1] - domain[0]), 20);
-
-        self.changeCallback(self);
-        //console.log('e', self.scales.x.domain())
-
-    }
-    /**
-     * set svg dimenesion, pixel per unit (1 unit = 1 AA)
-     * and adapt x/y scales not to be streched
-     */
-    SeqEntryViewport.prototype.computeDim = function() {
-        var self = this;
-
-        var w = $(self.el).width();
-        if (w > 0) {
-            self.dim.width = w;
-        } else {
-            w = $(document).width();
-            self.dim.width = w;
-        }
-        var h = $(self.el).height();
-        if (w > 0) {
-            self.dim.height = h;
-        } else {
-            w = $(document).height();
-            self.dim.height = h;
-        }
-        self.dim.innerWidth = self.dim.width - self.margins.left - self.margins.right;
-        self.computeScaling()
-    };
-
-    SeqEntryViewport.prototype.computeScaling = function(options) {
-        var self = this;
-        if (options == undefined) {
-            options = {};
-        }
-        var xMin = options.xMin || 0;
-        var xMax = options.xMax || (self.length - 1);
-        var lineHeight = 15;
-
-        if (self.scales == undefined)
-            self.scales = {};
-        if (self.scales.x == undefined) {
-            self.scales.x = d3.scale.linear().domain([xMin, xMax]).range([self.margins.left, self.dim.width - self.margins.right])
-            console.log()
-        } else {
-            self.scales.x.domain([xMin, xMax]);
-        }
-        self.scales.y = d3.scale.linear().domain([0, 100]).range([0, lineHeight * 100]);
-        self.scales.pxPerUnit = self.dim.width / (2 + self.length );
-        self.scales.font = Math.min(0.9 * self.dim.width / (xMax - xMin), 20);
-    };
-
-    return SeqEntryViewport;
-
-});
-
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/models/FeatureLayer',['underscore', 'backbone'], function(_, bb) {
-  var FeatureLayer = bb.Model.extend({
-    defaults : {
-      visible : true
-    },
-    initialize : function(options) {
-    },
-    type : function() {
-      return this.get('type') || this.get('name');
-    }
-  });
-
-  return FeatureLayer;
-});
-
-/*
-
- Copyright (c) 2013, Genentech Inc.
- All rights reserved.
-
- Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
-
- */
-define('pviz/views/FeatureLayerView',['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplayer'], function(_, bb, iconFactory, featureDisplayer) {
-    var FeatureLayerView = bb.View.extend({
-        initialize : function(options) {
-            var self = this;
-
-            options = options || {}
-            self.options = options;
-
-            self.clipper = self.options.clipper;
-
-            _.each(['container', 'viewport'], function(n) {
-                self[n] = self.options[n];
-                delete self.options[n];
-            })
-            self.options.layerMenu = self.options.layerMenu || 'sticky';
-
-
-            self.build(options);
-        },
-        build : function() {
-            var self = this;
-
-            var g = self.container.insert("g").attr("id", self.model.get('id') || self.model.get('.name')).attr('class', 'layer');
-
-            if (self.options.cssClass) {
-                g.classed(self.options.cssClass, true)
-            };
-            self.g = g;
-            self.gFeatures = g.append('g').attr('clip-path', 'url('+self.clipper+')');
-
-            if (self.options.layerMenu && self.options.layerMenu !== 'off') {
-                self.p_build_menu(self.options.layerMenu === 'minimize');
-            }
-            return self;
-        },
-        p_build_menu : function(isMinimizable) {
-            var self = this;
-
-            if (self.model.get('name') === 'sequence')
-                return;
-
-            if (isMinimizable) {
-                self.g.append("rect").attr('class', 'layer-background').attr('height', self.viewport.scales.y(self.height()) + 2).attr('width', self.viewport.dim.width)
-            }
-            var menuWidth = 50;
-            self.gMenu = self.g.append("g").attr('class', 'layer-menu').attr('transform', 'translate(0, -13)');
-
-            if (isMinimizable){
-                rect = self.gMenu.append('rect').attr('height', 25).attr('class', 'layer-background layer-menu-background').attr('rx', 5).attr('ry', 5);
-            }
-            var t = self.gMenu.append('text').attr('class', 'layer-category').text(self.model.get('name')).attr('y', 2).attr('x', 7);
-            var w = t.node().getComputedTextLength();
-
-            if (isMinimizable)
-                rect.attr('width', w + 50);
-
-            self.gMenuButtons = self.gMenu.append("g").attr('class', 'buttons').attr('transform', 'translate(' + (w + 15) + ', -2)');
-
-            if (isMinimizable) {
-                var ic = iconFactory.append(self.gMenuButtons, 'noview', 20);
-                ic.on('mousedown', function() {
-                    self.model.set('visible', false);
-                });
-                self.hideMenu();
-
-                self.g.on('mouseover', function() {
-                    self.showMenu()
-                });
-                self.g.on('mouseout', function() {
-                    self.hideMenu()
-                });
-            }
-
-            return self;
-        },
-        hideMenu : function() {
-            this.gMenu.style('display', 'none');
-            return this;
-        },
-        showMenu : function() {
-            this.gMenu.style('display', null);
-            return this;
-        },
-        height : function() {
-            var _this = this;
-            if(_this.model.get('isPlot')){
-                return featureDisplayer.getCategoryPlot(this.model.get('category')).height;
-            }
-            return this.model.get('nbTracks') * featureDisplayer.heightFactor(this.model.attributes);
-
-        }
-
-    });
-
-    return FeatureLayerView;
-});
-
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/collections/FeatureLayerCollection',['backbone', '../models/PositionedFeature'], function(bb, PositionedFeature) {
-  return bb.Collection.extend({
-    model : PositionedFeature,
-    group : function() {
-      var self = this;
-      return _.groupBy(self.models, function(ft) {
-        return (ft.groupSet ? (ft.groupSet + '/:') : '') + ft.category;
-
-      })
-    }
-  })
-
-})
-;
-/*
- /**
- * the container for the hidden/closed layers.
- * It shall display a list of button with the hidden one. so we clik on one and it open the layer back...
- * 
- * Copyright (c) 2013, Genentech Inc.
- * All rights reserved.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
- */
-define('pviz/views/HiddenLayersView',['underscore', 'backbone', 'd3', 'pviz/collections/FeatureLayerCollection', 'pviz/services/IconFactory'], function (_, bb, d3, FeatureLayerCollection, iconFactory) {
-    var HiddenLayersView = bb.View.extend({
-        initialize: function (options) {
-            var self = this;
-            self.options = options;
-
-            self.model = new FeatureLayerCollection(options.layers);
-            self.model.bind('change', function () {
-                self.render()
-            });
-
-            self.container = options.container;
-
-            var g = self.container.append('g').attr('class', 'hidden-layers');
-            self.g = g
-
-            var gbuts = g.selectAll('g.one-hidden-layer').data(self.model.models).enter().append('g').attr('class', 'one-hidden-layer').style('display', 'none');
-
-            //function of layer hidden...
-
-            gbuts.append('rect').attr('class', 'button').attr('height', 20).attr('rx', 5).attr('ry', 5);
-            gbuts.append('text').text(function (layer) {
-                return layer.get('name')
-            }).attr('y', 11).attr('x', 4);
-
-            var gih = gbuts.append('g').attr('class', 'icon-holder');
-            gih.each(function () {
-                iconFactory.append(d3.select(this), 'view', 20)
-            });
-            gbuts.on('mousedown', function (l) {
-                l.set('visible', true);
-            })
-
-            self.gbuts = gbuts;
-            self.render();
-        },
 
         /**
-         * rendering: we push on x the blocks fir the button to be displayed
+         * Within a category, it is possible to display plot type feature (size, height ...)
+         * See the test.
+         *
+         * @param cat: category name
+         * @param opts: the plot definitions
          */
-        render: function () {
-            var self = this;
-            var xPlus = 33;
+        FeatureDisplayer.prototype.setCategoryPlot = function (cat, opts) {
+            var _this = this;
+            //define default values
+            var plot = _.extend({
+                height: 100,
+                ylim: [-1, 1],
+                shape: 1,
+                scale: 'linear',
+                y: 0,
+                shape: 1,
+                size: 10,
+                fillPalette: 'Paired:12',
+                fill: 1,
+                colorPalette: 'Paired:12',
+                color: 1,
+                lwd: 1,
+                opacity: 0.7
+            }, opts);
 
-            self.gbuts.style('display', function (l) {
-                return l.get('visible') ? 'none' : null;
-            });
+            plot._y = d3.scale[plot.scale]().domain(plot.ylim).range([plot.height, 0]);
 
-            var allLength = [];
-            self.gbuts.selectAll('text').each(function (d, i) {
-                allLength.push(d3.select(this).node().getComputedTextLength() + xPlus);
-            });
-
-            var j = 0
-            self.gbuts.selectAll('rect.button').attr('width', function (l) {
-                return allLength[j++] - 4;
-            });
-
-            j = 0
-            self.gbuts.selectAll('g.icon-holder').attr('transform', function (l) {
-                return 'translate(' + (allLength[j++] - 27) + ',0)';
-            })
-            var tot = 0;
-            self.gbuts.attr('transform', function (l, i) {
-                var r = 'translate(' + tot + ',0)';
-                if (!l.get('visible')) {
-                    tot += allLength[i];
+            var afCol = plot.fillPalette.split(':');
+            var fPalette = ggplot2Adapter.discrete_palettes[afCol[0]][afCol[1]];
+            plot._fill = _.isFunction(plot.fill) ? (function (ft) {
+                var v = plot.fill(ft);
+                if (_.isNumber(v) && v > fPalette.length) {
+                    return '#444';
                 }
-                return r
-            })
-        },
-        height: function () {
-            return 1;
-        }
+                return _.isNumber(v) ? fPalette[v - 1] : v;
+            }) : (_.isNumber(plot.fill) ? fPalette[plot.fill - 1] : plot.fill);
+
+            var acCol = plot.colorPalette.split(':');
+            var cPalette = ggplot2Adapter.discrete_palettes[acCol[0]][acCol[1]];
+            plot._color = _.isFunction(plot.color) ? (function (ft) {
+                var v = plot.color(ft);
+                if (_.isNumber(v) && v > cPalette.length) {
+                    return '#111';
+                }
+                return _.isNumber(v) ? cPalette[v - 1] : v;
+            }) : (_.isNumber(plot.color) ? cPalette[plot.color - 1] : plot.color);
+
+            plot._shape = _.isFunction(plot.shape) ? (function (ft) {
+                return ggplot2Adapter.shapePaths[plot.shape(ft)];
+            }) : ggplot2Adapter.shapePaths[plot.shape];
+
+            plot._lwd = _.isFunction(plot.lwd) ? (function (ft) {
+                return plot.lwd(ft) + 'px';
+            }) : plot.lwd + 'px';
+
+
+            _this.categoryPlots[cat] = plot;
+
+        };
+
+        /**
+         * Tells is a given category is to be considered as a 'plot' one
+         * @private
+         * @param category
+         */
+        FeatureDisplayer.prototype.isCategoryPlot = function (category) {
+            var _this = this;
+            return _this.categoryPlots[category] !== undefined;
+        };
+
+        FeatureDisplayer.prototype.getCategoryPlot = function (cat) {
+            return this.categoryPlots[cat];
+        };
+
+        /**
+         * @private
+         * @param category
+         * @param viewport
+         * @param svgGroup
+         * @param features
+         */
+        FeatureDisplayer.prototype.categoryPlotAppend = function (category, viewport, svgGroup, features) {
+            var _this = this;
+
+            var plot = _this.categoryPlots[category];
+            var g = svgGroup.append('g').attr('class', 'plot');
+            var sel = svgGroup.selectAll("g._plot-point").data(features).enter().append("g").attr('class', 'feature data _plot-point').attr('category', category);
+
+
+            sel.style('opacity', plot.opacity);
+            var path = sel.append('path').attr('d', plot._shape).style('fill', plot._fill).style('stroke', plot._color).style('stroke-width', plot._lwd).attr('vector-effect', 'non-scaling-stroke');
+
+
+            _.isFunction(plot.size) ? (function (ft) {
+                return ggplot2Adapter.shapePaths[plot.shape](ft);
+            }) : ggplot2Adapter.shapePaths[plot.shape];
+
+            _this.categoryPlotPosition(viewport, sel);
+            return sel;
+        };
+
+        /**
+         * @private
+         * @param cat
+         * @param d3selection
+         */
+        FeatureDisplayer.prototype.categoryPlotPosition = function (viewport, d3selection) {
+            var _this = this;
+
+            d3selection.attr('transform', function (ft) {
+                var plot = _this.categoryPlots[ft.category];
+
+                var fty = plot.y;
+                var y = _.isFunction(fty) ? fty(ft) : fty;
+
+                ftsize = plot.size;
+                var s = _.isFunction(ftsize) ? ftsize(ft) : ftsize;
+                return 'translate(' + (viewport.scales.x(ft.pos)) + ',' + plot._y(y) + '),scale(' + s + ')';
+
+            });
+
+        };
+
+        var singleton = new FeatureDisplayer();
+        return singleton;
     });
-    return HiddenLayersView;
-});
+
+/*
+ * Copyright (c) 2013, Genentech Inc.
+ * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
+ */
+define(
+    /**
+     @exports SeqEntryViewport
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/views/SeqEntryViewport',['jquery', 'underscore', 'backbone', 'd3'], function ($, _, Backbone, d3) {
+        /**
+         *
+         * @class SeqEntryViewport map the sequence scale domain to the dom element
+         * @constructor
+         */
+
+        var SeqEntryViewport = function (options) {
+            var self = this;
+            self.options = options;
+
+            self.margins = _.extend({
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0
+            })
+            self.yShift = (options && options.yShift)
+
+            for (n in options) {
+                self[n] = options[n];
+            }
+            ;
+            self.dim = {};
+            self.computeDim();
+            self.xBar = self.svg.insert('line').attr('class', 'x-bar').attr('x1', -1).attr('x2', -1).attr('y1', self.yShift).attr('y2', '100%');
+            self.bgRect = self.svg.insert('rect').attr('width', '100%').attr('height', '100%').style('fill-opacity', '0').style('cursor', 'col-resize');
+
+            self.rectLeft = self.svg.append('rect').attr('class', 'brush left').attr('x', 0).attr('y', self.yShift).attr('height', '100%').style('display', 'none')
+            self.rectRight = self.svg.append('rect').attr('class', 'brush right').attr('x', 0).attr('y', self.yShift).attr('height', '100%').attr('width', '100%').style('display', 'none')
+            self.svg.on('mousemove', function () {
+                var i = d3.mouse(self.el[0])[0];
+                self.setXBar(self.scales.x.invert(i))
+                _.each(options.xChangeCallback, function (f) {
+                    if (!f) {
+                        return;
+                    }
+                    f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5));
+                });
+            });
+            self.svg.on('mouseout', function () {
+                self.xBar.style('display', 'none');
+            }).on('mouseover', function () {
+                self.xBar.style('display', null);
+            })
+            initBrush(self);
+        }
+
+        /**
+         * @private
+         * @param self
+         */
+        function initBrush(self) {
+            var brush = d3.svg.brush().on("brushend", brushZoom);
+
+            brush.on('brush', function () {
+                self.setRect(brush.extent())
+            })
+            brush.x(self.scales.x);
+
+            brush(self.bgRect)
+
+            function brushZoom() {
+                self.rectClear()
+                var bounds = brush.extent();
+                if (bounds[0] < 0) {
+                    bounds[0] = 0;
+                }
+                if (bounds[1] > self.length - 1) {
+                    bounds[1] = self.length - 1;
+                }
+                if (bounds[1] < bounds[0] + 0.3) {
+                    self.scales.x.domain([0, self.length - 1]);
+                } else {
+                    self.scales.x.domain([Math.floor(bounds[0]), Math.ceil(bounds[1])]);
+                }
+                self.change();
+                self.setXBar(self.scales.x.invert(d3.mouse(self.el[0])[0]));
+            }
+
+        };
+
+
+        /**
+         * @private
+         * @param x
+         */
+        SeqEntryViewport.prototype.setXBar = function (x) {
+            var self = this;
+            var i = self.scales.x(x)
+            self.xBar.attr('x1', i).attr('x2', i)
+
+        };
+        /**
+         * @private
+         * @param i
+         */
+        SeqEntryViewport.prototype.rectClear = function (i) {
+            var self = this;
+            self.rectLeft.style('display', 'none')
+            self.rectRight.style('display', 'none')
+        };
+        /**
+         * @private
+         * @param xs
+         */
+        SeqEntryViewport.prototype.setRect = function (xs) {
+            var self = this;
+            self.rectLeft.attr('width', self.scales.x(xs[0])).style('display', null)
+            self.rectRight.attr('x', self.scales.x(xs[1])).style('display', null)
+
+        };
+        /**
+         * @private
+         */
+        SeqEntryViewport.prototype.change = function () {
+            var self = this;
+            //xMax-xMin check makes sure we don't zoom to regions smaller than 4 AA
+            //undefined check for zoomout
+            // if (xMax - xMin > 3 || xMin == undefined) {
+            // self.computeScaling({
+            // xMin : xMin,
+            // xMax : xMax
+            // });
+            // }
+            var domain = self.scales.x.domain();
+            if (domain[0] < 1)
+                domain[0] = 0;
+            if (domain[1] > self.length)
+                domain[1] = self.length
+
+            if (domain[1] - domain[0] < 4) {
+                var d = 2 - (domain[1] - domain[0]) / 2;
+                domain[0] -= d;
+                domain[1] += d;
+            }
+
+            //console.log('b', domain)
+
+            //console.log('c', domain)
+
+            //self.scales.x.domain(domain)
+            //console.log('d', self.scales.x.domain())
+            self.scales.pxPerUnit = self.dim.width / (2 + self.length );
+            self.scales.font = Math.min(0.9 * self.dim.width / (domain[1] - domain[0]), 20);
+
+            self.changeCallback(self);
+            //console.log('e', self.scales.x.domain())
+
+        };
+        /**
+         * set svg dimension, pixel per unit (1 unit = 1 AA)
+         * and adapt x/y scales not to be stretched
+         * @private
+         */
+        SeqEntryViewport.prototype.computeDim = function () {
+            var self = this;
+
+            var w = $(self.el).width();
+            if (w > 0) {
+                self.dim.width = w;
+            } else {
+                w = $(document).width();
+                self.dim.width = w;
+            }
+            var h = $(self.el).height();
+            if (w > 0) {
+                self.dim.height = h;
+            } else {
+                w = $(document).height();
+                self.dim.height = h;
+            }
+            self.dim.innerWidth = self.dim.width - self.margins.left - self.margins.right;
+            self.computeScaling()
+        };
+        /**
+         * @private
+         * @param options
+         */
+        SeqEntryViewport.prototype.computeScaling = function (options) {
+            var self = this;
+            if (options == undefined) {
+                options = {};
+            }
+            var xMin = options.xMin || 0;
+            var xMax = options.xMax || (self.length - 1);
+            var lineHeight = 15;
+
+            if (self.scales == undefined)
+                self.scales = {};
+            if (self.scales.x == undefined) {
+                self.scales.x = d3.scale.linear().domain([xMin, xMax]).range([self.margins.left, self.dim.width - self.margins.right])
+                console.log()
+            } else {
+                self.scales.x.domain([xMin, xMax]);
+            }
+            self.scales.y = d3.scale.linear().domain([0, 100]).range([0, lineHeight * 100]);
+            self.scales.pxPerUnit = self.dim.width / (2 + self.length );
+            self.scales.font = Math.min(0.9 * self.dim.width / (xMax - xMin), 20);
+        };
+
+        return SeqEntryViewport;
+
+    });
+
+
+define(
+    /**
+     @exports FeatureLayer
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/models/FeatureLayer',['underscore', 'backbone'], function (_, bb) {
+
+        /**
+         * FeatureLayer regroups all the PositionedFeature of a same type
+         * @constructor
+         * @augments Backbone.Model
+         *
+         * @param {Map} options
+         * @param {String} options.type is only compulsory member
+         * @param {boolean} options.visible is the layer to be shown. Default is true
+         */
+        var FeatureLayer = bb.Model.extend(
+            /**
+             * @lends module:FeatureLayer~FeatureLayer.prototype
+             */
+            {
+                defaults: {
+                    visible: true
+                },
+                initialize: function (options) {
+                },
+                /**
+                 * The object type, based on the type or name attribute
+                 *
+                 * @return {String} the type key
+                 */
+                type: function () {
+                    return this.get('type') || this.get('name');
+                }
+            });
+        return FeatureLayer;
+    });
+
+define(
+    /**
+     @exports FeatureLayerView
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+
+    'pviz/views/FeatureLayerView',['underscore', 'backbone', 'pviz/services/IconFactory', './FeatureDisplayer'], function (_, bb, iconFactory, featureDisplayer) {
+        /**
+         * @class  FeatureLayerView handles the view of one feature layer
+         * @constructor
+         * @param {Map} options
+         * @param {String} options.clipper a reference to a svg clip-path
+         * @param {d3Element} options.container
+         * @param {SeqEntryViewport} options.viewport
+         * @param {String} options.layerMenu defines the layerMenu behavior (default is 'sticky', can be 'minimize')
+         * @augments Backbone.View
+         */
+        var FeatureLayerView = bb.View.extend(/** @lends module:FeatureLayerView~FeatureLayerView.prototype */{
+            initialize: function (options) {
+                var self = this;
+
+                options = options || {}
+                self.options = options;
+
+                self.clipper = self.options.clipper;
+
+                _.each(['container', 'viewport'], function (n) {
+                    self[n] = self.options[n];
+                    delete self.options[n];
+                })
+                self.options.layerMenu = self.options.layerMenu || 'sticky';
+
+
+                self.build(options);
+            },
+            /**
+             * build the layer at once
+             * @return {FeatureLayerView}
+             */
+            build: function () {
+                var self = this;
+
+                var g = self.container.insert("g").attr("id", self.model.get('id') || self.model.get('.name')).attr('class', 'layer');
+
+                if (self.options.cssClass) {
+                    g.classed(self.options.cssClass, true)
+                }
+                ;
+                self.g = g;
+                self.gFeatures = g.append('g').attr('clip-path', 'url(' + self.clipper + ')');
+
+                if (self.options.layerMenu && self.options.layerMenu !== 'off') {
+                    self.p_build_menu(self.options.layerMenu === 'minimize');
+                }
+                return self;
+            },
+            /**
+             * Builds the layer menu (if any)
+             * @private
+             * @param isMinimizable
+             * @return {FeatureLayerView}
+             */
+            p_build_menu: function (isMinimizable) {
+                var self = this;
+
+                if (self.model.get('name') === 'sequence')
+                    return;
+
+                if (isMinimizable) {
+                    self.g.append("rect").attr('class', 'layer-background').attr('height', self.viewport.scales.y(self.height()) + 2).attr('width', self.viewport.dim.width)
+                }
+                var menuWidth = 50;
+                self.gMenu = self.g.append("g").attr('class', 'layer-menu').attr('transform', 'translate(0, -13)');
+
+                if (isMinimizable) {
+                    rect = self.gMenu.append('rect').attr('height', 25).attr('class', 'layer-background layer-menu-background').attr('rx', 5).attr('ry', 5);
+                }
+                var t = self.gMenu.append('text').attr('class', 'layer-category').text(self.model.get('name')).attr('y', 2).attr('x', 7);
+                var w = t.node().getComputedTextLength();
+
+                if (isMinimizable)
+                    rect.attr('width', w + 50);
+
+                self.gMenuButtons = self.gMenu.append("g").attr('class', 'buttons').attr('transform', 'translate(' + (w + 15) + ', -2)');
+
+                if (isMinimizable) {
+                    var ic = iconFactory.append(self.gMenuButtons, 'noview', 20);
+                    ic.on('mousedown', function () {
+                        self.model.set('visible', false);
+                    });
+                    self.hideMenu();
+
+                    self.g.on('mouseover', function () {
+                        self.showMenu()
+                    });
+                    self.g.on('mouseout', function () {
+                        self.hideMenu()
+                    });
+                }
+
+                return self;
+            },
+            /**
+             * private
+             * @return {FeatureLayerView}
+             */
+            hideMenu: function () {
+                this.gMenu.style('display', 'none');
+                return this;
+            },
+            /**
+             * private
+             * @return {FeatureLayerView}
+             */
+            showMenu: function () {
+                this.gMenu.style('display', null);
+                return this;
+            },
+            /**
+             * Get the height of this FeatureLayer
+             * @return {Number}
+             */
+            height: function () {
+                var _this = this;
+                if (_this.model.get('isPlot')) {
+                    return featureDisplayer.getCategoryPlot(this.model.get('category')).height;
+                }
+                return this.model.get('nbTracks') * featureDisplayer.heightFactor(this.model.attributes);
+
+            }
+
+        });
+
+        return FeatureLayerView;
+    });
+
+define(
+    /**
+     @exports FeatureLayerCollection
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/collections/FeatureLayerCollection',['backbone', '../models/FeatureLayer'], function (bb, FeatureLayer) {
+        /**
+         * a collection of FeatureLayer, follows backbone collection mechanisms
+         * @constructor
+         * @augments Backbone.Collection
+         */
+        var FeatureLayerCollection = bb.Collection.extend(
+            /**
+             * @lends module:FeatureLayerCollection~FeatureLayerCollection.prototype
+             */
+            {
+                model: FeatureLayer
+
+            });
+        return FeatureLayerCollection;
+    });
+define(
+    /**
+     @exports HiddenLayersView
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/views/HiddenLayersView',['underscore', 'backbone', 'd3', 'pviz/collections/FeatureLayerCollection', 'pviz/services/IconFactory'], function (_, bb, d3, FeatureLayerCollection, iconFactory) {
+        /**
+         * HiddenLayersView the minimized FeatureLayer.
+         * @constructor
+         * @param {Map} options
+         * @param {d3Element} options.container
+         * @augments Backbone.View
+         */
+        var HiddenLayersView = bb.View.extend(/** @lends module:HiddenLayersView~HiddenLayersView.prototype */{
+            initialize: function (options) {
+                var self = this;
+                self.options = options;
+
+                self.model = new FeatureLayerCollection(options.layers);
+                self.model.bind('change', function () {
+                    self.render()
+                });
+
+                self.container = options.container;
+
+                var g = self.container.append('g').attr('class', 'hidden-layers');
+                self.g = g
+
+                var gbuts = g.selectAll('g.one-hidden-layer').data(self.model.models).enter().append('g').attr('class', 'one-hidden-layer').style('display', 'none');
+
+                //function of layer hidden...
+
+                gbuts.append('rect').attr('class', 'button').attr('height', 20).attr('rx', 5).attr('ry', 5);
+                gbuts.append('text').text(function (layer) {
+                    return layer.get('name')
+                }).attr('y', 11).attr('x', 4);
+
+                var gih = gbuts.append('g').attr('class', 'icon-holder');
+                gih.each(function () {
+                    iconFactory.append(d3.select(this), 'view', 20)
+                });
+                gbuts.on('mousedown', function (l) {
+                    l.set('visible', true);
+                })
+
+                self.gbuts = gbuts;
+                self.render();
+            },
+
+            /**
+             * rendering: we push on x the blocks if the button is to be displayed
+             */
+            render: function () {
+                var self = this;
+                var xPlus = 33;
+
+                self.gbuts.style('display', function (l) {
+                    return l.get('visible') ? 'none' : null;
+                });
+
+                var allLength = [];
+                self.gbuts.selectAll('text').each(function (d, i) {
+                    allLength.push(d3.select(this).node().getComputedTextLength() + xPlus);
+                });
+
+                var j = 0
+                self.gbuts.selectAll('rect.button').attr('width', function (l) {
+                    return allLength[j++] - 4;
+                });
+
+                j = 0
+                self.gbuts.selectAll('g.icon-holder').attr('transform', function (l) {
+                    return 'translate(' + (allLength[j++] - 27) + ',0)';
+                })
+                var tot = 0;
+                self.gbuts.attr('transform', function (l, i) {
+                    var r = 'translate(' + tot + ',0)';
+                    if (!l.get('visible')) {
+                        tot += allLength[i];
+                    }
+                    return r
+                })
+            },
+            /**
+             *
+             * @return {number}
+             */
+            height: function () {
+                return 1;
+            }
+        });
+        return HiddenLayersView;
+    });
 
 
 define('text!pviz_templates/details-pane.html',[],function () { return '<div class="details-pane">\n    <div class="" style="width:100%">\n        <div class="nav" style="display:none">\n            <ul class="nav nav-tabs">\n                <li class="pull-right">\n                    <label class="checkbox">\n                        <input type="checkbox" id="raise-active" checked=checked/>\n                        show active pane </label>\n                </li>\n            </ul>\n        </div>\n    </div>\n    <div class="tab-content">\n\n    </div>\n</div>\n';});
 
-/*
- A tab Pane can be linked to the feautre viewer, to display details or whatever you wish. Check example page.
+define(
+    /**
+     @exports DetailsPane
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
 
- * Copyright (c) 2013, Genentech Inc.
- * All rights reserved.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology, Genentech
- */
-define('pviz/views/DetailsPane',['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function (_, $, bb, undefined, tmpl) {
-    return bb.View.extend({
-        initialize: function (options) {
-            var self = this;
-            self.options = options;
-
-            var el = $(self.el);
-            el.empty();
-            el.append($(tmpl));
-
-            self.containers = {
-                menu: el.find('ul'),
-                tabs: el.find('div.tab-content'),
-                divRaiseActive: el.find('div.nav')
-            }
-
-            self.templates = {
-                menuItem: '<li><a href="#<%=id%>" data-toggle="tab"><%=name%></a></li>',
-                contents: '<div class="tab-pane" id="<%=id%>"></div>'
-            }
-
-            self.tabs = {};
-        },
-        render: function () {
-            var self = this;
-
-            return self;
-        },
+    'pviz/views/DetailsPane',['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function (_, $, bb, undefined, tmpl) {
         /**
-         * return a jquery elment for the tab pointed bby the given name
-         * if no tab exist, a tab + menu are created
-         * the obect return is a map with 'menuItem' and 'contents' elements
-         * @param {Object} name
+         * @class DetailsPane is a multi tab container to eventually display details from the highlighted features. It is synchronized with the sequence viewer
+         * @constructor
+         * @augments Backbone.View
          */
-        getTab: function (name) {
-            var self = this;
-            var tid = self.name2id(name);
-            if (self.tabs[tid] === undefined) {
-                var emi = $(_.template(self.templates.menuItem, {
-                    name: name,
-                    id: tid
-                }))
-                emi.find('a').click(function (e) {
-                    e.preventDefault();
-                    $(this).tab('show');
-                })
-                var ec = $(_.template(self.templates.contents, {
-                    name: name,
-                    id: tid
-                }))
+        var DetailsPane = bb.View.extend(
+            /**
+             * @lends module:DetailsPane~DetailsPane.prototype
+             */{
+                initialize: function (options) {
+                    var self = this;
+                    self.options = options;
 
-                self.containers.menu.append(emi);
-                self.containers.tabs.append(ec);
+                    var el = $(self.el);
+                    el.empty();
+                    el.append($(tmpl));
 
-                self.tabs[tid] = {
-                    menuItem: emi,
-                    contents: ec
-                };
-                if (_.size(self.tabs) >= 2) {
-                    self.containers.divRaiseActive.show();
+                    self.containers = {
+                        menu: el.find('ul'),
+                        tabs: el.find('div.tab-content'),
+                        divRaiseActive: el.find('div.nav')
+                    }
+
+                    self.templates = {
+                        menuItem: '<li><a href="#<%=id%>" data-toggle="tab"><%=name%></a></li>',
+                        contents: '<div class="tab-pane" id="<%=id%>"></div>'
+                    }
+
+                    self.tabs = {};
+                },
+                render: function () {
+                    var self = this;
+
+                    return self;
+                },
+                /**
+                 * return a jquery element for the tab pointed bby the given name
+                 * if no tab exist, a tab + menu are created
+                 * the obect return is a map with 'menuItem' and 'contents' elements
+                 * @param {String} name
+                 */
+                getTab: function (name) {
+                    var self = this;
+                    var tid = self.name2id(name);
+                    if (self.tabs[tid] === undefined) {
+                        var emi = $(_.template(self.templates.menuItem, {
+                            name: name,
+                            id: tid
+                        }))
+                        emi.find('a').click(function (e) {
+                            e.preventDefault();
+                            $(this).tab('show');
+                        })
+                        var ec = $(_.template(self.templates.contents, {
+                            name: name,
+                            id: tid
+                        }))
+
+                        self.containers.menu.append(emi);
+                        self.containers.tabs.append(ec);
+
+                        self.tabs[tid] = {
+                            menuItem: emi,
+                            contents: ec
+                        };
+                        if (_.size(self.tabs) >= 2) {
+                            self.containers.divRaiseActive.show();
+                        }
+                    }
+                    return self.tabs[tid];
+                },
+                /**
+                 * raise a tab (make it visible)
+                 * @param {element} tab
+                 */
+                raiseTab: function (tab) {
+                    var self = this;
+                    tab.menuItem.find('a').tab('show')
+                },
+                /**
+                 * raise the tab if the "raise-active" checkbox is set
+                 */
+                focusOnTab: function (tab) {
+                    var self = this;
+                    if (tab.menuItem.hasClass('active')) {
+                        return
+                    }
+                    if ($(self.el).find('input#raise-active').is(':checked')) {
+                        self.raiseTab(tab)
+                        return
+                    }
+
+                    tab.menuItem.animate({
+                        opacity: 0.1
+                    }, 100, function () {
+                        tab.menuItem.animate({
+                            opacity: 1.0
+                        }, 100)
+                    })
+                },
+
+                /**
+                 * trim, lowercase and convert non character symbols to dash
+                 * @private
+                 * @param {String} name
+                 */
+                name2id: function (name) {
+                    return name.trim().toLowerCase().replace(/\W+/g, '-');
                 }
-            }
-            return self.tabs[tid];
-        },
-        raiseTab: function (tab) {
-            var self = this;
-            tab.menuItem.find('a').tab('show')
-        },
-        /**
-         * raise the tab if the "raise-active" checkbox is set
-         */
-        focusOnTab: function (tab) {
-            var self = this;
-            if (tab.menuItem.hasClass('active')) {
-                return
-            }
-            if ($(self.el).find('input#raise-active').is(':checked')) {
-                self.raiseTab(tab)
-                return
-            }
-
-            tab.menuItem.animate({
-                opacity: 0.1
-            }, 100, function () {
-                tab.menuItem.animate({
-                    opacity: 1.0
-                }, 100)
-            })
-        },
-
-        /*
-         * trim, lowercase and convert non character symbols to dash
-         */
-        name2id: function (name) {
-            return name.trim().toLowerCase().replace(/\W+/g, '-');
-        }
+            });
+        return DetailsPane;
     });
-});
 
 
 define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { return '<div class=\'seq-entry-annot-interactive\'>\n    <div id=\'feature-viewer\'>\n        \n    </div>\n    <div id=\'details-viewer\'>\n        \n    </div>\n    \n</div>\n';});
 
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager', './FeatureDisplayer', './SeqEntryViewport', 'pviz/models/FeatureLayer', './FeatureLayerView', './HiddenLayersView', './DetailsPane', 'text!pviz_templates/seq-entry-annot-interactive.html'], function ($, _, Backbone, d3, featureManager, featureDisplayer, SeqEntryViewport, FeatureLayer, FeatureLayerView, HiddenLayersView, DetailsPane, tmpl) {
-    var SeqEntryAnnotInteractiveView = Backbone.View.extend({
+define(
+    /**
+     @exports SeqEntryAnnotInteractiveView
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
 
-        initialize: function (options) {
-            var self = this;
-            self.options = options;
-
-            self.margins = {
-                left: options.marginLeft || 20,
-                right: options.marginRight || 20,
-                top: options.marginTop || 25
-            };
-            self.layers = [];
-            self.layerViews = [];
-            self.hide = {};
-
-            self.paddingCategory = options.paddingCategory || 0;
-
-            self.bubbleSequenceNb = 4;
-            self.clipperId = 'clipper_' + Math.round(100000 * Math.random());
-
-            $(self.el).empty();
-            var el = $(tmpl);
-            $(self.el).append(el)
-
-            self.components = {
-                features: el.find('#feature-viewer'),
-                details: el.find('#details-viewer')
-            }
-
-            self.svg = d3.select(self.components.features[0]).append("svg").attr("width", '100%').attr("height", '123').attr('class', 'pviz');
-            self.p_setup_defs();
-
-            var rectBg = self.svg.insert("rect").attr("class", 'background').attr('width', '100%').attr('height', '100%');
-
-            var xChangeCallbacks = [];
-            if (options.xChangeCallback) {
-                xChangeCallbacks.push(options.xChangeCallback);
-            }
-
-            /*
-             * add the callback to set the aabubble position and text (if needed)
-             */
-            if (!options.noPositionBubble) {
-                xChangeCallbacks.push(function (i0, i1) {
-                    var gbubbles = self.svg.selectAll('g.axis-bubble');
-                    if (self.viewport.scales.font > 10) {
-                        gbubbles.style('display', 'none');
-                        self.svg.select('line.sequence-bg').style('display', 'none');
-                        return
-                    }
-                    self.svg.select('line.sequence-bg').style('display', null);
-
-                    var imid = (i0 + i1) / 2;
-                    var xscales = self.viewport.scales.x;
-                    if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
-                        gbubbles.style('display', 'none');
-                        return;
-
-                    }
-                    gbubbles.style('display', null);
-                    if (self.gPosBubble) {
-                        self.gPosBubble.selectAll('text').text(Math.round(imid + 1));
-                    }
-
-                    if (self.gAABubble) {
-                        var ic0 = Math.round(imid) - self.bubbleSequenceNb;
-                        var ic1 = Math.round(imid) + self.bubbleSequenceNb;
-                        var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
-
-                        var ts = self.gAABubble.selectAll('text.subseq').data(subseq.split(''));
-                        ts.exit().remove();
-                        ts.enter().append("text").attr('class', 'subseq');
-                        ts.text(function (d) {
-                            return d;
-                        }).attr('x', function (t, i) {
-                            var d = Math.abs(i - 4);
-                            return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
-                        }).style('font-size', function (t, i) {
-                            var d = Math.abs(i - 4);
-                            return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
-                        }).attr('y', -3);
-                    }
-
-                    //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
-                    gbubbles.attr('transform', 'translate(' + xscales(imid) + ',10)');
-                });
-
-            }
-            self.viewport = new SeqEntryViewport({
-                el: self.components.features,
-                svg: self.svg,
-                length: self.model.length(),
-                margins: self.margins,
-                changeCallback: function (vp) {
-                    self.p_positionText(vp, self.svg.selectAll('text.data'));
-                    featureDisplayer.position(vp, self.svg.selectAll('g.data'));
-
-                    if (!options.hideAxis)
-                        self.updateAxis();
-                    // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
-                    // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
-                },
-                xChangeCallback: xChangeCallbacks
-            });
-
-            self.drawContainer = self.svg.append('g');
-            //.attr('transform', 'translate(' + self.margins.left + ',' + self.margins.top + ')');
-            self.axisContainer = self.drawContainer.append('g').attr('class', 'axis')
-            //var yshiftScale = options.hideAxis ? 0 : 20;
-
-            self.layerContainer = self.drawContainer.append('g').attr('class', 'layers');
-
-            self.detailsPane = new DetailsPane({
-                el: self.components.details
-            })
-
-            self.update()
-            if (!options.hideAxis)
-                self.updateAxis();
-
-            self.listenTo(self.model, 'change', self.update)
-
-        },
-        updateAxis: function () {
-            var self = this;
-
-            var vpXScale = self.viewport.scales.x;
-            var scale = d3.scale.linear().domain([vpXScale.domain()[0] + 1, vpXScale.domain()[1] + 1]).range(vpXScale.range());
-            var xAxis = d3.svg.axis().scale(scale).tickSize(6, 5, 5).tickFormat(function (p) {
-                return (p == 0) ? '' : p
-            }).ticks(4);
-            self.axisContainer.call(xAxis);
-            self.gPosBubble = self.axisContainer.append('g').attr('class', 'axis-bubble').style('display', 'none');
-            self.gPosBubble.append('rect').attr('x', -30).attr('y', -4).attr('width', 60).attr('height', 17)
-            self.gPosBubble.append('text').attr('class', 'pos').attr('y', 6);
-
-        },
-        update: function () {
-            var self = this;
-            self.layerContainer.selectAll('g').remove()
-            self.svg.select('g.groupset-title').remove()
-
-            self.layers = [];
-            self.layerViews = [];
-            if (!self.options.hideSequence) {
-                self.p_setup_layer_sequence();
-            }
-
-            self.p_setup_layer_features();
-            self.p_setup_hidden_layers_container();
-            self.p_setup_groupset_titles()
-            self.render()
-
-            _.each(self.layers, function (layer) {
-                layer.on('change', function () {
-                    self.render();
-                })
-            });
-        },
+    'pviz/views/SeqEntryAnnotInteractiveView',['jquery', 'underscore', 'backbone', 'd3', 'pviz/services/FeatureManager', './FeatureDisplayer', './SeqEntryViewport', 'pviz/models/FeatureLayer', './FeatureLayerView', './HiddenLayersView', './DetailsPane', 'text!pviz_templates/seq-entry-annot-interactive.html'],
+    function ($, _, Backbone, d3, featureManager, featureDisplayer, SeqEntryViewport, FeatureLayer, FeatureLayerView, HiddenLayersView, DetailsPane, tmpl) {
         /**
-         * render: show the visible layers and pile them up.
+         * @class SeqEntryAnnotInteractiveView is the main interactive viewer for one SeqEntry
+         * @constructor
+         * @param {Map} options
+         * @param {Number} options.marginLeft inner margin (default=20)
+         * @param {Number} options.marginRight (default=20)
+         * @param {Number} options.marginTop (default=25)
+         * @param {Number} options.paddingCategory padding between categories (default=0)
+         * @param {Function} options.xChangeCallback callback called whenever the x refence is changed (zooming)
+         * @param {Boolean} options.noPositionBubble
+         * @param {Boolean} options.hideAxis hide the position axis (default=false)
+         * @param {Boolean} options.hideSequence hide the sequence (defaut=false)
+         * @param {Array} options.categoryOrder an array of String specifying the order in which should appear the categories (unspecified one will appear alpha numerically sorted)
+         * @param {String} options.layerMenu specify what type of menu is to be set on each category FeatureLayerView (default=sticky)
+         * @augments Backbone.View
          */
-        render: function () {
-            var self = this;
+        var SeqEntryAnnotInteractiveView = Backbone.View.extend(/** @lends module:SeqEntryAnnotInteractiveView~SeqEntryAnnotInteractiveView.prototype */{
 
-            var totTracks = 0;
-            var totHeight = 0
+            initialize: function (options) {
+                var self = this;
+                self.options = options;
 
-            var previousGroupSet = undefined;
-            _.chain(self.layerViews).filter(function (layerViews) {
-                return true;
-            }).each(function (view) {
-                if (view.model.get('visible')) {
-                    var currentGroupSet = view.model.get('groupSet');
-                    if (currentGroupSet != previousGroupSet) {
-                        var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
-                        totTracks += 2
-                        previousGroupSet = currentGroupSet;
-                        var yshiftScale = self.options.hideAxis ? -20 : 0;
-                        self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks) + totHeight + yshiftScale)
-                    }
-                    var yshift = self.viewport.scales.y(totTracks + 1)
-                    view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
-                    if (view.model.get('isPlot')) {
-                        totHeight += view.height();
-                        totTracks += 1 + self.paddingCategory;
-                    } else {
-                        totTracks += view.height() + 1 + self.paddingCategory;
-                    }
-                    view.g.style('display', null);
+                self.margins = {
+                    left: options.marginLeft || 20,
+                    right: options.marginRight || 20,
+                    top: options.marginTop || 25
+                };
+                self.layers = [];
+                self.layerViews = [];
+                self.hide = {};
 
-                } else {
-                    view.g.style('display', 'none');
+                self.paddingCategory = options.paddingCategory || 0;
+
+                self.bubbleSequenceNb = 4;
+                self.clipperId = 'clipper_' + Math.round(100000 * Math.random());
+
+                $(self.el).empty();
+                var el = $(tmpl);
+                $(self.el).append(el)
+
+                self.components = {
+                    features: el.find('#feature-viewer'),
+                    details: el.find('#details-viewer')
                 }
-            });
-            self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(totTracks + 1) + totHeight + 20) + ")");
 
-            var heightAdd = 0;
-            if (!self.options.hideAxis) {
-                heightAdd += 30;
-                self.axisY = self.viewport.scales.y(totTracks) + heightAdd + totHeight;
-                self.axisContainer.attr('transform', 'translate(0, ' + self.axisY + ')');
-            }
-            if (!self.options.hideSequene) {
-                heightAdd += 25;
-            }
+                self.svg = d3.select(self.components.features[0]).append("svg").attr("width", '100%').attr("height", '123').attr('class', 'pviz');
+                self.p_setup_defs();
 
-            self.svg.attr("height", self.viewport.scales.y(totTracks) + totHeight + heightAdd)
-        },
-        /*
-         * define gradients to be used.
-         * This should certainly lie elsewhere...
-         */
-        p_setup_defs: function () {
-            var self = this;
-            var defs = self.svg.append('defs');
+                var rectBg = self.svg.insert("rect").attr("class", 'background').attr('width', '100%').attr('height', '100%');
 
-            var gr = defs.append('svg:linearGradient').attr('id', 'grad_endFTBlock').attr('x1', 0).attr('y1', 0).attr('x2', '100%').attr('y2', 0);
-            gr.append('stop').attr('offset', '0%').style('stop-color', '#fff').style('stop-opacity', 0);
-            gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
+                var xChangeCallbacks = [];
+                if (options.xChangeCallback) {
+                    xChangeCallbacks.push(options.xChangeCallback);
+                }
 
-            var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
-            defs.append('clipPath').attr('id', self.clipperId).append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
-        },
-        /*
-         * build the Sequence layer
-         */
-        p_setup_layer_sequence: function () {
-            var self = this;
+                /*
+                 * add the callback to set the aabubble position and text (if needed)
+                 */
+                if (!options.noPositionBubble) {
+                    xChangeCallbacks.push(function (i0, i1) {
+                        var gbubbles = self.svg.selectAll('g.axis-bubble');
+                        if (self.viewport.scales.font > 10) {
+                            gbubbles.style('display', 'none');
+                            self.svg.select('line.sequence-bg').style('display', 'none');
+                            return
+                        }
+                        self.svg.select('line.sequence-bg').style('display', null);
 
-            var layer = new FeatureLayer({
-                name: 'sequence',
-                nbTracks: 2
-            })
-            self.layers.push(layer)
-            var view = new FeatureLayerView({
-                model: layer,
-                container: self.layerContainer,
-                viewport: self.viewport,
-                cssClass: 'sequence',
-                noMenu: true,
-                margins: self.margins,
-                clipper: '#' + self.clipperId
-            })
-            self.layerViews.push(view)
+                        var imid = (i0 + i1) / 2;
+                        var xscales = self.viewport.scales.x;
+                        if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
+                            gbubbles.style('display', 'none');
+                            return;
 
-            view.gFeatures.append('line').attr('x1', -100).attr('x2', 2000).attr('class', 'sequence-bg').attr('y1', 7).attr('y2', 7);
-            var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function (d) {
-                return d;
-            });
+                        }
+                        gbubbles.style('display', null);
+                        if (self.gPosBubble) {
+                            self.gPosBubble.selectAll('text').text(Math.round(imid + 1));
+                        }
 
-            self.p_positionText(self.viewport, sel);
-            self.gAABubble = view.g.append('g').attr('class', 'axis-bubble').style('display', 'none');
-            self.gAABubble.append('rect').attr('x', -30).attr('y', -12).attr('width', 61).attr('height', 16)
-            self.gAABubble.append('text').attr('class', 'subseq').attr('y', 2);
-        },
-        /*
-         * group features by category, and build a lyer for each of them
-         */
-        p_setup_layer_features: function () {
-            var self = this;
+                        if (self.gAABubble) {
+                            var ic0 = Math.round(imid) - self.bubbleSequenceNb;
+                            var ic1 = Math.round(imid) + self.bubbleSequenceNb;
+                            var subseq = self.model.get('sequence').substring(ic0, ic1 + 1);
 
-            var groupedFeatures = _.groupBy(self.model.get('features'), function (ft) {
-                var gcid = (ft.groupSet ? (ft.groupSet + '/') : ' /') + ft.category;
-                ft._groupCatId = gcid;
-                return gcid;
+                            var ts = self.gAABubble.selectAll('text.subseq').data(subseq.split(''));
+                            ts.exit().remove();
+                            ts.enter().append("text").attr('class', 'subseq');
+                            ts.text(function (d) {
+                                return d;
+                            }).attr('x', function (t, i) {
+                                var d = Math.abs(i - 4);
+                                return (i - self.bubbleSequenceNb) * 10 / (1 + d * 0.1)
+                            }).style('font-size', function (t, i) {
+                                var d = Math.abs(i - 4);
+                                return '' + (120 * (0.2 + 0.2 * (4 - d))) + '%';
+                            }).attr('y', -3);
+                        }
 
-            });
+                        //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
+                        gbubbles.attr('transform', 'translate(' + xscales(imid) + ',10)');
+                    });
 
-            //it is possible to pass the category Order, thus sort on it at first
-            var categoryOrder;
-            if (self.options.categoryOrder !== undefined) {
-                categoryOrder = {};
-                _.each(self.options.categoryOrder, function (n, i) {
-                    categoryOrder[n] = i + 1;
+                }
+                self.viewport = new SeqEntryViewport({
+                    el: self.components.features,
+                    svg: self.svg,
+                    length: self.model.length(),
+                    margins: self.margins,
+                    changeCallback: function (vp) {
+                        self.p_positionText(vp, self.svg.selectAll('text.data'));
+                        featureDisplayer.position(vp, self.svg.selectAll('g.data'));
+
+                        if (!options.hideAxis)
+                            self.updateAxis();
+                        // self.p_positionText(vp, self.svg.selectAll('text.data').transition()).duration(1);
+                        // featureDisplayer.position(vp, self.svg.selectAll('g.data').transition()).duration(1);
+                    },
+                    xChangeCallback: xChangeCallbacks
                 });
-            }
 
-            _.chain(groupedFeatures)
-                .sortBy(function (group) {
-                    if(categoryOrder!==undefined){
-                        return 1000000*(categoryOrder[group[0].category] || 100);
-                    }
-                    if (!group[0].groupSet) {
-                        return -99999;
-                    }
-                    return group[0].groupSet;
+                self.drawContainer = self.svg.append('g');
+                //.attr('transform', 'translate(' + self.margins.left + ',' + self.margins.top + ')');
+                self.axisContainer = self.drawContainer.append('g').attr('class', 'axis')
+                //var yshiftScale = options.hideAxis ? 0 : 20;
+
+                self.layerContainer = self.drawContainer.append('g').attr('class', 'layers');
+
+                self.detailsPane = new DetailsPane({
+                    el: self.components.details
                 })
-                .each(function (group, groupConcatName) {
-                    var nbTracks, isPlot;
-                    if (featureDisplayer.isCategoryPlot(group[0].category)) {
-                        nbTracks = 1;
-                        isPlot = true;
+
+                self.update()
+                if (!options.hideAxis)
+                    self.updateAxis();
+
+                self.listenTo(self.model, 'change', self.update)
+
+            },
+            /**
+             * @private
+             */
+            updateAxis: function () {
+                var self = this;
+
+                var vpXScale = self.viewport.scales.x;
+                var scale = d3.scale.linear().domain([vpXScale.domain()[0] + 1, vpXScale.domain()[1] + 1]).range(vpXScale.range());
+                var xAxis = d3.svg.axis().scale(scale).tickSize(6, 5, 5).tickFormat(function (p) {
+                    return (p == 0) ? '' : p
+                }).ticks(4);
+                self.axisContainer.call(xAxis);
+                self.gPosBubble = self.axisContainer.append('g').attr('class', 'axis-bubble').style('display', 'none');
+                self.gPosBubble.append('rect').attr('x', -30).attr('y', -4).attr('width', 60).attr('height', 17)
+                self.gPosBubble.append('text').attr('class', 'pos').attr('y', 6);
+
+            },
+            /**
+             * refresh the whole view
+             */
+            update: function () {
+                var self = this;
+                self.layerContainer.selectAll('g').remove()
+                self.svg.select('g.groupset-title').remove()
+
+                self.layers = [];
+                self.layerViews = [];
+                if (!self.options.hideSequence) {
+                    self.p_setup_layer_sequence();
+                }
+
+                self.p_setup_layer_features();
+                self.p_setup_hidden_layers_container();
+                self.p_setup_groupset_titles()
+                self.render()
+
+                _.each(self.layers, function (layer) {
+                    layer.on('change', function () {
+                        self.render();
+                    })
+                });
+            },
+            /**
+             * render: show the visible layers and pile them up.
+             */
+            render: function () {
+                var self = this;
+
+                var totTracks = 0;
+                var totHeight = 0
+
+                var previousGroupSet = undefined;
+                _.chain(self.layerViews).filter(function (layerViews) {
+                    return true;
+                }).each(function (view) {
+                    if (view.model.get('visible')) {
+                        var currentGroupSet = view.model.get('groupSet');
+                        if (currentGroupSet != previousGroupSet) {
+                            var cgsId = (currentGroupSet || '').replace(/\W/g, '_');
+                            totTracks += 2
+                            previousGroupSet = currentGroupSet;
+                            var yshiftScale = self.options.hideAxis ? -20 : 0;
+                            self.gGroupSets.select('text#groupset-title-' + cgsId).attr('y', self.viewport.scales.y(totTracks) + totHeight + yshiftScale)
+                        }
+                        var yshift = self.viewport.scales.y(totTracks + 1)
+                        view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
+                        if (view.model.get('isPlot')) {
+                            totHeight += view.height();
+                            totTracks += 1 + self.paddingCategory;
+                        } else {
+                            totTracks += view.height() + 1 + self.paddingCategory;
+                        }
+                        view.g.style('display', null);
+
                     } else {
-                        nbTracks = featureManager.assignTracks(group);
+                        view.g.style('display', 'none');
                     }
-                    var groupName = group[0].category;
-                    var groupType = group[0].categoryType || groupName;
-                    var groupSet = group[0].groupSet;
-                    var cssClass = groupName.replace(/\s+/g, '_')
+                });
+                self.hiddenLayers.g.attr("transform", "translate(0," + (self.viewport.scales.y(totTracks + 1) + totHeight + 20) + ")");
 
-                    var layer = new FeatureLayer({
-                        name: (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
-                        type: groupType,
-                        category: groupName,
-                        groupSet: groupSet,
-                        id: 'features-' + cssClass,
-                        nbTracks: nbTracks,
-                        isPlot: isPlot
-                    });
-                    self.layers.push(layer)
+                var heightAdd = 0;
+                if (!self.options.hideAxis) {
+                    heightAdd += 30;
+                    self.axisY = self.viewport.scales.y(totTracks) + heightAdd + totHeight;
+                    self.axisContainer.attr('transform', 'translate(0, ' + self.axisY + ')');
+                }
+                if (!self.options.hideSequene) {
+                    heightAdd += 25;
+                }
 
-                    var layerView = new FeatureLayerView({
-                        model: layer,
-                        container: self.layerContainer,
-                        viewport: self.viewport,
-                        cssClass: cssClass,
-                        layerMenu: self.options.layerMenu,
-                        margins: self.margins,
-                        clipper: '#' + self.clipperId
-                    });
-                    self.layerViews.push(layerView);
+                self.svg.attr("height", self.viewport.scales.y(totTracks) + totHeight + heightAdd)
+            },
+            /**
+             * define gradients to be used.
+             * This should certainly lie elsewhere...
+             * @private
+             */
+            p_setup_defs: function () {
+                var self = this;
+                var defs = self.svg.append('defs');
 
-                    var sel;
-                    if (isPlot) {
-                        sel = featureDisplayer.categoryPlotAppend(groupName, self.viewport, layerView.gFeatures, group).classed(cssClass, true);
-                    } else {
-                        sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                var gr = defs.append('svg:linearGradient').attr('id', 'grad_endFTBlock').attr('x1', 0).attr('y1', 0).attr('x2', '100%').attr('y2', 0);
+                gr.append('stop').attr('offset', '0%').style('stop-color', '#fff').style('stop-opacity', 0);
+                gr.append('stop').attr('offset', '100%').style('stop-color', '#fff').style('stop-opacity', 0.3);
 
-                    }
-                    //add tolltip based on description field
-                    sel.append('title').text(function (ft) {
-                        return ft.description;
-                    });
+                var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
+                defs.append('clipPath').attr('id', self.clipperId).append('path').attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
+            },
+            /**
+             * build the Sequence layer
+             * @private
+             */
+            p_setup_layer_sequence: function () {
+                var self = this;
+
+                var layer = new FeatureLayer({
+                    name: 'sequence',
+                    nbTracks: 2
+                })
+                self.layers.push(layer)
+                var view = new FeatureLayerView({
+                    model: layer,
+                    container: self.layerContainer,
+                    viewport: self.viewport,
+                    cssClass: 'sequence',
+                    noMenu: true,
+                    margins: self.margins,
+                    clipper: '#' + self.clipperId
+                })
+                self.layerViews.push(view)
+
+                view.gFeatures.append('line').attr('x1', -100).attr('x2', 2000).attr('class', 'sequence-bg').attr('y1', 7).attr('y2', 7);
+                var sel = view.gFeatures.selectAll("text").data(self.model.get('sequence').split('')).enter().append("text").attr('class', 'sequence data').text(function (d) {
+                    return d;
                 });
 
-        },
-        p_setup_hidden_layers_container: function () {
-            var self = this;
+                self.p_positionText(self.viewport, sel);
+                self.gAABubble = view.g.append('g').attr('class', 'axis-bubble').style('display', 'none');
+                self.gAABubble.append('rect').attr('x', -30).attr('y', -12).attr('width', 61).attr('height', 16)
+                self.gAABubble.append('text').attr('class', 'subseq').attr('y', 2);
+            },
+            /**
+             * group features by category, and build a layer for each of them
+             * @private
+             */
+            p_setup_layer_features: function () {
+                var self = this;
 
-            self.hiddenLayers = new HiddenLayersView({
+                var groupedFeatures = _.groupBy(self.model.get('features'), function (ft) {
+                    var gcid = (ft.groupSet ? (ft.groupSet + '/') : ' /') + ft.category;
+                    ft._groupCatId = gcid;
+                    return gcid;
 
-                container: self.svg,
-                layers: self.layers,
-                nbTracks: 1
-            });
-            // /self.layers.push(layer)
+                });
 
-        },
-        p_setup_groupset_titles: function () {
-            var self = this;
-            var groupSetNames = _.chain(self.model.get('features')).map(function (ft) {
-                return ft.groupSet
-            }).unique().filter(function (t) {
-                return t
-            }).value();
-
-            self.gGroupSets = self.svg.append('g').attr('class', 'groupset-title');
-            self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function (x) {
-                return x;
-            }).attr('x', 7).attr('y', 10).attr('id', function (x) {
-                return 'groupset-title-' + (x || '').replace(/\W/g, '_');
-            })
-
-            return self;
-        },
-        /*
-         * position sequence text.
-         * @param {Object} viewport
-         * @param {Object} sel
-         */
-        p_positionText: function (viewport, sel) {
-            var self = this;
-            sel.attr('x', function (d, i) {
-                return viewport.scales.x(i);
-            }).attr('y', viewport.scales.y(1) - 7).style('font-size', '' + viewport.scales.font + 'px').style('letter-spacing', '' + (viewport.scales.x(2) - viewport.scales.x(1) - viewport.scales.font) + 'px')
-            return sel
-        }
-    });
-
-    return SeqEntryAnnotInteractiveView;
-});
-/**
- * just a dummy fasta display
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-
-define('pviz/views/SeqEntryFastaView',['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
-    var SeqEntryFastaView = Backbone.View.extend({
-        initialize: function (options) {
-            var self = this;
-            self.options = options;
-
-        },
-        render: function () {
-            var self = this;
-            $(self.el).empty();
-            var seq = self.model.get('sequence');
-            var seq60 = '';
-            for (i = 0; i < seq.length; i += 10) {
-                seq60 += seq.substring(i, i + 10)
-                if ((i + 10) % 60 == 0) {
-                    seq60 += "\n";
-                } else {
-                    seq60 += " ";
+                //it is possible to pass the category Order, thus sort on it at first
+                var categoryOrder;
+                if (self.options.categoryOrder !== undefined) {
+                    categoryOrder = {};
+                    _.each(self.options.categoryOrder, function (n, i) {
+                        categoryOrder[n] = i + 1;
+                    });
                 }
 
+                _.chain(groupedFeatures)
+                    .sortBy(function (group) {
+                        if (categoryOrder !== undefined) {
+                            return 1000000 * (categoryOrder[group[0].category] || 100);
+                        }
+                        if (!group[0].groupSet) {
+                            return -99999;
+                        }
+                        return group[0].groupSet;
+                    })
+                    .each(function (group, groupConcatName) {
+                        var nbTracks, isPlot;
+                        if (featureDisplayer.isCategoryPlot(group[0].category)) {
+                            nbTracks = 1;
+                            isPlot = true;
+                        } else {
+                            nbTracks = featureManager.assignTracks(group);
+                        }
+                        var groupName = group[0].category;
+                        var groupType = group[0].categoryType || groupName;
+                        var groupSet = group[0].groupSet;
+                        var cssClass = groupName.replace(/\s+/g, '_')
+
+                        var layer = new FeatureLayer({
+                            name: (group[0].categoryName === undefined) ? groupName : group[0].categoryName,
+                            type: groupType,
+                            category: groupName,
+                            groupSet: groupSet,
+                            id: 'features-' + cssClass,
+                            nbTracks: nbTracks,
+                            isPlot: isPlot
+                        });
+                        self.layers.push(layer)
+
+                        var layerView = new FeatureLayerView({
+                            model: layer,
+                            container: self.layerContainer,
+                            viewport: self.viewport,
+                            cssClass: cssClass,
+                            layerMenu: self.options.layerMenu,
+                            margins: self.margins,
+                            clipper: '#' + self.clipperId
+                        });
+                        self.layerViews.push(layerView);
+
+                        var sel;
+                        if (isPlot) {
+                            sel = featureDisplayer.categoryPlotAppend(groupName, self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+                        } else {
+                            sel = featureDisplayer.append(self.viewport, layerView.gFeatures, group).classed(cssClass, true);
+
+                        }
+                        //add tolltip based on description field
+                        sel.append('title').text(function (ft) {
+                            return ft.description;
+                        });
+                    });
+
+            },
+            /**
+             * @private
+             */
+            p_setup_hidden_layers_container: function () {
+                var self = this;
+
+                self.hiddenLayers = new HiddenLayersView({
+
+                    container: self.svg,
+                    layers: self.layers,
+                    nbTracks: 1
+                });
+                // /self.layers.push(layer)
+
+            },
+            /**
+             * @private
+             * @return {SeqEntryAnnotInteractiveView}
+             */
+            p_setup_groupset_titles: function () {
+                var self = this;
+                var groupSetNames = _.chain(self.model.get('features')).map(function (ft) {
+                    return ft.groupSet
+                }).unique().filter(function (t) {
+                    return t
+                }).value();
+
+                self.gGroupSets = self.svg.append('g').attr('class', 'groupset-title');
+                self.gGroupSets.selectAll('text').data(groupSetNames).enter().append('text').text(function (x) {
+                    return x;
+                }).attr('x', 7).attr('y', 10).attr('id', function (x) {
+                    return 'groupset-title-' + (x || '').replace(/\W/g, '_');
+                })
+
+                return self;
+            },
+            /**
+             * position sequence text.
+             * @param {Object} viewport
+             * @param {Object} sel
+             * @private
+             */
+            p_positionText: function (viewport, sel) {
+                var self = this;
+                sel.attr('x', function (d, i) {
+                    return viewport.scales.x(i);
+                }).attr('y', viewport.scales.y(1) - 7).style('font-size', '' + viewport.scales.font + 'px').style('letter-spacing', '' + (viewport.scales.x(2) - viewport.scales.x(1) - viewport.scales.font) + 'px')
+                return sel
             }
+        });
 
-            $(self.el).append("<pre>>" + self.model.get('id') + "\n" + seq60 + "</pre>")
-        }
+        return SeqEntryAnnotInteractiveView;
     });
-    return SeqEntryFastaView;
-});
-/**
- * OneLiner project all feature on  a non-zoomable, monochromatic icon
- *
- * it is possible to add a categories:[...] option in the constructor to retain only certain category and bet them fisplay in one sub line of the icon
- *
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define('pviz/views/OneLiner',['jquery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function ($, _, bb, d3, tmpl) {
-    return bb.View.extend({
-        initialize: function (options) {
-            var self = this;
-            self.options = options;
+define(/**
+     @exports SeqEntryFastaView
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    'pviz/views/SeqEntryFastaView',['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
+        /**
+         * @class SeqEntryFastaView is a simple text fasta viewer (60 character per line and a space every 10)
+         * @constructor
+         * @augments Backbone.View
+         */
+        var SeqEntryFastaView = Backbone.View.extend(/** @lends module:SeqEntryFastaView~SeqEntryFastaView.prototype */{
+            initialize: function (options) {
+                var self = this;
+                self.options = options;
 
-            self.height = 16;
+            },
+            render: function () {
+                var self = this;
+                $(self.el).empty();
+                var seq = self.model.get('sequence');
+                var seq60 = '';
+                for (i = 0; i < seq.length; i += 10) {
+                    seq60 += seq.substring(i, i + 10)
+                    if ((i + 10) % 60 == 0) {
+                        seq60 += "\n";
+                    } else {
+                        seq60 += " ";
+                    }
 
-            self.svg = d3.select(self.el).append("svg").attr("width", '100%').attr('height', self.height).attr('class', 'pviz one-liner');
-            self.svg.append('line').attr('x1', 0).attr('x2', '100%').attr('y1', self.height / 2).attr('y2', self.height / 2);
-
-            self.update();
-            self.listenTo(self.model, 'change', function () {
-                self.update();
-                self.render();
-            });
-
-        },
-        categories: function () {
-            return this.options.categories;
-        },
-        xscale: function () {
-            var self = this;
-            return d3.scale.linear().domain([0, self.model.length()]).range([0, $(self.el).width()])
-        },
-        update: function () {
-            var self = this;
-            self.svg.selectAll("rect").remove();
-
-            var features = self.model.get('features');
-
-            var cat2line = {}
-            _.each(self.categories(), function (c, i) {
-                cat2line[c] = i
-            })
-            self.cat2line = cat2line;
-            var features = _.filter(features, function (ft) {
-                return (self.categories() === undefined) || (cat2line[ft.category] !== undefined)
-            })
-
-            self.rectangles = self.svg.selectAll('rect').data(features).enter();
-
-            self.rectangles.append('rect').attr('height', (self.categories() ? (self.height / self.categories().length) : self.height))
-        },
-
-        render: function () {
-            var self = this;
-            var x = self.xscale()
-            self.svg.selectAll('rect').attr('x',function (ft) {
-                return x(ft.start)
-            }).attr('width',function (ft) {
-                return x(ft.end - ft.start + 1)
-            }).attr('y',function (ft) {
-                if (self.categories()) {
-                    return self.cat2line[ft.category] * self.height / self.categories().length
-                } else {
-                    return 0
                 }
-            }).attr('class', function (ft) {
-                if (self.categories() === undefined)
-                    return '';
-                return 'subline-' + self.cat2line[ft.category]
-            });
-        }
-    })
 
-});
+                $(self.el).append("<pre>>" + self.model.get('id') + "\n" + seq60 + "</pre>")
+            }
+        });
+        return SeqEntryFastaView;
+    });
+define(
+    /**
+     @exports OneLiner
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+
+    'pviz/views/OneLiner',['jquery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function ($, _, bb, d3, tmpl) {
+        /**
+         * @class OneLiner view are PositionedFeatures displayed on a non interactive super simplified icon-like view
+         * @constructor
+         * @param {Map} options
+         * @param {Array} options.categories [optional] a limited list of categories to be plot. Each of them will be on a different line on the view
+         * @augments Backbone.View
+         */
+        var OneLiner = bb.View.extend(/** @lends module:OneLiner~OneLiner.prototype */{
+            initialize: function (options) {
+                var self = this;
+                self.options = options;
+
+                self.height = 16;
+
+                self.svg = d3.select(self.el).append("svg").attr("width", '100%').attr('height', self.height).attr('class', 'pviz one-liner');
+                self.svg.append('line').attr('x1', 0).attr('x2', '100%').attr('y1', self.height / 2).attr('y2', self.height / 2);
+
+                self.update();
+                self.listenTo(self.model, 'change', function () {
+                    self.update();
+                    self.render();
+                });
+
+            },
+            /**
+             * @private
+             * @return {categories}
+             */
+            categories: function () {
+                return this.options.categories;
+            },
+            /**
+             * @private
+             * @return a d3.scale
+             */
+            xscale: function () {
+                var self = this;
+                return d3.scale.linear().domain([0, self.model.length()]).range([0, $(self.el).width()])
+            },
+            /**
+             * @private
+             */
+            update: function () {
+                var self = this;
+                self.svg.selectAll("rect").remove();
+
+                var features = self.model.get('features');
+
+                var cat2line = {}
+                _.each(self.categories(), function (c, i) {
+                    cat2line[c] = i
+                })
+                self.cat2line = cat2line;
+                var features = _.filter(features, function (ft) {
+                    return (self.categories() === undefined) || (cat2line[ft.category] !== undefined)
+                })
+
+                self.rectangles = self.svg.selectAll('rect').data(features).enter();
+
+                self.rectangles.append('rect').attr('height', (self.categories() ? (self.height / self.categories().length) : self.height))
+            },
+            /**
+             * build the actual widget in its specified container (el)
+             */
+            render: function () {
+                var self = this;
+                var x = self.xscale()
+                self.svg.selectAll('rect').attr('x', function (ft) {
+                    return x(ft.start)
+                }).attr('width', function (ft) {
+                    return x(ft.end - ft.start + 1)
+                }).attr('y', function (ft) {
+                    if (self.categories()) {
+                        return self.cat2line[ft.category] * self.height / self.categories().length
+                    } else {
+                        return 0
+                    }
+                }).attr('class', function (ft) {
+                    if (self.categories() === undefined)
+                        return '';
+                    return 'subline-' + self.cat2line[ft.category]
+                });
+            }
+        });
+        return OneLiner;
+
+    });
 
 /*
  * Copyright (c) 2013, Genentech Inc.
