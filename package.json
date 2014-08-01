@@ -1,6 +1,6 @@
 {
   "name": "pviz",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.2",
