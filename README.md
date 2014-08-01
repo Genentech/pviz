@@ -112,6 +112,11 @@ Via jasmine, either in the browser ([test/index.html](test/index.html)) or comma
 ####Continuous integration
 test, distribution etc. can be launched in a CI environment via grunt tasks <code>grunt test, build...</code>
 
+####Build code documentation
+JsDoc3 annotations were used to document the library. To generate the doc (in examples/doc directory):
+
+    grunt jsdoc
+
 ###Authors
 This library was initiated by 
 Alexandre Masselot (masselot.alexandre@gene.com) & Kiran Mukhyala (mukhyala.kiran@gene.com) within Genentech Bioinformatics & Computational Biology Department.

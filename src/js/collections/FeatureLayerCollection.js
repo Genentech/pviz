@@ -1,17 +1,23 @@
-/*
- * Copyright (c) 2013, Genentech Inc.
- * Authors: Alexandre Masselot, Kiran Mukhyala, Bioinformatics & Computational Biology
- */
-define(['backbone', '../models/PositionedFeature'], function(bb, PositionedFeature) {
-  return bb.Collection.extend({
-    model : PositionedFeature,
-    group : function() {
-      var self = this;
-      return _.groupBy(self.models, function(ft) {
-        return (ft.groupSet ? (ft.groupSet + '/:') : '') + ft.category;
+define(
+    /**
+     @exports FeatureLayerCollection
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    ['backbone', '../models/FeatureLayer'], function (bb, FeatureLayer) {
+        /**
+         * a collection of FeatureLayer, follows backbone collection mechanisms
+         * @constructor
+         * @augments Backbone.Collection
+         */
+        var FeatureLayerCollection = bb.Collection.extend(
+            /**
+             * @lends module:FeatureLayerCollection~FeatureLayerCollection.prototype
+             */
+            {
+                model: FeatureLayer
 
-      })
-    }
-  })
-
-})
+            });
+        return FeatureLayerCollection;
+    });

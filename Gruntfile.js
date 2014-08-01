@@ -135,8 +135,17 @@ module.exports = function(grunt) {
                     ui: 'bdd',
                     require: [
                         'should',
-                    ],
-                },
+                    ]
+                }
+            }
+        },
+        jsdoc : {
+            dist : {
+                src: ['src/js/**/*.js'],
+                options: {
+                    destination: 'examples/doc',
+                    private:false
+                }
             }
         }
 
@@ -152,12 +161,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     // Default task(s).
     grunt.registerTask('build_x', ['requirejs', 'concat:concat_copyright']);
     grunt.registerTask('default', ['build']);
     grunt.registerTask('test', ['mocha-server']);
 
-    grunt.registerTask('build', ['build_x', 'copy:dist', 'copy:dist-examples']);
+    grunt.registerTask('build', ['build_x', 'copy:dist', 'copy:dist-examples', 'jsdoc']);
 
 };
