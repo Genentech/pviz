@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/FeatureManager.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: services/FeatureManager.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>define(
+    /**
+     @exports FeatureManager
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+    ['underscore'], function (_) {
+        /**
+         * Distribute features under one category across different track so they do not overlap
+         * requiring this module will indeed return a singleton
+         @constructor
+         */
+        var FeatureManager = function () {
+        }
+        /**
+         * Sort the feature by starting positions
+         * @private
+         * @param {Array[]}
+         */
+        FeatureManager.prototype.sortFeatures = function (features, options) {
+            var self = this;
+
+            if (options === undefined) {
+                options = {}
+            }
+            return _.sortBy(features, function (a) {
+                return a.start;
+            });
+        }
+
+        /**
+         * Do two features overlap?
+         * @private
+         * @param {Object} fta
+         * @param {Object} ftb
+         */
+        FeatureManager.prototype.featuresIntersect = function (fta, ftb) {
+            return !((fta.end &lt; ftb.start) || (ftb.end &lt; fta.start))
+            // /(fta.start >= ftb.start && fta.start &lt;= ftb.end) || (fta.end >= ftb.start && fta.end &lt;= ftb.end)
+        };
+
+        /**
+         * get the overlapping features for the fnum^th one
+         * Only works on sorted features
+         * @param {int} fNum
+         * @param {Array} features array of PositionedFeature
+         * @private
+         */
+        FeatureManager.prototype._getOverlaps = function (fNum, features) {
+            var self = this;
+            var feat = features[fNum];
+
+            return _.filter(features.slice(0, fNum), function (ft) {
+                //we check that we can have several time the same feature???
+                return (!_.isEqual(feat, ft)) && (self.featuresIntersect(feat, ft));
+            });
+
+        }
+        /**
+         *  Distribute the features among tracks by adding a displayTrack attribute to each feature
+         *
+         * @param {Array} features and array of features. We add a displayTrack attribute to each element.
+         * @return the number of tracks
+         */
+        FeatureManager.prototype.assignTracks = function (features, options) {
+            var sortedFeats = this.sortFeatures(features, options);
+
+            var nbTracks = 0;
+            var lastPosPerTrack = []
+            _.chain(sortedFeats).each(function (ft) {
+                var ftStart = ft.start;
+                for (itrack = 0; itrack &lt; lastPosPerTrack.length && lastPosPerTrack[itrack] >= ftStart; itrack++) {
+                }
+                lastPosPerTrack[itrack] = ft.end
+                ft.displayTrack = itrack
+            })
+            return lastPosPerTrack.length
+        }
+        /*
+         * singleton contructor
+         */
+        return new FeatureManager()
+    });
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureManager.html">FeatureManager</a></li><li><a href="module-GGPLot2Adapter.html">GGPLot2Adapter</a></li><li><a href="module-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntry.html">SeqEntry</a></li><li><a href="module-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Classes</h3><ul><li><a href="module-DASReader-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayerCollection-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureLayer-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureManager-FeatureManager.html">FeatureManager</a></li><li><a href="module-HiddenLayersView-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntryAnnotInteractiveView-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-SeqEntry-SeqEntry.html">SeqEntry</a></li><li><a href="module-TypeDisplayer-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Global</h3><ul><li><a href="global.html#discrete_palettes">discrete_palettes</a></li><li><a href="global.html#shapePaths">shapePaths</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Aug 01 2014 13:35:12 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

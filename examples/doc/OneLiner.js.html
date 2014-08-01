@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: views/OneLiner.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: views/OneLiner.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>define(
+    /**
+     @exports OneLiner
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+
+    ['jquery', 'underscore', 'backbone', 'd3', 'text!pviz_templates/seq-entry-annot-interactive.html'], function ($, _, bb, d3, tmpl) {
+        /**
+         * @class OneLiner view are PositionedFeatures displayed on a non interactive super simplified icon-like view
+         * @constructor
+         * @param {Map} options
+         * @param {Array} options.categories [optional] a limited list of categories to be plot. Each of them will be on a different line on the view
+         * @augments Backbone.View
+         */
+        var OneLiner = bb.View.extend(/** @lends module:OneLiner~OneLiner.prototype */{
+            initialize: function (options) {
+                var self = this;
+                self.options = options;
+
+                self.height = 16;
+
+                self.svg = d3.select(self.el).append("svg").attr("width", '100%').attr('height', self.height).attr('class', 'pviz one-liner');
+                self.svg.append('line').attr('x1', 0).attr('x2', '100%').attr('y1', self.height / 2).attr('y2', self.height / 2);
+
+                self.update();
+                self.listenTo(self.model, 'change', function () {
+                    self.update();
+                    self.render();
+                });
+
+            },
+            /**
+             * @private
+             * @return {categories}
+             */
+            categories: function () {
+                return this.options.categories;
+            },
+            /**
+             * @private
+             * @return a d3.scale
+             */
+            xscale: function () {
+                var self = this;
+                return d3.scale.linear().domain([0, self.model.length()]).range([0, $(self.el).width()])
+            },
+            /**
+             * @private
+             */
+            update: function () {
+                var self = this;
+                self.svg.selectAll("rect").remove();
+
+                var features = self.model.get('features');
+
+                var cat2line = {}
+                _.each(self.categories(), function (c, i) {
+                    cat2line[c] = i
+                })
+                self.cat2line = cat2line;
+                var features = _.filter(features, function (ft) {
+                    return (self.categories() === undefined) || (cat2line[ft.category] !== undefined)
+                })
+
+                self.rectangles = self.svg.selectAll('rect').data(features).enter();
+
+                self.rectangles.append('rect').attr('height', (self.categories() ? (self.height / self.categories().length) : self.height))
+            },
+            /**
+             * build the actual widget in its specified container (el)
+             */
+            render: function () {
+                var self = this;
+                var x = self.xscale()
+                self.svg.selectAll('rect').attr('x', function (ft) {
+                    return x(ft.start)
+                }).attr('width', function (ft) {
+                    return x(ft.end - ft.start + 1)
+                }).attr('y', function (ft) {
+                    if (self.categories()) {
+                        return self.cat2line[ft.category] * self.height / self.categories().length
+                    } else {
+                        return 0
+                    }
+                }).attr('class', function (ft) {
+                    if (self.categories() === undefined)
+                        return '';
+                    return 'subline-' + self.cat2line[ft.category]
+                });
+            }
+        });
+        return OneLiner;
+
+    });
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureManager.html">FeatureManager</a></li><li><a href="module-GGPLot2Adapter.html">GGPLot2Adapter</a></li><li><a href="module-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntry.html">SeqEntry</a></li><li><a href="module-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Classes</h3><ul><li><a href="module-DASReader-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayerCollection-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureLayer-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureManager-FeatureManager.html">FeatureManager</a></li><li><a href="module-HiddenLayersView-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntryAnnotInteractiveView-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-SeqEntry-SeqEntry.html">SeqEntry</a></li><li><a href="module-TypeDisplayer-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Global</h3><ul><li><a href="global.html#discrete_palettes">discrete_palettes</a></li><li><a href="global.html#shapePaths">shapePaths</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Aug 01 2014 13:35:12 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

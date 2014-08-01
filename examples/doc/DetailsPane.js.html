@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: views/DetailsPane.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: views/DetailsPane.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>define(
+    /**
+     @exports DetailsPane
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+
+    ['underscore', 'jquery', 'backbone', 'bootstrap', 'text!pviz_templates/details-pane.html'], function (_, $, bb, undefined, tmpl) {
+        /**
+         * @class DetailsPane is a multi tab container to eventually display details from the highlighted features. It is synchronized with the sequence viewer
+         * @constructor
+         * @augments Backbone.View
+         */
+        var DetailsPane = bb.View.extend(
+            /**
+             * @lends module:DetailsPane~DetailsPane.prototype
+             */{
+                initialize: function (options) {
+                    var self = this;
+                    self.options = options;
+
+                    var el = $(self.el);
+                    el.empty();
+                    el.append($(tmpl));
+
+                    self.containers = {
+                        menu: el.find('ul'),
+                        tabs: el.find('div.tab-content'),
+                        divRaiseActive: el.find('div.nav')
+                    }
+
+                    self.templates = {
+                        menuItem: '&lt;li>&lt;a href="#&lt;%=id%>" data-toggle="tab">&lt;%=name%>&lt;/a>&lt;/li>',
+                        contents: '&lt;div class="tab-pane" id="&lt;%=id%>">&lt;/div>'
+                    }
+
+                    self.tabs = {};
+                },
+                render: function () {
+                    var self = this;
+
+                    return self;
+                },
+                /**
+                 * return a jquery element for the tab pointed bby the given name
+                 * if no tab exist, a tab + menu are created
+                 * the obect return is a map with 'menuItem' and 'contents' elements
+                 * @param {String} name
+                 */
+                getTab: function (name) {
+                    var self = this;
+                    var tid = self.name2id(name);
+                    if (self.tabs[tid] === undefined) {
+                        var emi = $(_.template(self.templates.menuItem, {
+                            name: name,
+                            id: tid
+                        }))
+                        emi.find('a').click(function (e) {
+                            e.preventDefault();
+                            $(this).tab('show');
+                        })
+                        var ec = $(_.template(self.templates.contents, {
+                            name: name,
+                            id: tid
+                        }))
+
+                        self.containers.menu.append(emi);
+                        self.containers.tabs.append(ec);
+
+                        self.tabs[tid] = {
+                            menuItem: emi,
+                            contents: ec
+                        };
+                        if (_.size(self.tabs) >= 2) {
+                            self.containers.divRaiseActive.show();
+                        }
+                    }
+                    return self.tabs[tid];
+                },
+                /**
+                 * raise a tab (make it visible)
+                 * @param {element} tab
+                 */
+                raiseTab: function (tab) {
+                    var self = this;
+                    tab.menuItem.find('a').tab('show')
+                },
+                /**
+                 * raise the tab if the "raise-active" checkbox is set
+                 */
+                focusOnTab: function (tab) {
+                    var self = this;
+                    if (tab.menuItem.hasClass('active')) {
+                        return
+                    }
+                    if ($(self.el).find('input#raise-active').is(':checked')) {
+                        self.raiseTab(tab)
+                        return
+                    }
+
+                    tab.menuItem.animate({
+                        opacity: 0.1
+                    }, 100, function () {
+                        tab.menuItem.animate({
+                            opacity: 1.0
+                        }, 100)
+                    })
+                },
+
+                /**
+                 * trim, lowercase and convert non character symbols to dash
+                 * @private
+                 * @param {String} name
+                 */
+                name2id: function (name) {
+                    return name.trim().toLowerCase().replace(/\W+/g, '-');
+                }
+            });
+        return DetailsPane;
+    });
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureManager.html">FeatureManager</a></li><li><a href="module-GGPLot2Adapter.html">GGPLot2Adapter</a></li><li><a href="module-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntry.html">SeqEntry</a></li><li><a href="module-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Classes</h3><ul><li><a href="module-DASReader-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayerCollection-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureLayer-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureManager-FeatureManager.html">FeatureManager</a></li><li><a href="module-HiddenLayersView-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntryAnnotInteractiveView-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-SeqEntry-SeqEntry.html">SeqEntry</a></li><li><a href="module-TypeDisplayer-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Global</h3><ul><li><a href="global.html#discrete_palettes">discrete_palettes</a></li><li><a href="global.html#shapePaths">shapePaths</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Aug 01 2014 13:35:12 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: views/TypedDisplayer.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: views/TypedDisplayer.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>
+define(/**
+     @exports TypeDisplayer
+     @author Alexandre Masselot
+     @author Kiran Mukhyala
+     @copyright 2013,  Bioinformatics & Computational Biology Department, Genentech Inc.
+     */
+
+    [], function () {
+        /**
+         * Features are by default displayed by rectangles with text.
+         * However, it is possible to defined more complex information depending on the type.
+         * We define here a fwe default displayer for some types.
+         *
+         * It is possible of course to extend these displyers in a custom file
+         *
+         * @class SeqEntryViewport map the sequence scale domain to the dom element
+         * @constructor
+         */
+        var TypeDisplayer = {
+            init: function (featureDisplayer) {
+                featureDisplayer.setCustomHandler('helix', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        sel.append("path").attr('d', 'M0,0').attr('class', type)
+                        return svgGroup.selectAll("g.feature.data." + type);
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                        });
+                        var ftWidth = function (ft) {
+                            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+                        }
+                        d3selection.selectAll("path.helix").attr('d', function (ft) {
+                            //width in pixels
+                            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
+                            //number of waves, should not be larger than 20 px
+                            var n = Math.max(1, Math.round(w / 20));
+                            // half period
+                            var hwStep = w / n / 2;
+                            var d = _.times(n, function (i) {
+                                return "q" + (hwStep / 2) + ",-10," + hwStep + ",0," + (hwStep / 2) + ",10," + hwStep + ",0"
+                            }).join(" ")
+                            return "M0,0 " + d
+                        })
+                        return d3selection
+                    }
+                })
+
+                featureDisplayer.setCustomHandler('beta_strand', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        sel.append("line").attr('class', type);
+                        sel.append("path").attr('class', type).attr('d', "M0,0l-10,-5l0,10l10,-5");
+
+                        return svgGroup.selectAll("g.feature.data." + type);
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                        });
+                        var ftWidth = function (ft) {
+                            return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+                        }
+                        d3selection.selectAll("line.beta_strand").attr('x1', 0).attr('y1', 0).attr('x2', function (ft) {
+                            return ftWidth(ft) - 4
+                        }).attr('y2', 0)
+                        d3selection.selectAll("path.beta_strand").attr('transform', function (ft) {
+                            return 'translate(' + ftWidth(ft) + ',0)'
+                        });
+
+                        return d3selection
+                    }
+                })
+
+                featureDisplayer.setCustomHandler('turn', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        sel.append("path").attr('class', type).attr('d', "M0,0");
+                        return svgGroup.selectAll("g.feature.data." + type);
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + viewport.scales.y(0.5 + ft.displayTrack) + ')';
+                        });
+
+                        d3selection.selectAll("path.turn").attr('d', function (ft) {
+                            var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1);
+                            return 'M0,3 l' + (w - 10) + ',0 q10,-3,0,-6 l-' + (w - 10) + ',0'
+                        })
+
+                        return d3selection
+                    }
+                });
+                featureDisplayer.setCustomHandler('circle', {
+                    appender: function (viewport, svgGroup, features, type) {
+                        var sel = svgGroup.selectAll("g.feature.data." + type).data(features).enter().append("g").attr("class", "feature data " + type);
+                        var g = sel.append("g");
+                        g.append('circle');
+                        g.append('text').text(function (ft) {
+                            return ft.text;
+                        })
+                        return sel;
+                    },
+                    positioner: function (viewport, d3selection) {
+                        d3selection.attr('transform', function (ft) {
+                            return 'translate(' + viewport.scales.x(ft.start) + ',' + viewport.scales.y((0.5 + ft.displayTrack) * featureDisplayer.heightFactor(ft.category)) + ')';
+                        });
+                        d3selection.selectAll("circle").attr('r', function (ft) {
+                            return ft.radius
+                        });
+
+                        return d3selection
+                    }
+                });
+            }
+        };
+        return TypeDisplayer;
+
+    });
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureManager.html">FeatureManager</a></li><li><a href="module-GGPLot2Adapter.html">GGPLot2Adapter</a></li><li><a href="module-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntry.html">SeqEntry</a></li><li><a href="module-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Classes</h3><ul><li><a href="module-DASReader-DASReader.html">DASReader</a></li><li><a href="module-DetailsPane-DetailsPane.html">DetailsPane</a></li><li><a href="module-FastaReader-FastaReader.html">FastaReader</a></li><li><a href="module-FeatureDisplayer-FeatureDisplayer.html">FeatureDisplayer</a></li><li><a href="module-FeatureLayerCollection-FeatureLayerCollection.html">FeatureLayerCollection</a></li><li><a href="module-FeatureLayerView-FeatureLayerView.html">FeatureLayerView</a></li><li><a href="module-FeatureLayer-FeatureLayer.html">FeatureLayer</a></li><li><a href="module-FeatureManager-FeatureManager.html">FeatureManager</a></li><li><a href="module-HiddenLayersView-HiddenLayersView.html">HiddenLayersView</a></li><li><a href="module-OneLiner-OneLiner.html">OneLiner</a></li><li><a href="module-PositionedFeature-PositionedFeature.html">PositionedFeature</a></li><li><a href="module-SeqEntryAnnotInteractiveView-SeqEntryAnnotInteractiveView.html">SeqEntryAnnotInteractiveView</a></li><li><a href="module-SeqEntryFastaView-SeqEntryFastaView.html">SeqEntryFastaView</a></li><li><a href="module-SeqEntryTableView-SeqEntryTableView.html">SeqEntryTableView</a></li><li><a href="module-SeqEntryViewport-SeqEntryViewport.html">SeqEntryViewport</a></li><li><a href="module-SeqEntry-SeqEntry.html">SeqEntry</a></li><li><a href="module-TypeDisplayer-TypeDisplayer.html">TypeDisplayer</a></li></ul><h3>Global</h3><ul><li><a href="global.html#discrete_palettes">discrete_palettes</a></li><li><a href="global.html#shapePaths">shapePaths</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Fri Aug 01 2014 13:35:12 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
