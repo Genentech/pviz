@@ -75,6 +75,8 @@ But do not worry, including the [packaged distribution](dist/pviz-bundle-min.js)
 ##Examples
 ###The working examples and demo applications can be found [here](http://research-pub.gene.com/pviz/examples/).
 
+####Full documentation can be found [here](http://research-pub.gene.com/pviz/examples/doc/index.html).
+
 Easier than a full documentation, we bring some demonstration use cases:
 <table style="border-spacing: 0px">
 	<tr>
