@@ -2,8 +2,8 @@
   "name": "pviz",
   "version": "0.1.5",
   "main": [
-    "build/pviz-amd.js",
-    "build/pviz-core.css"
+    "dist/pviz-bundle.min.js",
+    "dist/pviz-core.css"
   ],
   "homepage": "https://github.com/Genentech/pviz/",
   "authors": [
