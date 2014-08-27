@@ -157,17 +157,20 @@ define(
             //register call back event handlers
             var allSel = svgGroup.selectAll(".feature.data")
             allSel.on('mouseover', function (ft) {
-                self.callMouseoverCallBacks(ft, this)
-            })
+                self.callMouseoverCallBacks(ft, this);
+            });
             allSel.on('mouseout', function (ft) {
-                self.callMouseoutCallBacks(ft, this)
-            })
+                self.callMouseoutCallBacks(ft, this);
+            });
             allSel.on('click', function (ft) {
                 self.callClickCallBacks(ft, this);
             });
+            _.each(self.clickCallBacks, function (cb, type) {
+                svgGroup.selectAll(".feature.data."+type).style('cursor', 'pointer');
+            });
 
             return allSel
-        }
+        };
 
         /**
          * fire the call back (if any is linked to this feature type)
@@ -177,9 +180,9 @@ define(
         FeatureDisplayer.prototype.callMouseoverCallBacks = function (ft, el) {
             var self = this;
             if (self.mouseoverCallBacks[ft.type] !== undefined) {
-                self.mouseoverCallBacks[ft.type](ft, el)
+                self.mouseoverCallBacks[ft.type](ft, el);
             }
-        }
+        };
 
         /**
          * fire the call back (if any is linked to this feature type)
@@ -189,9 +192,9 @@ define(
         FeatureDisplayer.prototype.callMouseoutCallBacks = function (ft, el) {
             var self = this;
             if (self.mouseoutCallBacks[ft.type] !== undefined) {
-                self.mouseoutCallBacks[ft.type](ft, el)
+                self.mouseoutCallBacks[ft.type](ft, el);
             }
-        }
+        };
         /**
          * fire the call back (if any is linked to this feature type)
          * @param {PositionFeature} ft feature
