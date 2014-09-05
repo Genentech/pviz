@@ -119,12 +119,16 @@ JsDoc3 annotations were used to document the library. To generate the doc (in ex
 
     grunt jsdoc
 
-###Authors
 ####Build code documentation
 JsDoc3 annotations were used to document the library. To generate the doc (in examples/doc directory):
 
+###Authors
+
 This library was initiated by 
 Alexandre Masselot (masselot.alexandre@gene.com) & Kiran Mukhyala (mukhyala.kiran@gene.com) within Genentech Bioinformatics & Computational Biology Department.
+
+###Reference
+Please refer to this library via "Visualization of protein sequence features using JavaScript and SVG with pViz.js - Mukhyala K, Masselot A - Bioinformatics. 2014 Aug"
             
 ###License
 The library is distributed under a BSD license. Full description can be found in [LICENSE.txt](LICENSE.txt)
