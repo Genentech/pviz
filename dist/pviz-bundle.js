@@ -1,4 +1,4 @@
-/*! pviz - v0.1.5 - 2014-08-27 */
+/*! pviz - v0.1.5 - 2014-09-17 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -17842,22 +17842,35 @@ define(
                 });
 
                 //it is possible to pass the category Order, thus sort on it at first
-                var categoryOrder;
-                if (self.options.categoryOrder !== undefined) {
-                    categoryOrder = {};
-                    _.each(self.options.categoryOrder, function (n, i) {
-                        categoryOrder[n] = i + 1;
-                    });
-                }
+                var buildOrder=function(orderName){
+                    var order;
+                    if (self.options[orderName] !== undefined) {
+                        order = {};
+                        _.each(self.options[orderName], function (n, i) {
+                            order[n] = i + 1;
+                        });
+                        return order;
+                    }
+                    return undefined;
+                };
+                var categoryOrder = buildOrder('categoryOrder');
+                var groupSetOrder = buildOrder('groupSetOrder');
+
 
                 _.chain(groupedFeatures)
                     .sortBy(function (group) {
                         if (categoryOrder !== undefined) {
                             return 1000000 * (categoryOrder[group[0].category] || 100);
                         }
+
+                        if(groupSetOrder){
+                            return 1000000 * (groupSetOrder[group[0].groupSet] || 100);
+
+                        }
                         if (!group[0].groupSet) {
                             return -99999;
                         }
+
                         return group[0].groupSet;
                     })
                     .each(function (group, groupConcatName) {
