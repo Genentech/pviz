@@ -196,7 +196,7 @@ define(
             });
         describe('shorty with groupSet, noLayerMenu', function() {
             var se = new SeqEntry({
-                id : 'shorty',
+                id : 'with-groupSet',
                 label : 'asuper short on',
                 sequence : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
             })
@@ -233,10 +233,66 @@ define(
                 {category:'catP', categoryName:'cat catP', start:25, end:25, type:'xxx', text:'B_P', groupSet:'BBB'}
             ]);
 
-            var div = addDZDiv('annot-interactive', 'shorty', 600, 'auto');
+            var div = addDZDiv('annot-interactive', 'with-groupSet', 600, 'auto');
+            var view = new SeqEntryAnnotInteractiveView({
+                model : se,
+                el : div
+                //layerMenu : 'off'
+            })
+            view.render();
+
+            it('count ft displayed', function() {
+                // heihei, this a a D3 svg rendered test!!
+                expect(
+                    view.svg.selectAll("g.feature.data.Region").selectAll(
+                        "rect.feature").length).toBe(2);
+            })
+
+        })
+        describe('shorty with groupSet and groupSetOrder', function() {
+            var se = new SeqEntry({
+                id : 'with-groupSetOrder',
+                label : 'asuper short on',
+                sequence : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            })
+            se.set('features', [ {
+                category : 'full',
+                start : 0,
+                end : 25,
+                type : 'ttt'
+            }, {
+                category : 'Region',
+                start : 1,
+                end : 4,
+                type : 'ttt',
+                text : '2-5',
+                description:'one description'
+            }, {
+                category : 'Region',
+                start : 6,
+                end : 11,
+                type : 'xxx',
+                description:'another description'
+            },{category:'Amino acid modification', start:6, end:6, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+                {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+                {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'C', groupSet:'CCC'},
+                {category:'Amino acid modification', start:14, end:14, type:'xxx', text:'B', groupSet:'BBB'},
+                {category:'Amino acid modification', start:25, end:25, type:'xxx', text:'B', groupSet:'BBB'},
+                {category:'Amino acid modification', start:24, end:24, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+                {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'A', groupSet:'AAA (pouet)'},
+                {category:'Amino acid modification', start:6, end:6, type:'xxx', text:'C', groupSet:'CCC'},
+                {category:'Amino acid modification', start:11, end:11, type:'xxx', text:'C', groupSet:'CCC'},
+                {category:'Amino acid modification', start:21, end:25, type:'xxx', text:'C1', groupSet:'CCC'},
+                {category:'catP', categoryName:'cat catP', start:11, end:11, type:'xxx', text:'C_P', groupSet:'CCC'},
+                {category:'catP', categoryName:'cat catP', start:6, end:6, type:'xxx', text:'A_P', groupSet:'AAA (pouet)'},
+                {category:'catP', categoryName:'cat catP', start:25, end:25, type:'xxx', text:'B_P', groupSet:'BBB'}
+            ]);
+
+            var div = addDZDiv('annot-interactive', 'with-groupSetOrder', 600, 'auto');
             var view = new SeqEntryAnnotInteractiveView({
                 model : se,
                 el : div,
+                groupSetOrder:['CCC', 'AAA (pouet)', 'BBB']
                 //layerMenu : 'off'
             })
             view.render();
