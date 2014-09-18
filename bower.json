@@ -29,9 +29,9 @@
   "dependencies": {
     "jquery": "~1.9",
     "underscore-amd": "1.4.4",
-    "bootstrap": "3.0.0",
+    "bootstrap": ">=3.0.0 <4",
     "backbone-amd": "1.0.0",
-    "d3": "~3.3.0",
+    "d3": ">=3 <4",
     "requirejs-text": "~2.0.10",
     "requirejs-domready": "~2.0.1",
     "requirejs": "~2.1.9"
