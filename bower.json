@@ -1,6 +1,6 @@
 {
   "name": "pviz",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "main": [
     "dist/pviz-bundle.min.js",
     "dist/pviz-core.css"
@@ -26,7 +26,7 @@
     "test",
     "tests"
   ],
-  "dependencies": {
+  "devDependencies": {
     "jquery": "~1.9",
     "underscore-amd": "1.4.4",
     "bootstrap": ">=3.0.0 <4",
