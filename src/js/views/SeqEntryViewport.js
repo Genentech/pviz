@@ -39,6 +39,7 @@ define(
 
             self.rectLeft = self.svg.append('rect').attr('class', 'brush left').attr('x', 0).attr('y', self.yShift).attr('height', '100%').style('display', 'none')
             self.rectRight = self.svg.append('rect').attr('class', 'brush right').attr('x', 0).attr('y', self.yShift).attr('height', '100%').attr('width', '100%').style('display', 'none')
+            self.selectBrush = self.svg.append('g').attr('class','select');
             self.svg.on('mousemove', function () {
                 var i = d3.mouse(self.el[0])[0];
                 self.setXBar(self.scales.x.invert(i))
@@ -55,6 +56,7 @@ define(
                 self.xBar.style('display', null);
             })
             initBrush(self);
+            self.setMode('zoom');
         }
 
         /**
@@ -62,18 +64,27 @@ define(
          * @param self
          */
         function initBrush(self) {
-            var brush = d3.svg.brush().on("brushend", brushZoom);
+            self.brush = d3.svg.brush().on("brushend", brushMode);
+            self.selectBrush.call(self.brush);
 
-            brush.on('brush', function () {
-                self.setRect(brush.extent())
+            self.brush.on('brush', function () {
+                if (self.mode === 'zoom') {
+                    self.setRect(self.brush.extent());
+                }
             })
-            brush.x(self.scales.x);
-
-            brush(self.bgRect)
+            self.brush(self.bgRect);
+            function brushMode() {
+                if (self.mode === 'zoom') {
+                    brushZoom();
+                }
+                if (self.mode === 'select') {
+                    brushSelect();
+                }
+            }
 
             function brushZoom() {
                 self.rectClear()
-                var bounds = brush.extent();
+                var bounds = self.brush.extent();
                 if (bounds[0] < 0) {
                     bounds[0] = 0;
                 }
@@ -89,8 +100,78 @@ define(
                 self.setXBar(self.scales.x.invert(d3.mouse(self.el[0])[0]));
             }
 
+            function brushSelect() {
+                var selectedFeatures = self.selectFeatures(self.brush.extent());
+                self.selectBrush.call(self.brush.clear());
+                if (self.selectCallback) {
+                    self.selectCallback(selectedFeatures);
+                }
+            }
         };
 
+        /**
+         * @private
+         * @param extent
+         * select the features given the xtent of the select rectangle
+         */
+        SeqEntryViewport.prototype.selectFeatures = function (extent) {
+            var self = this;
+            var bgRectBoundgingRect = self.bgRect.node().getBoundingClientRect();
+            selectedFeatures = [];
+            var xMin = extent ? bgRectBoundgingRect.left + extent[0][0] : -1;
+            var xMax = extent ? bgRectBoundgingRect.left + extent[1][0] : -1;
+            var yMin = extent ? bgRectBoundgingRect.top + extent[0][1] : -1;
+            var yMax = extent ? bgRectBoundgingRect.top + extent[1][1] : -1;
+            _.each(d3.selectAll(':not(g).feature.selectable')[0], function (elem) {
+                var bbox = elem.getBoundingClientRect();
+                var isInside = bbox.left + bbox.width >= xMin && bbox.top + bbox.height >= yMin && bbox.left <= xMax && bbox.top <= yMax;
+                if (isInside) {
+                    selectedFeatures.push(d3.select(elem).data()[0]);
+                }
+                d3.select(elem).classed('selected',isInside);
+            });
+            return selectedFeatures;
+        };
+        /**
+         * called for window resize
+         * @private
+         */
+        SeqEntryViewport.prototype.resizeBrush = function () {
+            var self = this;
+            if (self.mode === 'select') {
+                self.brush.x(d3.scale.identity().domain([0,self.svg.node().getBoundingClientRect().right]));
+                self.brush.y(d3.scale.identity().domain([0,self.svg.node().getBoundingClientRect().bottom]));
+            }
+        };
+        /**
+         * setMode: sets the action taken when the user performs a click-drag on the plot
+         * @param {String} mode either: 'zoom', or 'select'. Default is 'zoom'
+         */
+        SeqEntryViewport.prototype.setMode = function (mode) {
+            var self = this;
+            self.mode = mode;
+            if (mode === 'zoom') {
+                self.bgRect.style('pointer-events',null);
+                self.brush.x(self.scales.x);
+                self.brush.y(null);
+                if (self.selectBrush) {
+                    self.selectBrush.style('display', 'none');
+                }
+                self.bgRect.style('cursor', 'col-resize');
+                self.selectBrush.call(self.brush.clear());
+            }
+            else if (mode === 'select') {
+                self.bgRect.style('pointer-events',null);
+                self.resizeBrush();
+                self.selectBrush.style('display', null);
+                self.bgRect.style('cursor', 'crosshair');
+                self.selectBrush.call(self.brush.clear());
+            }
+            else {
+                self.bgRect.style('pointer-events','none');
+                self.bgRect.style('cursor', 'pointer');
+            }
+        };
 
         /**
          * @private
@@ -210,6 +291,17 @@ define(
             self.scales.font = Math.min(0.9 * self.dim.width / (xMax - xMin), 20);
         };
 
+        /**
+         * reset: zoom out to the initial value (full x-axis) and clear selected features.
+         */
+        SeqEntryViewport.prototype.reset = function () {
+            var self = this;
+            self.brush.extent([0,0]);
+            self.scales.x.domain([0, self.length - 1]);
+            self.change();
+            self.setXBar(0);
+            self.selectFeatures();
+        };
         return SeqEntryViewport;
 
     });

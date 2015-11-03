@@ -53,6 +53,17 @@ define(
 
                 if (self.options.layerMenu && self.options.layerMenu !== 'off') {
                     self.p_build_menu(self.options.layerMenu === 'minimize');
+                    if (self.options.categorySeparator && self.gMenu) {
+                        self.gMenu
+                            .append('g')
+                            .attr('class', 'category-separator')
+                            .append('line')
+                            .attr('x1', self.viewport.scales.x(0))
+                            .attr('x2', self.viewport.scales.x(self.viewport.length))
+                            .attr('y1', 0)
+                            .attr('y2', 0)
+                            .attr('class', 'category-separator-line ' + self.options.groupSetName + ' ' + self.options.cssClass);
+                    }
                 }
                 return self;
             },

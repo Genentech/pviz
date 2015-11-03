@@ -1,0 +1,176 @@
+<html>
+    <head>
+        <title>pViz select</title>
+        <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="deps/pviz-core.css">
+        <link rel="stylesheet" type="text/css" href="style/pviz-example.css">
+        <script src="deps/pviz-bundle.min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz select</h2>
+        </div>
+        <div id="main" class="row"></div>
+        <div id="display" style="width:100%;height:60px;display:block;overflow:auto;"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            There are two modes for click drag, the default mode is "zoom", where the click and drag will zoom into the horizontal region
+            selected. The other mode is "select", where the click and drag will mark the features under the drag rectangle and pass
+            them to a callback function. To be selected, the features must have the class "selectable". This way you can choose which
+            features can be selected. Here all the rectangles are selectable, the circles are not selectable. After selection, all selected features
+            will have the class "selected", and be colored as cyan. The mode can be set using SeqEntryAnnotInteractiveView.viewport.setMode(mode)
+            where mode is "zoom" or "select". The same application can toggle between the two modes.
+            Note - the select rectangle size is set to height of the svg element. If you add features after setting mode to "select" and this
+            causes the svg height to increase, the rectangle will be too short. If this happens, call SeqEntryAnnotInteractiveView.resize().
+            <br/>
+            <br/>
+            Each group set can have the categories seperated by a line via a css class.
+            Here groupset "kappa" has a line separators. See <a href="style/pviz-example.css">pviz-example.css</a>
+            <br/>
+            <br/>
+            The groupset headers are vertically separated from the first category
+        </div>
+
+        <script class="example">
+          //namespace handling pViz classes
+          var pviz = this.pviz;
+
+          //define the model, a sequence entry with an explicit sequence
+          var seq = 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLA';
+          var seqEntry = new pviz.SeqEntry({
+            sequence : seq
+          });
+
+          /*
+           * thefined the view, in a backbone.js fashion
+           * model: that's the model, who would have guessed
+           * el: a selector to the target where to insert the view (size and so will be inherited)
+           *
+           * .render(): call the rendering
+           *
+           * NB: even though the features are not yet added to the model, the view will be recomputed at the end of any feature addition.
+           * This is to take into account asynchroncity, when data comes from several remote sources
+           */
+          var seqEntryAnnotInteractiveView = new pviz.SeqEntryAnnotInteractiveView({
+            model : seqEntry,
+            paddingGroupSet: 1, // <- vertical separation between groupset header and first category
+            selectCallback : function(data) {
+            	var types = '';
+            	for (var i = 0; i < data.length; i++) {
+            		if (types != '') {
+            			types += ',';
+            		}
+            		types += data[i].type;
+            	}
+                d3.select('#display').node().innerHTML = types;
+            },
+            el : '#main'
+          });
+          seqEntryAnnotInteractiveView.render();
+          /* we can add featureswith properties
+           * group: features will be grouped together on this property. they might no be displayed on the same line, but feature with different grous cannot be on the same line
+           * type: within group, property can have different types
+           * text: to be displayed or use wherever you want
+           * start: initial position, starting at 0
+           * end: last position of the feature (including), starting at 0
+           *
+           * NB: the explicit loading of features could be replaced by a JSON call. But for the sake of a standalone example, ajax does not work with file queries
+           d3.tsv('example-features.tsv', function(err, data) {
+             seqEntry.addFeatures(data);
+           });
+           */
+          seqEntry.addFeatures([{
+            groupSet : 'kappa',
+            category : 'ptms',
+            type : 'circle',
+            start : 20,
+            radius : 5,
+            count : 10
+          }, {
+            groupSet : 'kappa',
+            category : 'ptms',
+            type : 'circle',
+            start : 22,
+            radius : 5,
+            count : 3
+          }, {
+            groupSet : 'kappa',
+            category : 'ptms',
+            type : 'circle',
+            start : 40,
+            radius : 5,
+            count : 10
+          }, {
+            groupSet : 'kappa',
+            category : 'ptms',
+            type : 'circle',
+            start : 50,
+            radius : 5,
+            count : 2
+          }, {
+            groupSet : 'kappa',
+            category : 'psms',
+            type : 'cherry',
+            start : 71,
+            end : 79,
+            count : 2
+          }, {
+            groupSet : 'kappa',
+            category : 'psms',
+            type : 'apple',
+            start : 83,
+            end : 99,
+            count : 2
+          }, {
+            groupSet : 'kappa',
+            category : 'prms',
+            type : 'guava',
+            start : 21,
+            end : 54,
+            count : 2
+          }, {
+            groupSet : 'kappa',
+            category : 'pqms',
+            type : 'circle',
+            start : 18,
+            radius : 8,
+            count : 2
+          }, {
+            groupSet : 'kappa',
+            category : 'pqms',
+            type : 'circle',
+            start : 47,
+            radius : 8,
+            count : 2
+          }, {
+            groupSet : 'lambda',
+            category : 'pums',
+            type : 'pear',
+            start : 7,
+            end : 10,
+            count : 2
+          }, {
+            groupSet : 'lambda',
+            category : 'pums',
+            type : 'orange',
+            start : 18,
+            end : 25,
+            count : 2
+          }, {
+            groupSet : 'lambda',
+            category : 'pums',
+            type : 'mango',
+            start : 27,
+            end : 62,
+            count : 2
+          }]);
+          d3.selectAll('rect').classed('selectable',true); // <- all rectangles can be selected
+          seqEntryAnnotInteractiveView.viewport.setMode('select'); // <- set click drag mode to select
+        </script>
+
+    </body>
+</html>

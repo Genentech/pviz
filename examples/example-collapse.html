@@ -1,0 +1,226 @@
+<html>
+    <head>
+        <title>pViz collapse</title>
+        <link rel="stylesheet" type="text/css" href="deps/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="deps/pviz-core.css">
+        <link rel="stylesheet" type="text/css" href="style/pviz-example.css">
+        <script src="deps/pviz-bundle.min.js"></script>
+
+        <!-- just a few lines of javscript to decorate the page -->
+        <script src="examples-utils.js"></script>
+    </head>
+    <body class="container">
+        <div class="row">
+            <h2>pViz collapse / expand</h2>
+        </div>
+        <div id="main" class="row"></div>
+
+        <div class="row">
+            <h3>Comments</h3>
+            By setting the collapsible option in the seqEntryAnnotInteractiveView to true, all groupsets can be collapsed /
+            expanded by clicking on the triangle icon next to the header. Groupsets can also be collapsed / expanded programmatically
+            using SeqEntryAnnotInteractiveView.toggleGroupsetCollapse(groupSet)
+            <br/>
+            <br/>
+            Each groupset can have the background styled via a css class.
+            Here groupset "beta" has a green background, and groupset "gamma" has a yellow background. See <a href="style/pviz-example.css">pviz-example.css</a>
+            <br/>
+            <br/>
+            There is a horizontal center line for category prms
+        </div>
+
+        <script class="example">
+          //namespace handling pViz classes
+          var pviz = this.pviz;
+
+          //define the model, a sequence entry with an explicit sequence
+          var seq = 'MELAALCRWGLLLALLPPGAASTQVCTGTDMKLRLPASPETHLDMLRHLYQGCQVVQGNLELTYLPTNASLSFLQDIQEVQGYVLIAHNQVRQVPLQRLRIVRGTQLFEDNYALAVLDNGDPLNNTTPVTGASPGGLRELQLRSLTEILKGGVLIQRNPQLCYQDTILWKDIFHKNNQLA';
+          var seqEntry = new pviz.SeqEntry({
+            sequence : seq
+          });
+
+          /*
+           * thefined the view, in a backbone.js fashion
+           * model: that's the model, who would have guessed
+           * el: a selector to the target where to insert the view (size and so will be inherited)
+           *
+           * .render(): call the rendering
+           *
+           * NB: even though the features are not yet added to the model, the view will be recomputed at the end of any feature addition.
+           * This is to take into account asynchroncity, when data comes from several remote sources
+           */
+          var seqEntryAnnotInteractiveView = new pviz.SeqEntryAnnotInteractiveView({
+            model : seqEntry,
+            collapsible: true, // <- use this option to set the collapse / expand rectangles
+            el : '#main'
+          });
+          seqEntryAnnotInteractiveView.render();
+
+          /* we can add featureswith properties
+           * group: features will be grouped together on this property. they might no be displayed on the same line, but feature with different grous cannot be on the same line
+           * type: within group, property can have different types
+           * text: to be displayed or use wherever you want
+           * start: initial position, starting at 0
+           * end: last position of the feature (including), starting at 0
+           *
+           * NB: the explicit loading of features could be replaced by a JSON call. But for the sake of a standalone example, ajax does not work with file queries
+           d3.tsv('example-features.tsv', function(err, data) {
+             seqEntry.addFeatures(data);
+           });
+           */
+          pviz.FeatureDisplayer.setStrikeoutCategory('prms'); // <- horizontal center line for category prms
+          seqEntry.addFeatures([{
+            groupSet : 'alpha',
+            category : 'ptms',
+            type : 'mickey',
+            start : 20,
+            end : 20,
+            count : 10
+          }, {
+            groupSet : 'alpha',
+            category : 'ptms',
+            type : 'mickey',
+            start : 22,
+            end : 22,
+            count : 3
+          }, {
+            groupSet : 'alpha',
+            category : 'ptms',
+            type : 'mickey',
+            start : 40,
+            end : 40,
+            count : 10
+          }, {
+            groupSet : 'alpha',
+            category : 'ptms',
+            type : 'mickey',
+            start : 50,
+            end : 50,
+            count : 2
+          }, {
+            groupSet : 'alpha',
+            category : 'psms',
+            type : 'minnie',
+            start : 71,
+            end : 71,
+            count : 2
+          }, {
+            groupSet : 'alpha',
+            category : 'psms',
+            type : 'minnie',
+            start : 83,
+            end : 83,
+            count : 2
+          }, {
+            groupSet : 'beta',
+            category : 'prms',
+            type : 'donald',
+            start : 7,
+            end : 7,
+            count : 2
+          }, {
+            groupSet : 'beta',
+            category : 'prms',
+            type : 'donald',
+            start : 24,
+            end : 24,
+            count : 2
+          }, {
+            groupSet : 'beta',
+            category : 'prms',
+            type : 'donald',
+            start : 27,
+            end : 27,
+            count : 2
+          }, {
+            groupSet : 'gamma',
+            category : 'regions',
+            type : 'topological domain',
+            text : 'extra cellular',
+            start : 22,
+            end : 650
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 24,
+            end : 26
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'helix',
+            start : 38,
+            end : 49
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 53,
+            end : 57
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 59,
+            end : 63
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'helix',
+            start : 71,
+            end : 73
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 78,
+            end : 81
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 83,
+            end : 87
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 91,
+            end : 94
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'turn',
+            start : 108,
+            end : 110
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 111,
+            end : 116
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'turn',
+            start : 129,
+            end : 131
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 138,
+            end : 140
+          }, {
+            groupSet : 'delta',
+            category : 'secondary structure',
+            type : 'beta_strand',
+            start : 150,
+            end : 155
+          }]);
+          seqEntryAnnotInteractiveView.toggleGroupsetCollapse('delta'); // <- initial state of delta groupset is collapsed
+
+        </script>
+
+    </body>
+</html>

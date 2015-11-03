@@ -132,7 +132,7 @@ define(
         FeatureDisplayer.prototype.append = function (viewport, svgGroup, features) {
             var self = this;
 
-            //add hirizontal line if needed for thecategory
+            //add horizontal line if needed for thecategory
 
             var curCat = _.chain(features).pluck('category').uniq().value()[0];
             if (self.strikeoutCategory[curCat]) {
@@ -224,6 +224,9 @@ define(
             return sel
         }
 
+        FeatureDisplayer.prototype.getDefaultAppender = function () {
+            return defaultAppender;
+        }
         FeatureDisplayer.prototype.position = function (viewport, sel) {
             var self = this;
 
@@ -277,14 +280,15 @@ define(
          */
         // FeatureDisplayer.prototype.position = function(viewport, d3selection) {
         var defaultPositioner = function (viewport, d3selection) {
+            var oneOffAdjust = viewport.oneOffFix ? -1 : 0;
             var hFactor = singleton.heightFactor(d3selection[0][0].__data__.category);
             // var yscale=singleton.trackHeightFactorPerCategory[]
 
             d3selection.attr('transform', function (ft) {
-                return 'translate(' + viewport.scales.x(ft.start - 0.45) + ',' + hFactor * viewport.scales.y(0.12 + ft.displayTrack) + ')';
+                return 'translate(' + viewport.scales.x(ft.start + oneOffAdjust - 0.45) + ',' + hFactor * viewport.scales.y(0.12 + ft.displayTrack) + ')';
             });
             var ftWidth = function (ft) {
-                return viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start + 0.1)
+                return viewport.scales.x(ft.end + oneOffAdjust + 0.9) - viewport.scales.x(ft.start + oneOffAdjust + 0.1)
             }
             d3selection.selectAll("rect.feature").attr('width', ftWidth).attr('height', hFactor * viewport.scales.y(0.76));
             d3selection.selectAll("rect.feature-block-end").attr('width', 10).attr('x', function (ft) {
@@ -298,7 +302,7 @@ define(
             var selText = d3selection.selectAll("text");
             selText.text(function (ft) {
                 var text = (ft.text !== undefined) ? ft.text : ft.type;
-                var w = viewport.scales.x(ft.end + 0.9) - viewport.scales.x(ft.start);
+                var w = viewport.scales.x(ft.end + oneOffAdjust + 0.9) - viewport.scales.x(ft.start + oneOffAdjust);
                 if (w <= 5 || text.length == 0) {
                     return '';
                 }
@@ -310,6 +314,9 @@ define(
                 return text.substr(0, nchar);
             }).style('font-size', fontSize);
             return d3selection
+        }
+        FeatureDisplayer.prototype.getDefaultPositioner = function () {
+            return defaultPositioner;
         }
 
         /**

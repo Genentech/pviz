@@ -215,6 +215,29 @@
 	
         <tr>
             
+                <td class="name"><code>paddingGroupSet</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">padding between groupSet and first category (default=0)</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
                 <td class="name"><code>xChangeCallback</code></td>
             
             
@@ -232,6 +255,52 @@
             
             
             <td class="description last">callback called whenever the x refence is changed (zooming)</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>selectCallback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">callback called whenever a selection is made. Returns all selected features (requires mode = 'select')</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>collapseCallback</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">callback called whenever a group set is collapsed/expanded (requires options.collapsible = true)</td>
         </tr>
 	
 	
@@ -301,6 +370,52 @@
             
             
             <td class="description last">hide the sequence (defaut=false)</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>collapsible</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">collapsible groupSets (default=false)</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>oneOffFix</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">correct one off problem (default=false)</td>
         </tr>
 	
 	
@@ -383,7 +498,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line27">line 27</a>
+        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line32">line 32</a>
     </li></ul></dd>
     
     
@@ -476,7 +591,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line195">line 195</a>
+        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line252">line 252</a>
     </li></ul></dd>
     
     
@@ -573,6 +688,192 @@
         
             
 <dt>
+    <h4 class="name" id="resize"><span class="type-signature"></span>resize<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        called for window resize: recompute dimensions and refresh the whole view
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line175">line 175</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="toggleGroupsetCollapse"><span class="type-signature"></span>toggleGroupsetCollapse<span class="signature">(groupsetName)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        collapse / expand groupset with passed groupsetName, as if the triangle was clicked
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>groupsetName</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line541">line 541</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
@@ -614,7 +915,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line170">line 170</a>
+        <a href="SeqEntryAnnotInteractiveView.js.html">views/SeqEntryAnnotInteractiveView.js</a>, <a href="SeqEntryAnnotInteractiveView.js.html#line227">line 227</a>
     </li></ul></dd>
     
     
@@ -661,7 +962,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Apr 07 2015 19:50:25 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Tue Nov 03 2015 08:57:48 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>
