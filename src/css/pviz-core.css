@@ -192,3 +192,38 @@ svg.one-liner rect.subline-1 {
 svg.one-liner rect.subline-2 {
     fill: green;
 }
+
+/** collapser
+ *
+ */
+g.groupset-title > polygon.collapse_expand {
+    fill: #7F7F7F;
+    border:1px solid #ccc;
+}
+g.layers > g.hidden {
+    display: none;
+}
+line.category-separator-line {
+    display:none;
+    pointer-events:none;
+}
+/** select
+ *
+ */
+g.select {
+     fill:7f7f7f;
+     fill-opacity:0.3;
+ }
+g.feature.data > .feature.selected {
+    stroke: none;
+    color: #3FFFFF;
+    fill: #3FFFFF;
+}
+g.feature.data > rect.feature.tooltip-bg {
+    fill-opacity: 0;
+    stroke-opacity: 0;
+}
+g>rect.groupset-background {
+    fill-opacity: 0;
+    stroke-opacity: 0;
+}
