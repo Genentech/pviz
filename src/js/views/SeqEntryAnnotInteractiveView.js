@@ -513,10 +513,12 @@ define(
                     return 'groupset-title-' + (x || '').replace(/\W/g, '_');
                 })
                 if (self.options.collapsible) {
+					var oldGroupSetStatuses = self.groupSetStatuses || {};
                     self.groupSetStatuses = [];
-                    _.each(groupSetNames, function (d, i) {
-                        self.groupSetStatuses[d] = {name:d,open:true};
-                    })
+                    _.each(groupSetNames, function (d) {
+						var isOpen = oldGroupSetStatuses[d] === undefined ? true : oldGroupSetStatuses[d].open;
+                	    self.groupSetStatuses[d] = {name:d,open:isOpen};
+                    });
                     self.collapseIcon = self.gGroupSets
                         .selectAll('polygon')
                         .data(groupSetNames)

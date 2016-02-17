@@ -63,6 +63,39 @@ define(
                     return self;
                 },
                 /**
+                 * Removes an array or a single feature from the seq entry. A 'change' event will be triggered by default. The Backbone view will be binded to such changes
+                 * @param {Array|Object} feats
+                 * @param {Map} options
+                 * @param {boolean} options.triggerChange defines is a 'change' event is to be fired (default is true)
+                 * @return {SeqEntry}
+                 */
+                removeFeatures: function (feats, options) {
+                    var self = this;
+                    options = options || {};
+
+                    var triggerChange = options.triggerChange || (options.triggerChange === undefined);
+
+					var featureArray = self.get('features');
+                    if (_.isArray(feats)) {
+                        _.each(feats, function (ft) {
+							var index = featureArray.indexOf(ft);
+							if (index !== -1) {
+								featureArray.splice(index, 1);
+							}
+                        })
+                        if (triggerChange)
+                            self.trigger('change');
+                        return self;
+                    }
+					var index = featureArray.indexOf(feats);
+					if (index !== -1) {
+						featureArray.splice(index, 1);
+					}
+                    if (triggerChange)
+                        self.trigger('change');
+                    return self;
+                },
+                /**
                  * Removes all the features (and fire a 'change' event
                  * @return {SeqEntry}
                  */
