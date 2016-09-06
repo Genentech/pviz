@@ -42,12 +42,13 @@ define(
             self.selectBrush = self.svg.append('g').attr('class','select');
             self.svg.on('mousemove', function () {
                 var i = d3.mouse(self.el[0])[0];
+                var i2 = d3.mouse(self.el[0])[1];
                 self.setXBar(self.scales.x.invert(i))
                 _.each(options.xChangeCallback, function (f) {
                     if (!f) {
                         return;
                     }
-                    f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5));
+                    f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5), i2);
                 });
             });
             self.svg.on('mouseout', function () {
@@ -72,6 +73,7 @@ define(
                     self.setRect(self.brush.extent());
                 }
             })
+
             self.brush(self.bgRect);
             function brushMode() {
                 if (self.mode === 'zoom') {
@@ -107,6 +109,7 @@ define(
                     self.selectCallback(selectedFeatures);
                 }
             }
+
         };
 
         /**
@@ -132,6 +135,7 @@ define(
             });
             return selectedFeatures;
         };
+
         /**
          * called for window resize
          * @private
@@ -143,6 +147,8 @@ define(
                 self.brush.y(d3.scale.identity().domain([0,self.svg.node().getBoundingClientRect().bottom]));
             }
         };
+
+
         /**
          * setMode: sets the action taken when the user performs a click-drag on the plot
          * @param {String} mode either: 'zoom', or 'select'. Default is 'zoom'
@@ -302,6 +308,8 @@ define(
             self.setXBar(0);
             self.selectFeatures();
         };
+
         return SeqEntryViewport;
 
     });
+
