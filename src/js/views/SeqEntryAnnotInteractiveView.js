@@ -21,8 +21,9 @@ define(
          * @param {Function} options.selectCallback callback called whenever a selection is made. Returns all selected features (requires mode = 'select')
          * @param {Function} options.collapseCallback callback called whenever a group set is collapsed/expanded (requires options.collapsible = true)
          * @param {Boolean} options.noPositionBubble
+         * @param {Boolean} options.cursorPositionBubble position bubble at the cursor (default=false)
          * @param {Boolean} options.hideAxis hide the position axis (default=false)
-         * @param {Boolean} options.hideSequence hide the sequence (defaut=false)
+         * @param {Boolean} options.hideSequence hide the sequence (default=false)
          * @param {Boolean} options.collapsible collapsible groupSets (default=false)
          * @param {Boolean} options.oneOffFix correct one off problem (default=false)
          * @param {Array} options.categoryOrder an array of String specifying the order in which should appear the categories (unspecified one will appear alpha numerically sorted)
@@ -49,6 +50,7 @@ define(
 
                 self.bubbleSequenceNb = 4;
                 self.clipperId = 'clipper_' + Math.round(100000 * Math.random());
+
                 if (self.options.collapsible) {
                     self.collapserSize = 15;
                     var collapserHalfWidth = self.collapserSize / 2.0;
@@ -84,17 +86,26 @@ define(
                  * add the callback to set the aabubble position and text (if needed)
                  */
                 if (!options.noPositionBubble) {
-                    xChangeCallbacks.push(function (i0, i1) {
+                    xChangeCallbacks.push(function (i0, i1, i2) {
+                        var imid = (i0 + i1) / 2;
+                        var xscales = self.viewport.scales.x;
                         var gbubbles = self.svg.selectAll('g.axis-bubble');
                         if (self.viewport.scales.font > 10) {
                             gbubbles.style('display', 'none');
+                            if (self.gCursorPosBubble) {
+                                self.gCursorPosBubble.style('display', null);
+                                var aaPos = Math.round(imid);
+                                var aaCode = self.model.get('sequence').substring(aaPos, aaPos + 1);
+                                self.gCursorPosBubble.selectAll('text').text("" + (aaPos + 1) + "," + aaCode);
+                                if (i2 !== undefined) {
+                                    self.gCursorPosBubble.attr('transform', 'translate(' + xscales(imid) + ',' + i2 + ')');
+                                }
+                            }
                             self.svg.select('line.sequence-bg').style('display', 'none');
-                            return
+                            return;
                         }
                         self.svg.select('line.sequence-bg').style('display', null);
 
-                        var imid = (i0 + i1) / 2;
-                        var xscales = self.viewport.scales.x;
                         if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
                             gbubbles.style('display', 'none');
                             return;
@@ -103,6 +114,11 @@ define(
                         gbubbles.style('display', null);
                         if (self.gPosBubble) {
                             self.gPosBubble.selectAll('text').text(Math.round(imid + 1));
+                        }
+                        if (self.gCursorPosBubble) {
+                            var aaPos = Math.round(imid);
+                            var aaCode = self.model.get('sequence').substring(aaPos, aaPos + 1);
+                            self.gCursorPosBubble.selectAll('text').text("" + (aaPos + 1) + "," + aaCode);
                         }
 
                         if (self.gAABubble) {
@@ -126,6 +142,9 @@ define(
 
                         //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
                         gbubbles.attr('transform', 'translate(' + xscales(imid) + ',10)');
+                        if (self.gCursorPosBubble && i2 !== undefined) {
+                        	self.gCursorPosBubble.attr('transform', 'translate(' + xscales(imid) + ',' + i2 + ')');
+                        }
                     });
 
                 }
@@ -187,6 +206,7 @@ define(
                 }
                 var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
                 self.clipPath.attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
+
                 // restore bubble positions
                 var gbubbles = self.svg.selectAll('g.axis-bubble');
                 gbubbles.each(function(d,i) {
@@ -219,6 +239,11 @@ define(
                 self.gPosBubble = self.axisContainer.append('g').attr('class', 'axis-bubble').style('display', 'none');
                 self.gPosBubble.append('rect').attr('x', -30).attr('y', -4).attr('width', 60).attr('height', 17)
                 self.gPosBubble.append('text').attr('class', 'pos').attr('y', 6);
+                if (self.options.cursorPositionBubble && !self.gCursorPosBubble) {
+                	self.gCursorPosBubble = self.drawContainer.append('g').attr('class', 'axis-bubble cursor-pos-bubble').style('display', 'none');
+                	self.gCursorPosBubble.append('rect').attr('x', -30).attr('y', -24).attr('width', 60).attr('height', 17)
+                	self.gCursorPosBubble.append('text').attr('class', 'pos').attr('y', -14);
+                }
 
             },
             /**
@@ -285,16 +310,16 @@ define(
                             if (!paddingGroupSetAdded && self.paddingGroupSet) {
                                 totTracks += self.paddingGroupSet;
                                 paddingGroupSetAdded = true;
-                        }
-                        var yshift = self.viewport.scales.y(totTracks + 1)
-                        view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
-                        if (view.model.get('isPlot')) {
-                            totHeight += view.height();
-                            totTracks += 1 + self.paddingCategory;
-                        } else {
-                            totTracks += view.height() + 1 + self.paddingCategory;
-                        }
-                        view.g.style('display', null);
+                            }
+                            var yshift = self.viewport.scales.y(totTracks + 1)
+                            view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
+                            if (view.model.get('isPlot')) {
+                                totHeight += view.height();
+                                totTracks += 1 + self.paddingCategory;
+                            } else {
+                                totTracks += view.height() + 1 + self.paddingCategory;
+                            }
+                            view.g.style('display', null);
                         }
                         else {
                             view.g.style('display', 'none');
@@ -513,11 +538,11 @@ define(
                     return 'groupset-title-' + (x || '').replace(/\W/g, '_');
                 })
                 if (self.options.collapsible) {
-					var oldGroupSetStatuses = self.groupSetStatuses || {};
+                    var oldGroupSetStatuses = self.groupSetStatuses || {};
                     self.groupSetStatuses = [];
                     _.each(groupSetNames, function (d) {
-						var isOpen = oldGroupSetStatuses[d] === undefined ? true : oldGroupSetStatuses[d].open;
-                	    self.groupSetStatuses[d] = {name:d,open:isOpen};
+                        var isOpen = oldGroupSetStatuses[d] === undefined ? true : oldGroupSetStatuses[d].open;
+                        self.groupSetStatuses[d] = {name:d,open:isOpen};
                     });
                     self.collapseIcon = self.gGroupSets
                         .selectAll('polygon')
@@ -578,3 +603,4 @@ define(
 
         return SeqEntryAnnotInteractiveView;
     })
+    
