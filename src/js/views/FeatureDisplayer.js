@@ -28,6 +28,7 @@ define(
 
             typedDisplayer.init(self);
             self.trackHeightPerCategoryType = {};
+            self.fontTrackHeightPerCategoryType = {};
             self.strikeoutCategory = {}
         }
         /**
@@ -227,6 +228,7 @@ define(
         FeatureDisplayer.prototype.getDefaultAppender = function () {
             return defaultAppender;
         }
+
         FeatureDisplayer.prototype.position = function (viewport, sel) {
             var self = this;
 
@@ -250,16 +252,18 @@ define(
         }
         /**
          * return the height factory associated with
+         * @param {Object} o object to get height factor
+         * @param {Boolean} isFont is this height factor for font
          * @return Number
          */
-        FeatureDisplayer.prototype.heightFactor = function (o) {
+        FeatureDisplayer.prototype.heightFactor = function (o, isFont) {
             if (o instanceof Object) {
-                return this.heightFactor(o.type || o.name)
+                return this.heightFactor(o.type || o.name, isFont);
             }
-            return this.trackHeightPerCategoryType[o] || 1
+            return isFont ? this.fontTrackHeightPerCategoryType[o] || this.trackHeightPerCategoryType[o] || 1 : this.trackHeightPerCategoryType[o] || 1;
         }
         /**
-         * You can register a catgory to have a strikeout line.
+         * You can register a category to have a strikeout line.
          * The strikeout is at the category level, because all the type below this category are concerned.
          * This feature was add for better visibility in situations where features are sparsed
          * Some people love it...
@@ -297,7 +301,8 @@ define(
                 return (ftWidth(ft) > 20) ? null : 'none';
             }).attr('height', viewport.scales.y(hFactor * 0.76));
 
-            var fontSize = 9 * hFactor;
+            var fontHFactor = singleton.heightFactor(d3selection[0][0].__data__.category, true);
+            var fontSize = 9 * fontHFactor;
             // self.fontSizeLine();
             var selText = d3selection.selectAll("text");
             selText.text(function (ft) {
@@ -315,6 +320,7 @@ define(
             }).style('font-size', fontSize);
             return d3selection
         }
+
         FeatureDisplayer.prototype.getDefaultPositioner = function () {
             return defaultPositioner;
         }
