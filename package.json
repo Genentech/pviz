@@ -1,6 +1,10 @@
 {
   "name": "pviz",
   "version": "0.1.12",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Genentech/pviz"
+  },
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.2",
