@@ -1,6 +1,6 @@
 {
   "name": "pviz",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": [
     "dist/pviz-bundle.min.js",
     "dist/pviz-core.css"

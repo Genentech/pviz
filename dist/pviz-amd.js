@@ -1,4 +1,4 @@
-/*! pviz - v0.1.6 - 2015-11-03 */
+/*! pviz - v0.1.7 - 2016-09-12 */
 /**
 	* pViz
 	* Copyright (c) 2013, Genentech Inc.
@@ -82,6 +82,39 @@ define(
                     return self;
                 },
                 /**
+                 * Removes an array or a single feature from the seq entry. A 'change' event will be triggered by default. The Backbone view will be binded to such changes
+                 * @param {Array|Object} feats
+                 * @param {Map} options
+                 * @param {boolean} options.triggerChange defines is a 'change' event is to be fired (default is true)
+                 * @return {SeqEntry}
+                 */
+                removeFeatures: function (feats, options) {
+                    var self = this;
+                    options = options || {};
+
+                    var triggerChange = options.triggerChange || (options.triggerChange === undefined);
+
+					var featureArray = self.get('features');
+                    if (_.isArray(feats)) {
+                        _.each(feats, function (ft) {
+							var index = featureArray.indexOf(ft);
+							if (index !== -1) {
+								featureArray.splice(index, 1);
+							}
+                        })
+                        if (triggerChange)
+                            self.trigger('change');
+                        return self;
+                    }
+					var index = featureArray.indexOf(feats);
+					if (index !== -1) {
+						featureArray.splice(index, 1);
+					}
+                    if (triggerChange)
+                        self.trigger('change');
+                    return self;
+                },
+                /**
                  * Removes all the features (and fire a 'change' event
                  * @return {SeqEntry}
                  */
@@ -94,6 +127,7 @@ define(
             });
         return SeqEntry;
     });
+
 
 define(
     /**
@@ -1319,6 +1353,7 @@ define(
 
             typedDisplayer.init(self);
             self.trackHeightPerCategoryType = {};
+            self.fontTrackHeightPerCategoryType = {};
             self.strikeoutCategory = {}
         }
         /**
@@ -1518,6 +1553,7 @@ define(
         FeatureDisplayer.prototype.getDefaultAppender = function () {
             return defaultAppender;
         }
+
         FeatureDisplayer.prototype.position = function (viewport, sel) {
             var self = this;
 
@@ -1541,16 +1577,18 @@ define(
         }
         /**
          * return the height factory associated with
+         * @param {Object} o object to get height factor
+         * @param {Boolean} isFont is this height factor for font
          * @return Number
          */
-        FeatureDisplayer.prototype.heightFactor = function (o) {
+        FeatureDisplayer.prototype.heightFactor = function (o, isFont) {
             if (o instanceof Object) {
-                return this.heightFactor(o.type || o.name)
+                return this.heightFactor(o.type || o.name, isFont);
             }
-            return this.trackHeightPerCategoryType[o] || 1
+            return isFont ? this.fontTrackHeightPerCategoryType[o] || this.trackHeightPerCategoryType[o] || 1 : this.trackHeightPerCategoryType[o] || 1;
         }
         /**
-         * You can register a catgory to have a strikeout line.
+         * You can register a category to have a strikeout line.
          * The strikeout is at the category level, because all the type below this category are concerned.
          * This feature was add for better visibility in situations where features are sparsed
          * Some people love it...
@@ -1588,7 +1626,8 @@ define(
                 return (ftWidth(ft) > 20) ? null : 'none';
             }).attr('height', viewport.scales.y(hFactor * 0.76));
 
-            var fontSize = 9 * hFactor;
+            var fontHFactor = singleton.heightFactor(d3selection[0][0].__data__.category, true);
+            var fontSize = 9 * fontHFactor;
             // self.fontSizeLine();
             var selText = d3selection.selectAll("text");
             selText.text(function (ft) {
@@ -1606,6 +1645,7 @@ define(
             }).style('font-size', fontSize);
             return d3selection
         }
+
         FeatureDisplayer.prototype.getDefaultPositioner = function () {
             return defaultPositioner;
         }
@@ -1782,12 +1822,13 @@ define(
             self.selectBrush = self.svg.append('g').attr('class','select');
             self.svg.on('mousemove', function () {
                 var i = d3.mouse(self.el[0])[0];
+                var i2 = d3.mouse(self.el[0])[1];
                 self.setXBar(self.scales.x.invert(i))
                 _.each(options.xChangeCallback, function (f) {
                     if (!f) {
                         return;
                     }
-                    f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5));
+                    f(self.scales.x.invert(i - 0.5), self.scales.x.invert(i + 0.5), i2);
                 });
             });
             self.svg.on('mouseout', function () {
@@ -1812,6 +1853,7 @@ define(
                     self.setRect(self.brush.extent());
                 }
             })
+
             self.brush(self.bgRect);
             function brushMode() {
                 if (self.mode === 'zoom') {
@@ -1847,6 +1889,7 @@ define(
                     self.selectCallback(selectedFeatures);
                 }
             }
+
         };
 
         /**
@@ -1872,6 +1915,7 @@ define(
             });
             return selectedFeatures;
         };
+
         /**
          * called for window resize
          * @private
@@ -1883,6 +1927,8 @@ define(
                 self.brush.y(d3.scale.identity().domain([0,self.svg.node().getBoundingClientRect().bottom]));
             }
         };
+
+
         /**
          * setMode: sets the action taken when the user performs a click-drag on the plot
          * @param {String} mode either: 'zoom', or 'select'. Default is 'zoom'
@@ -2042,9 +2088,11 @@ define(
             self.setXBar(0);
             self.selectFeatures();
         };
+
         return SeqEntryViewport;
 
     });
+
 
 
 define(
@@ -2356,7 +2404,7 @@ define(
     });
 
 
-define('text!pviz_templates/details-pane.html',[],function () { return '<div class="details-pane">\r\n    <div class="" style="width:100%">\r\n        <div class="nav" style="display:none">\r\n            <ul class="nav nav-tabs">\r\n                <li class="pull-right">\r\n                    <label class="checkbox">\r\n                        <input type="checkbox" id="raise-active" checked=checked/>\r\n                        show active pane </label>\r\n                </li>\r\n            </ul>\r\n        </div>\r\n    </div>\r\n    <div class="tab-content">\r\n\r\n    </div>\r\n</div>\r\n';});
+define('text!pviz_templates/details-pane.html',[],function () { return '<div class="details-pane">\n    <div class="" style="width:100%">\n        <div class="nav" style="display:none">\n            <ul class="nav nav-tabs">\n                <li class="pull-right">\n                    <label class="checkbox">\n                        <input type="checkbox" id="raise-active" checked=checked/>\n                        show active pane </label>\n                </li>\n            </ul>\n        </div>\n    </div>\n    <div class="tab-content">\n\n    </div>\n</div>\n';});
 
 define(
     /**
@@ -2481,7 +2529,7 @@ define(
     });
 
 
-define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { return '<div class=\'seq-entry-annot-interactive\'>\r\n    <div id=\'feature-viewer\'>\r\n        \r\n    </div>\r\n    <div id=\'details-viewer\'>\r\n        \r\n    </div>\r\n    \r\n</div>\r\n';});
+define('text!pviz_templates/seq-entry-annot-interactive.html',[],function () { return '<div class=\'seq-entry-annot-interactive\'>\n    <div id=\'feature-viewer\'>\n        \n    </div>\n    <div id=\'details-viewer\'>\n        \n    </div>\n    \n</div>\n';});
 
 define(
     /**
@@ -2506,8 +2554,9 @@ define(
          * @param {Function} options.selectCallback callback called whenever a selection is made. Returns all selected features (requires mode = 'select')
          * @param {Function} options.collapseCallback callback called whenever a group set is collapsed/expanded (requires options.collapsible = true)
          * @param {Boolean} options.noPositionBubble
+         * @param {Boolean} options.cursorPositionBubble position bubble at the cursor (default=false)
          * @param {Boolean} options.hideAxis hide the position axis (default=false)
-         * @param {Boolean} options.hideSequence hide the sequence (defaut=false)
+         * @param {Boolean} options.hideSequence hide the sequence (default=false)
          * @param {Boolean} options.collapsible collapsible groupSets (default=false)
          * @param {Boolean} options.oneOffFix correct one off problem (default=false)
          * @param {Array} options.categoryOrder an array of String specifying the order in which should appear the categories (unspecified one will appear alpha numerically sorted)
@@ -2534,6 +2583,7 @@ define(
 
                 self.bubbleSequenceNb = 4;
                 self.clipperId = 'clipper_' + Math.round(100000 * Math.random());
+
                 if (self.options.collapsible) {
                     self.collapserSize = 15;
                     var collapserHalfWidth = self.collapserSize / 2.0;
@@ -2569,17 +2619,26 @@ define(
                  * add the callback to set the aabubble position and text (if needed)
                  */
                 if (!options.noPositionBubble) {
-                    xChangeCallbacks.push(function (i0, i1) {
+                    xChangeCallbacks.push(function (i0, i1, i2) {
+                        var imid = (i0 + i1) / 2;
+                        var xscales = self.viewport.scales.x;
                         var gbubbles = self.svg.selectAll('g.axis-bubble');
                         if (self.viewport.scales.font > 10) {
                             gbubbles.style('display', 'none');
+                            if (self.gCursorPosBubble) {
+                                self.gCursorPosBubble.style('display', null);
+                                var aaPos = Math.round(imid);
+                                var aaCode = self.model.get('sequence').substring(aaPos, aaPos + 1);
+                                self.gCursorPosBubble.selectAll('text').text("" + (aaPos + 1) + "," + aaCode);
+                                if (i2 !== undefined) {
+                                    self.gCursorPosBubble.attr('transform', 'translate(' + xscales(imid) + ',' + i2 + ')');
+                                }
+                            }
                             self.svg.select('line.sequence-bg').style('display', 'none');
-                            return
+                            return;
                         }
                         self.svg.select('line.sequence-bg').style('display', null);
 
-                        var imid = (i0 + i1) / 2;
-                        var xscales = self.viewport.scales.x;
                         if (imid < xscales.domain()[0] || imid > xscales.domain()[1]) {
                             gbubbles.style('display', 'none');
                             return;
@@ -2588,6 +2647,11 @@ define(
                         gbubbles.style('display', null);
                         if (self.gPosBubble) {
                             self.gPosBubble.selectAll('text').text(Math.round(imid + 1));
+                        }
+                        if (self.gCursorPosBubble) {
+                            var aaPos = Math.round(imid);
+                            var aaCode = self.model.get('sequence').substring(aaPos, aaPos + 1);
+                            self.gCursorPosBubble.selectAll('text').text("" + (aaPos + 1) + "," + aaCode);
                         }
 
                         if (self.gAABubble) {
@@ -2611,6 +2675,9 @@ define(
 
                         //                  gbubble.selectAll('text.subseq').data(subseq.split(''));
                         gbubbles.attr('transform', 'translate(' + xscales(imid) + ',10)');
+                        if (self.gCursorPosBubble && i2 !== undefined) {
+                        	self.gCursorPosBubble.attr('transform', 'translate(' + xscales(imid) + ',' + i2 + ')');
+                        }
                     });
 
                 }
@@ -2672,6 +2739,7 @@ define(
                 }
                 var xRight = ($(self.el).width() || $(document).width()) - self.margins.right;
                 self.clipPath.attr('d', 'M' + (self.margins.left - 15) + ',-100L' + (xRight + 15) + ',-100L' + (xRight + 15) + ',20000L' + (self.margins.left - 15) + ',20000');
+
                 // restore bubble positions
                 var gbubbles = self.svg.selectAll('g.axis-bubble');
                 gbubbles.each(function(d,i) {
@@ -2704,6 +2772,11 @@ define(
                 self.gPosBubble = self.axisContainer.append('g').attr('class', 'axis-bubble').style('display', 'none');
                 self.gPosBubble.append('rect').attr('x', -30).attr('y', -4).attr('width', 60).attr('height', 17)
                 self.gPosBubble.append('text').attr('class', 'pos').attr('y', 6);
+                if (self.options.cursorPositionBubble && !self.gCursorPosBubble) {
+                	self.gCursorPosBubble = self.drawContainer.append('g').attr('class', 'axis-bubble cursor-pos-bubble').style('display', 'none');
+                	self.gCursorPosBubble.append('rect').attr('x', -30).attr('y', -24).attr('width', 60).attr('height', 17)
+                	self.gCursorPosBubble.append('text').attr('class', 'pos').attr('y', -14);
+                }
 
             },
             /**
@@ -2770,16 +2843,16 @@ define(
                             if (!paddingGroupSetAdded && self.paddingGroupSet) {
                                 totTracks += self.paddingGroupSet;
                                 paddingGroupSetAdded = true;
-                        }
-                        var yshift = self.viewport.scales.y(totTracks + 1)
-                        view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
-                        if (view.model.get('isPlot')) {
-                            totHeight += view.height();
-                            totTracks += 1 + self.paddingCategory;
-                        } else {
-                            totTracks += view.height() + 1 + self.paddingCategory;
-                        }
-                        view.g.style('display', null);
+                            }
+                            var yshift = self.viewport.scales.y(totTracks + 1)
+                            view.g.attr("transform", 'translate(' + 0 + ',' + yshift + ")");
+                            if (view.model.get('isPlot')) {
+                                totHeight += view.height();
+                                totTracks += 1 + self.paddingCategory;
+                            } else {
+                                totTracks += view.height() + 1 + self.paddingCategory;
+                            }
+                            view.g.style('display', null);
                         }
                         else {
                             view.g.style('display', 'none');
@@ -2998,10 +3071,12 @@ define(
                     return 'groupset-title-' + (x || '').replace(/\W/g, '_');
                 })
                 if (self.options.collapsible) {
+                    var oldGroupSetStatuses = self.groupSetStatuses || {};
                     self.groupSetStatuses = [];
-                    _.each(groupSetNames, function (d, i) {
-                        self.groupSetStatuses[d] = {name:d,open:true};
-                    })
+                    _.each(groupSetNames, function (d) {
+                        var isOpen = oldGroupSetStatuses[d] === undefined ? true : oldGroupSetStatuses[d].open;
+                        self.groupSetStatuses[d] = {name:d,open:isOpen};
+                    });
                     self.collapseIcon = self.gGroupSets
                         .selectAll('polygon')
                         .data(groupSetNames)
@@ -3060,7 +3135,9 @@ define(
         });
 
         return SeqEntryAnnotInteractiveView;
-    });
+    })
+    
+;
 define(/**
      @exports SeqEntryFastaView
      @author Alexandre Masselot
